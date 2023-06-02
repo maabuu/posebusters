@@ -94,7 +94,7 @@ module_names:
   loading: "Loading"
   sanity: "Chemistry"
   identity: "Identity"
-  distance_geometry: "Distance geometry"
+  distance_geometry: "Geometry"
   flatness: "Flatness"
   intermolecular_distance: "Intermolecular distance"
   energy_ratio: "Energy ratio"
