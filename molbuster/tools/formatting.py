@@ -6,9 +6,10 @@ def _create_long_output(df: pd.DataFrame) -> str:
     df = df.T
     cols = df.columns
     output = ""
+    segments = []
     for col in cols:
-        output += "--> " + " ".join(col) + "\n"
-        output += df[[col]].to_string(index=True, header=False)
+        segments.append("--> " + " ".join(col) + "\n" + df[[col]].to_string(index=True, header=False))
+    output += "\n\n".join(segments)
     return output
 
 
