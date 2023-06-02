@@ -1,0 +1,107 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name =  "posebusters"
+authors = [
+    {name = "Martin Buttenschoen", email = "martin.buttenschoen@stats.ox.ac.uk"},
+]
+keywords =["posebusters", "docking", "tests", "metric"]
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
+requires-python = "~=3.7"
+dynamic = ["version", "description"]
+dependencies = [
+    'click',
+    'rdkit >= 2020.09',
+    'pandas',
+    'numpy',
+    'pyyaml',
+]
+
+[project.optional-dependencies]
+dev = [
+    "isort",
+    "black",
+]
+docs = [
+    "ipython",
+    "nbsphinx",
+    "sphinx_rtd_theme",
+    "sphinx",
+]
+test = [
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+]
+
+[project.urls]
+Documentation = "https://posebusters.readthedocs.io/en/latest/"
+Source = "https://github.com/maabuu/posebusters/"
+Tracker = "https://github.com/maabuu/posebusters/issues/"
+
+[project.scripts]
+bust = "posebusters.cli:bust"
+
+#[project.entry-points.posebusters]
+#bust = "posebusters.cli:bust"
+
+[tool.flit.module]
+name = "posebusters"
+
+[tool.isort]
+profile = "black"
+src_paths = ["posebusters", "tests"]
+
+[tool.black]
+line-length = 120
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.flake8]
+max-complexity = 10
+max-line-length = 120
+per-file-ignores = """
+    tests/*: D
+"""
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+fail_under = 100
+
+[tool.pytest.ini_options]
+addopts = "--cov-report xml:coverage.xml --cov posebusters --cov-fail-under 0 --cov-append -m 'not integration'"
+pythonpath = "posebusters"
+testpaths = "tests"
+
+[tool.pycln]
+all = false
+
+[tool.codespell]
+skip = '*.pdb,*.sdf,*.po,*.ts'
+count = ''
+quiet-level = 3
+
+[tool.bandit]
+number = 4
+recursive = true
+targets = "posebusters"
+skips = ['B101']

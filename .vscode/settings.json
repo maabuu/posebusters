@@ -1,0 +1,36 @@
+{
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "files.trimTrailingWhitespace": true,
+    "files.autoSave": "onFocusChange",
+    "git.autofetch": true,
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.analysis.typeCheckingMode": "basic",
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
+    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "black-formatter.args": [
+        "--config=pyproject.toml"
+    ],
+    "flake8.args": [
+        "--toml-config=pyproject.toml"
+    ],
+    "isort.args": [
+        "--settings-path=pyproject.toml"
+    ],
+    "pylint.args": [
+        "--rcfile=pyproject.toml"
+    ],
+    "autoDocstring.docstringFormat": "google-notypes",
+    "autoDocstring.generateDocstringOnEnter": true,
+    "autoDocstring.guessTypes": false,
+}

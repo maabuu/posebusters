@@ -1,0 +1,233 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "bust conditioned on protein and ligand",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1ia1/1ia1_ligand.sdf",
+                "-l",
+                "tests/conftest/1ia1/1ia1_ligands.sdf",
+                "-p",
+                "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb",
+            ]
+        },
+        {
+            "name": "bust conditioned on protein and ligand -- long",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1ia1/1ia1_ligand.sdf",
+                "-l",
+                "tests/conftest/1ia1/1ia1_ligands.sdf",
+                "-p",
+                "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust conditioned on protein",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1ia1/1ia1_ligand.sdf",
+                "-p",
+                "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb",
+            ]
+        },
+        {
+            "name": "bust unconditioned",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1ia1/1ia1_ligands.sdf",
+            ]
+        },
+        {
+            "name": "bust unconditioned - yael test case",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "/Users/Martin/Projects/posebusters/notebooks/yael_testcase_short.sdf",
+            ]
+        },
+        {
+            "name": "bust table input",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "-t",
+                "tests/conftest/sample_bust_docks_table.csv",
+            ]
+        },
+        {
+            "name": "bust table -- long",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "-t",
+                "tests/conftest/sample_bust_mols_table.csv",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust table -- csv",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "-t",
+                "tests/conftest/sample_bust_mols_table.csv",
+                "--outfmt",
+                "csv",
+            ]
+        },
+        {
+            "name": "Python: Debug Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "purpose": [
+                "debug-test"
+            ],
+            "stopOnEntry": false,
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "PYTEST_ADDOPTS": "--no-cov"
+            }
+        },
+        {
+            "name": "bust conditioned on protein and ligand -- 1ia1",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1IA1_TQ3/1IA1_TQ3_ligand.sdf",
+                "-l",
+                "tests/conftest/1IA1_TQ3/1IA1_TQ3_ligands.sdf",
+                "-p",
+                "tests/conftest/1IA1_TQ3/1IA1_TQ3_no_ligand_no_solvent.pdb",
+                "--outfmt",
+                "long",
+                "--full-report",
+            ]
+        },
+        {
+            "name": "bust conditioned on protein -- 1ia1",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1IA1_TQ3/1IA1_TQ3_ligand.sdf",
+                "-p",
+                "tests/conftest/1IA1_TQ3/1IA1_TQ3_no_ligand_no_solvent.pdb",
+            ]
+        },
+        {
+            "name": "bust conditioned on protein -- 1w1p crystal",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1W1P_GIO/1W1P_GIO_ligand.sdf",
+                "-l",
+                "tests/conftest/1W1P_GIO/1W1P_GIO_ligands.sdf",
+                "-p",
+                "tests/conftest/1W1P_GIO/1W1P_GIO_protein.pdb",
+                "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust conditioned on protein -- 1g9v gold",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1G9V_RQ3/1G9V_RQ3_gold_redock.sdf",
+                "-l",
+                "tests/conftest/1G9V_RQ3/1G9V_RQ3_ligands.sdf",
+                "-p",
+                "tests/conftest/1G9V_RQ3/1G9V_RQ3_protein.pdb",
+                "--top-n",
+                "1",
+                "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust conditioned on protein -- 1gkc",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "~/Datasets/PoseBuster/1GKC_NFH/1GKC_NFH_ligand.sdf",
+                "-l",
+                "~/Datasets/PoseBuster/1GKC_NFH/1GKC_NFH_ligands.sdf",
+                "-p",
+                "~/Datasets/PoseBuster/1GKC_NFH/1GKC_NFH_protein.pdb",
+                "--top-n",
+                "1",
+                "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        }
+    ]
+}

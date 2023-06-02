@@ -1,0 +1,5 @@
+name,mol_cond,mol_true,mol_pred
+1ia1,pdb/1ia1/1ia1_protein_one_lig_removed.pdb,pdb/1ia1/1ia1_ligands.sdf,pdb/1ia1/1ia1_ligand.sdf
+1of6,pdb/1of6/1of6_protein_one_lig_removed.pdb,pdb/1of6/1of6_ligands.sdf,pdb/1of6/1of6_ligand.sdf
+1s3v,pdb/1s3v/1s3v_protein_one_lig_removed.pdb,pdb/1s3v/1s3v_ligands.sdf,pdb/1s3v/1s3v_ligand.sdf
+1uou,pdb/1uou/1uou_protein_one_lig_removed.pdb,pdb/1uou/1uou_ligands.sdf,pdb/1uou/1uou_ligand.sdf
