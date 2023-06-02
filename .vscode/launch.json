@@ -1,0 +1,105 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "bust redock",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "molbuster",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "redock",
+                "tests/conftest/1ia1/1ia1_ligand.sdf",
+                "tests/conftest/1ia1/1ia1_ligands.sdf",
+                "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb",
+            ]
+        },
+        {
+            "name": "bust dock",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "molbuster",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "dock",
+                "tests/conftest/1ia1/1ia1_ligand.sdf",
+                "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb",
+            ]
+        },
+        {
+            "name": "bust mol",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "molbuster",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "mol",
+                "tests/conftest/1ia1/1ia1_ligands.sdf",
+            ]
+        },
+        {
+            "name": "bust mol - yael test case",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "molbuster",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "mol",
+                "/Users/Martin/Projects/molbuster/notebooks/yael_testcase_short.sdf",
+            ]
+        },
+        {
+            "name": "bust table",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "molbuster",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "table",
+                "tests/conftest/sample_bust_docks_table.csv",
+            ]
+        },
+        {
+            "name": "bust table",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "molbuster",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "table",
+                "tests/conftest/sample_bust_mols_table.csv",
+            ]
+        },
+        {
+            "name": "Python: Debug Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "purpose": [
+                "debug-test"
+            ],
+            "stopOnEntry": false,
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "PYTEST_ADDOPTS": "--no-cov"
+            }
+        }
+    ]
+}

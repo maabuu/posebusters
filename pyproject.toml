@@ -1,0 +1,109 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[project]
+name =  "molbuster"
+authors = [
+    {name = "Martin Buttenschoen", email = "martin.buttenschoen@stats.ox.ac.uk"},
+]
+keywords =["molbuster", "docking", "tests", "metric"]
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
+requires-python = "~=3.7"
+dynamic = ["version", "description"]
+dependencies = [
+    'rdkit >= 2020.09',
+    'pandas',
+    'numpy',
+    'tqdm',
+]
+
+[project.optional-dependencies]
+cli = [
+    "click",
+]
+dev = [
+    "isort",
+    "black",
+]
+docs = [
+    "ipython",
+    "nbsphinx",
+    "sphinx_rtd_theme",
+    "sphinx",
+]
+test = [
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+]
+
+[project.urls]
+Documentation = "https://github.com/maabuu/molbuster/tree/main#readme"
+Source = "https://github.com/maabuu/molbuster"
+Tracker = "https://github.com/maabuu/molbuster/issues"
+
+[project.scripts]
+bust = "molbuster.cli:bust"
+
+#[project.entry-points.molbuster]
+#bust = "molbuster.cli:bust"
+
+[tool.flit.module]
+name = "molbuster"
+
+[tool.isort]
+profile = "black"
+src_paths = ["molbuster", "tests"]
+
+[tool.black]
+line-length = 120
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.flake8]
+max-complexity = 10
+max-line-length = 120
+per-file-ignores = """
+    tests/*: D
+"""
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+fail_under = 100
+
+[tool.pytest.ini_options]
+addopts = "--cov-report xml:coverage.xml --cov molbuster --cov-fail-under 0 --cov-append -m 'not integration'"
+pythonpath = "molbuster"
+testpaths = "tests"
+
+[tool.pycln]
+all = false
+
+[tool.codespell]
+skip = '*.pdb,*.sdf,*.po,*.ts'
+count = ''
+quiet-level = 3
+
+[tool.bandit]
+number = 4
+recursive = true
+targets = "molbuster"
+skips = ['B101']

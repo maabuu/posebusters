@@ -1,0 +1,5 @@
+name,mol_pred
+1ia1,tests/conftest/1ia1/1ia1_ligand.sdf
+1of6,tests/conftest/1of6/1of6_ligand.sdf
+1s3v,tests/conftest/1s3v/1s3v_ligand.sdf
+1uou,tests/conftest/1uou/1uou_ligand.sdf
