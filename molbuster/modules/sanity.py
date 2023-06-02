@@ -1,7 +1,7 @@
 import pandas as pd
 from rdkit import RDLogger
 from rdkit.Chem.rdchem import Mol
-from rdkit.Chem.rdmolops import DetectChemistryProblems, SanitizeFlags, GetMolFrags
+from rdkit.Chem.rdmolops import DetectChemistryProblems, GetMolFrags, SanitizeFlags
 
 
 def check_chemistry(mol_pred: Mol) -> Mol:

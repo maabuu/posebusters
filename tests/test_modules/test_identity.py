@@ -37,20 +37,12 @@ def test_standardize_and_get_inchi():
     assert standardize_and_get_inchi(mol_ethane) == "InChI=1S/C2H6/c1-2/h1-2H3"
 
     # bond order matters
-    assert standardize_and_get_inchi(mol_ethane) != standardize_and_get_inchi(
-        mol_ethene
-    )
-    assert standardize_and_get_inchi(mol_benzene) != standardize_and_get_inchi(
-        mol_cyclohexane
-    )
+    assert standardize_and_get_inchi(mol_ethane) != standardize_and_get_inchi(mol_ethene)
+    assert standardize_and_get_inchi(mol_benzene) != standardize_and_get_inchi(mol_cyclohexane)
 
     # protonation state to be normalized
-    assert standardize_and_get_inchi(mol_ethylamine) == standardize_and_get_inchi(
-        mol_ethylaminium
-    )
-    assert standardize_and_get_inchi(mol_ethylamine) == standardize_and_get_inchi(
-        mol_ethanaminide
-    )
+    assert standardize_and_get_inchi(mol_ethylamine) == standardize_and_get_inchi(mol_ethylaminium)
+    assert standardize_and_get_inchi(mol_ethylamine) == standardize_and_get_inchi(mol_ethanaminide)
 
 
 def test_split_inchi():

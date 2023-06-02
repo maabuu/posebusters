@@ -1,6 +1,5 @@
 """MolBuster: Checking the chemical and physical sensibility of docked or generated molecules."""
 
-from molbuster.molbuster import MolBuster
 from molbuster.modules.distance_geometry import check_geometry
 from molbuster.modules.energy_ratio import check_energy_ratio
 from molbuster.modules.flatness import check_flatness
@@ -9,6 +8,7 @@ from molbuster.modules.intermolecular_distance import check_intermolecular_dista
 from molbuster.modules.loading import check_loading
 from molbuster.modules.rmsd import check_rmsd
 from molbuster.modules.volume_overlap import check_volume_overlap
+from molbuster.molbuster import MolBuster
 
 __all__ = [
     "MolBuster",
