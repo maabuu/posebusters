@@ -7,14 +7,16 @@ from molbuster.modules.identity import check_identity
 from molbuster.modules.intermolecular_distance import check_intermolecular_distance
 from molbuster.modules.loading import check_loading
 from molbuster.modules.rmsd import check_rmsd
+from molbuster.modules.sanity import check_chemistry
 from molbuster.modules.volume_overlap import check_volume_overlap
 from molbuster.molbuster import MolBuster
 
 __all__ = [
     "MolBuster",
-    "check_geometry",
+    "check_chemistry",
     "check_energy_ratio",
     "check_flatness",
+    "check_geometry",
     "check_identity",
     "check_intermolecular_distance",
     "check_loading",
