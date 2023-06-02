@@ -17,7 +17,6 @@ from rdkit.Chem.rdForceFieldHelpers import (
 from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D
 
 from ..tools.logging import CaptureLogger
-from ..tools.molecules import assert_sanity
 
 logger = logging.getLogger(__name__)
 
@@ -38,9 +37,6 @@ def check_energy_ratio(
     Returns:
         MolBuster results dictionary.
     """
-    # mol_pred = assert_sanity(deepcopy(mol_pred))
-    # mol_pred = AddHs(mol_pred, addCoords=True)
-    # AssignStereochemistryFrom3D(mol_pred)
     with CaptureLogger():
         inchi = MolToInchi(mol_pred)
     try:

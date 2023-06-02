@@ -52,7 +52,6 @@ def safe_supply_mols(path: Path, load_all=True, sanitize=True, **load_params) ->
     Returns:
         Molecule object or None if loading failed.
     """
-
     supplier = SDMolSupplier(str(path), sanitize=False, strictParsing=True)
     i = 0
     for mol in supplier:
@@ -75,7 +74,6 @@ def _load_mol(
     **params,
 ) -> Mol | None:
     """Load one molecule from a file, picking the right RDKit function."""
-
     if load_all and path.suffix == ".sdf":
         mol = _load_and_combine_mols(path, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
     elif load_all:
@@ -112,7 +110,6 @@ def _check_path(path: Path | str) -> Path:
 
 def _load_and_combine_mols(path: Path, sanitize=True, removeHs=True, strictParsing=True) -> Mol | None:
     """Load mols from SDF file and combine into one molecule."""
-
     supplier = SDMolSupplier(str(path), sanitize=sanitize, removeHs=removeHs, strictParsing=strictParsing)
 
     # warning: combines molecules within checking identity or atom order
@@ -135,7 +132,6 @@ def _process_mol(
     assign_stereo=True,
 ) -> Mol:
     """Load a molecule from a file, optionally adding hydrogens and assigning bond orders."""
-
     if mol is None:
         raise ValueError("Could not load molecule.")
 

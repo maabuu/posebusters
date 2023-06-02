@@ -1,3 +1,4 @@
+"""Module to check chemistry of molecules."""
 import pandas as pd
 from rdkit import RDLogger
 from rdkit.Chem.rdchem import Mol

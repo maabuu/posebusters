@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable
 
 import click
 import pandas as pd
@@ -61,7 +61,7 @@ def create_options_from_template_config() -> Callable:
 def bust(debug=False):
     """Run MolBuster from the command line."""
     if debug:
-        click.echo(f"Debug mode is on.")
+        click.echo("Debug mode is on.")
     # TODO: make debug show all output
     pass
 
