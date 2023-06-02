@@ -56,50 +56,66 @@ def create_options_from_template_config() -> Callable:
 
 
 @click.group(help="MolBuster: A tool for evaluating docking results.")
-def bust():
+@click.version_option()
+@click.option("--debug", default=False, is_flag=True, help="Show debug output.")
+def bust(debug=False):
     """Run MolBuster from the command line."""
+    if debug:
+        click.echo(f"Debug mode is on.")
+    # TODO: make debug show all output
     pass
 
 
-@click.command("redock", help="Check docked ligands against crystal protein and ligand.")
+@click.command("redock", help="Check docked ligand(s) against crystal protein and ligand.")
 @click.argument("mol_pred", type=click.Path(exists=True, path_type=Path))
 @click.argument("mol_true", type=click.Path(exists=True, path_type=Path))
 @click.argument("mol_cond", type=click.Path(exists=True, path_type=Path))
-@click.option("-c", "--config", type=click.File("r"))
-def bust_redock(mol_pred: Path, mol_true: Path, mol_cond: Path, config: dict[str, Any] = {}, __outfmt: str = "short"):
+@click.option("--outfmt", type=click.Choice(["short", "long", "csv"]), default="short")
+@click.option("--output", type=click.File("w"), default="-")
+@click.option("--config", type=click.File("r"))
+def bust_redock(mol_pred, mol_true, mol_cond, outfmt, output, config):
     """Run MolBuster on docked ligands with protein and native ligand."""
-    molbuster = MolBuster("redock").bust(mol_pred, mol_true, mol_cond)
-    _print_results(molbuster.results, __outfmt)
+    mode = "redock" if config is None else config
+    molbuster = MolBuster(mode).bust(mol_pred, mol_true, mol_cond)
+    _print_results(molbuster.results, outfmt)
 
 
-@click.command("dock", help="Check docked ligand with protein.")
+@click.command("dock", help="Check docked ligand(s) with protein.")
 @click.argument("mol_pred", nargs=1, type=click.Path(exists=True, path_type=Path))
-@click.argument("protein", nargs=1, type=click.Path(exists=True, path_type=Path))
-@click.argument("--outfmt", type=click.Choice(["short", "long", "csv"]), default="short")
-def bust_dock(mol_pred: Path, protein: Path, config: dict[str, Any] = {}, __outfmt: str = "short"):
+@click.argument("mol_cond", nargs=1, type=click.Path(exists=True, path_type=Path))
+@click.option("--outfmt", type=click.Choice(["short", "long", "csv"]), default="short")
+@click.option("--output", type=click.File("w"), default="-")
+@click.option("--config", type=click.File("r"))
+def bust_dock(mol_pred, mol_cond, outfmt, output, config):
     """Run MolBuster on docked ligands and protein."""
-    molbuster = MolBuster("dock").bust(mol_pred, None, protein)
-    _print_results(molbuster.results, __outfmt)
+    mode = "dock" if config is None else config
+    molbuster = MolBuster(mode).bust(mol_pred, None, mol_cond)
+    _print_results(molbuster.results, outfmt)
 
 
-@click.command("mol", help="Check molecules.")
+@click.command("mol", help="Check molecule(s).")
 @click.argument("molecule", type=click.Path(exists=True, path_type=Path))
-@click.argument("--outfmt", type=click.Choice(["short", "long", "csv"]), default="short")
-def bust_mol(molecule: list[Path], config: dict[str, Any] = {}, __outfmt: str = "short"):
+@click.option("--outfmt", type=click.Choice(["short", "long", "csv"]), default="short")
+@click.option("--output", type=click.File("w"), default="-")
+@click.option("--config", type=click.File("r"))
+def bust_mol(molecule, outfmt, output, config):
     """Run MolBuster on docked ligands only."""
-    molbuster = MolBuster("mol").bust(molecule, None, None)
-    _print_results(molbuster.results, __outfmt)
+    mode = "mol" if config is None else config
+    molbuster = MolBuster(mode).bust(molecule, None, None)
+    _print_results(molbuster.results, outfmt)
 
 
-@click.command("table", help="Run MolBuster on multiple inputs listed in a .csv file.")
+@click.command("table", help="Check files listed in .csv file.")
 @click.argument("table", type=click.Path(exists=True, path_type=Path))
-@click.argument("--outfmt", type=click.Choice(["short", "long", "csv"]), default="short")
-def bust_table(table: Path, config: dict[str, Any] = {}, __outfmt: str = "short"):
+@click.option("--outfmt", type=click.Choice(["short", "long", "csv"]), default="short")
+@click.option("--output", type=click.File("w"), default="-")
+@click.option("--config", type=click.File("r"))
+def bust_table(table: Path, outfmt, output, config):
     """Run MolBuster on multiple inputs listed in a .csv file."""
     file_paths = pd.read_csv(table, index_col=None)
-    mode = _select_mode(file_paths)
+    mode = _select_mode(file_paths) if config is None else config
     molbuster = MolBuster(mode).bust_table(file_paths)
-    _print_results(molbuster.results, __outfmt)
+    _print_results(molbuster.results, outfmt)
 
 
 bust.add_command(bust_dock)
@@ -110,25 +126,26 @@ bust.add_command(bust_table)
 
 def _print_results(df: pd.DataFrame, outfmt: str = "short"):
     if outfmt == "long":
-        click.echo(df.to_string(index=True, header=True))
+        _create_long_output(df)
     elif outfmt == "csv":
         click.echo(df.to_csv(index=True, header=True))
     elif outfmt == "short":
-        if df.shape[0] == 1:
-            click.echo("MolBuster test summary:")
-            click.echo(_create_single_output(df))
-        else:
-            click.echo("MolBuster test summary:")
-            click.echo(_create_short_results(df))
+        _create_short_results(df)
     else:
         raise ValueError(f"Unknown output format {outfmt}")
 
 
-def _create_single_output(df: pd.DataFrame) -> str:
-    return df.T.to_string(index=True, header=False)
+def _create_long_output(df: pd.DataFrame):
+    # return df.T.to_string(index=True, header=False)
+    df = df.T
+    cols = df.columns
+    click.echo("MolBuster test summary:")
+    for col in cols:
+        click.echo("--> " + " ".join(col))
+        click.echo(df[[col]].to_string(index=True, header=False))
 
 
-def _create_short_results(df: pd.DataFrame) -> str:
+def _create_short_results(df: pd.DataFrame):
     results = df.copy()
     results.columns = results.columns.to_flat_index()
     columns = results.columns
@@ -140,7 +157,9 @@ def _create_short_results(df: pd.DataFrame) -> str:
     # results.index.names = ("File", "Name")
     results.index.name = None
     results = results[["Passed tests"]]
-    return results.to_string(index=True, header=False)
+
+    click.echo("MolBuster test summary:")
+    click.echo(results.to_string(index=True, header=False))
 
 
 def _select_mode(file_paths: pd.DataFrame) -> str:
