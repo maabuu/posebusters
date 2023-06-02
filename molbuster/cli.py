@@ -2,11 +2,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable
 
 import click
 import pandas as pd
-from yaml import safe_load
 
 from .molbuster import MolBuster
 from .tools.formatting import _create_long_output, _create_short_results
@@ -15,45 +13,6 @@ from .tools.formatting import _create_long_output, _create_short_results
 def main():
     """Run MolBuster from the command line."""
     bust()
-
-
-def create_options_from_template_config() -> Callable:
-    """Create click options from template configuration file.
-
-    Returns:
-        Decorator that adds click options to a function.
-    """
-    config_options = safe_load(open(Path(__file__).parent / "config" / "template.yml")).get("parameters")
-
-    options = []
-    for module_name, module_conf in config_options.items():
-        for option_name, option_default in module_conf.items():
-            if isinstance(option_default, dict):
-                for sub_option_name, sub_option_default in option_default.items():
-                    name = module_name + "_" + option_name + "_" + sub_option_name
-                    options.append({"long": name, "required": False, "default": sub_option_default})
-            # elif isinstance(option_default, list):
-            #     name = module_name + "_" + option_name
-            #     _type = list[type(option_default[0])]
-            #     options.append({"long": name, "required": False,
-            #          "default": option_default, "nargs": -1, "type": _type})
-            # TODO: need to support lists ?
-            else:
-                name = module_name + "_" + option_name
-                options.append({"long": name, "required": False, "default": option_default})
-
-    def decorator(f):
-        for option in reversed(options):
-            args = ("--" + option["long"],)
-            kwargs = dict(
-                required=option["required"],
-                default=option["default"],
-                nargs=option.get("nargs", 1),
-            )
-            click.option(*args, **kwargs)(f)
-        return f
-
-    return decorator
 
 
 @click.group(help="MolBuster: A tool for evaluating docking results.")
