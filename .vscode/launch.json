@@ -73,7 +73,7 @@
             ]
         },
         {
-            "name": "bust table",
+            "name": "bust table -- long",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -83,6 +83,23 @@
             "args": [
                 "table",
                 "tests/conftest/sample_bust_mols_table.csv",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust table -- csv",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "molbuster",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "table",
+                "tests/conftest/sample_bust_mols_table.csv",
+                "--outfmt",
+                "csv",
             ]
         },
         {
