@@ -9,6 +9,7 @@ import pandas as pd
 from yaml import safe_load
 
 from .molbuster import MolBuster
+from .tools.formatting import _create_long_output, _create_short_results
 
 
 def main():
@@ -126,40 +127,15 @@ bust.add_command(bust_table)
 
 def _print_results(df: pd.DataFrame, outfmt: str = "short"):
     if outfmt == "long":
-        _create_long_output(df)
+        click.echo("MolBuster test summary:")
+        click.echo(_create_long_output(df))
     elif outfmt == "csv":
         click.echo(df.to_csv(index=True, header=True))
     elif outfmt == "short":
-        _create_short_results(df)
+        click.echo("MolBuster test summary:")
+        click.echo(_create_short_results(df))
     else:
         raise ValueError(f"Unknown output format {outfmt}")
-
-
-def _create_long_output(df: pd.DataFrame):
-    # return df.T.to_string(index=True, header=False)
-    df = df.T
-    cols = df.columns
-    click.echo("MolBuster test summary:")
-    for col in cols:
-        click.echo("--> " + " ".join(col))
-        click.echo(df[[col]].to_string(index=True, header=False))
-
-
-def _create_short_results(df: pd.DataFrame):
-    results = df.copy()
-    results.columns = results.columns.to_flat_index()
-    columns = results.columns
-    passes = results[columns].sum(axis=1)
-    # results = results.replace(True, ".").replace(False, "x").replace(np.nan, " ")
-    # results["Tests"] = results[columns].agg("".join, axis=1)
-    results["Passed tests"] = passes.apply(lambda x: f"passes ({x} / {len(columns)})")
-    results["Pass"] = results[columns].all(axis=1)
-    # results.index.names = ("File", "Name")
-    results.index.name = None
-    results = results[["Passed tests"]]
-
-    click.echo("MolBuster test summary:")
-    click.echo(results.to_string(index=True, header=False))
 
 
 def _select_mode(file_paths: pd.DataFrame) -> str:
