@@ -8,7 +8,7 @@ def _create_long_output(df: pd.DataFrame) -> str:
     output = ""
     segments = []
     for col in cols:
-        segments.append("--> " + " ".join(col) + "\n" + df[[col]].to_string(index=True, header=False))
+        segments.append("Long summary for " + " ".join(col) + "\n" + df[[col]].to_string(index=True, header=False))
     output += "\n\n".join(segments)
     return output
 
@@ -22,4 +22,4 @@ def _create_short_results(df: pd.DataFrame) -> str:
     results["Pass"] = results[columns].all(axis=1)
     results.index.name = None
     results = results[["Passed tests"]]
-    return results.to_string(index=True, header=False) + "\n"
+    return results.to_string(index=True, header=False)

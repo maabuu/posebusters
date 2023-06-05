@@ -121,7 +121,7 @@ test_names:
   distance_geometry:
     bond_lengths_within_bounds:       "Bond lengths within bounds"
     bond_angles_within_bounds:        "Bond angles within bounds"
-    no_internal_clash:                "No internal clash"
+    no_internal_clash:                "No internal steric clash"
   flatness:
     flatness_passes:                  "Aromatic rings flat"
   intermolecular_distance:

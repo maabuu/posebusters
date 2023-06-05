@@ -86,12 +86,10 @@ bust.add_command(bust_table)
 
 def _print_results(df: pd.DataFrame, outfmt: str = "short"):
     if outfmt == "long":
-        click.echo("MolBuster test summary:")
         click.echo(_create_long_output(df))
     elif outfmt == "csv":
         click.echo(df.to_csv(index=True, header=True))
     elif outfmt == "short":
-        click.echo("MolBuster test summary:")
         click.echo(_create_short_results(df))
     else:
         raise ValueError(f"Unknown output format {outfmt}")
