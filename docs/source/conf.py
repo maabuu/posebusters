@@ -6,8 +6,14 @@ project = "MolBuster"
 copyright = "2023, Martin Buttenschoen"
 author = "Martin Buttenschoen"
 
-release = "0.1"
-version = "0.1.0"
+# get version and release from library. ref https://peps.python.org/pep-0440/
+version, release = "major.minor.micro", "major.minor"
+with open("../../molbuster/__init__.py") as init_file:
+    for line in init_file:
+        if line.startswith("__version__"):
+            version = line.split("=")[1].strip().strip('"')
+            release = ".".join(version.split(".", 2)[:2])
+            break
 
 # -- General configuration ---------------------------------------------------
 
@@ -17,11 +23,13 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    # "sphinx.ext.autosectionlabel",
     "sphinx.ext.intersphinx",
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "nbsphinx",
+    "sphinxcontrib.programoutput",
 ]
 
 intersphinx_mapping = {
@@ -31,7 +39,7 @@ intersphinx_mapping = {
 intersphinx_disabled_domains = ["std"]
 
 templates_path = ["_templates"]
-exclude_patterns = ["build"]
+exclude_patterns = ["build", "_build", "Thumbs.db", ".DS_Store"]
 
 language = "en"
 
@@ -84,3 +92,6 @@ hoverxref_role_types = {
     "signal": "tooltip",
 }
 hoverxref_roles = ["command", "reqmeta", "setting", "signal"]
+
+# -- Options for programoutput extension -------------------------------------
+programoutput_prompt_template = ">>> {command}\n{output}"

@@ -1,9 +1,8 @@
 
-============================================================================================================
-MolBuster: checking the chemical and physical sensibility of generated molecules.
-============================================================================================================
+.. _checks:
 
-MolBuster can check the output of molecular conformation generators, docking programs, or other programs that generate molecules in 3D.
+Checks
+====================================
 
 .. |tetrahedral_stereo_fail| image:: images/tankbind_astex_1hww.png
    :height: 500 px
@@ -102,30 +101,70 @@ MolBuster can check the output of molecular conformation generators, docking pro
    :alt: Volume overlap true
 
 
-Sample checks
-====================================
+In molecular conformation generation or de-novo molecular generation, the generated molecule
+conformation should have a reasonable geometry including standard bond lengths and angles and
+no steric clash.
 
-For more information on the checks, see :ref:`checks`.
++---------------------------------------------+----------------------------------------+
+| Bond lengths                                                                         |
++---------------------------------------------+----------------------------------------+
+| |bond_lengths_fail|                         | |bond_lengths_true|                    |
+|                                             |                                        |
+| Bottom left carbon-oxygen bond too short    |                                        |
++---------------------------------------------+----------------------------------------+
+
++---------------------------------------------+----------------------------------------+
+| Bond angles                                                                          |
++---------------------------------------------+----------------------------------------+
+| |bond_angles_fail|                          | |bond_angles_true|                     |
+|                                             |                                        |
+| Bond angles off and atoms clashing          |                                        |
++---------------------------------------------+----------------------------------------+
 
 +---------------------------------------------+----------------------------------------+
 | Steric clash                                                                         |
 +---------------------------------------------+----------------------------------------+
-| Bad:                                        | Good:                                  |
-|                                             |                                        |
 | |internal_clash_fail|                       | |internal_clash_true|                  |
 |                                             |                                        |
 | Molecule intertwined and atoms clashing     |                                        |
 +---------------------------------------------+----------------------------------------+
 
 +---------------------------------------------+----------------------------------------+
-| Aromatic rings flatness                                                              |
+| High energy conformation                                                             |
 +---------------------------------------------+----------------------------------------+
-| Bad:                                        | Good:                                  |
+| |energy_ratio_fail|                         | |energy_ratio_true|                    |
 |                                             |                                        |
+| Twisted rings energetically unfavorable     |                                        |
++---------------------------------------------+----------------------------------------+
+
++---------------------------------------------+----------------------------------------+
+| Aromatic rings not flat                                                              |
++---------------------------------------------+----------------------------------------+
 | |flat_aromatics_fail|                       | |flat_aromatics_true|                  |
 |                                             |                                        |
 | Conjugated pi bond systems should be flat   |                                        |
 +---------------------------------------------+----------------------------------------+
+
+In docking the molecular identity should be preserved including stereochemistry.
+
++---------------------------------------------+----------------------------------------+
+| Tetrahedral stereochemistry changed                                                  |
++---------------------------------------------+----------------------------------------+
+| |tetrahedral_stereo_fail|                   | |tetrahedral_stereo_true|              |
+|                                             |                                        |
+| Top right oxygen facing the wrong way       |                                        |
++---------------------------------------------+----------------------------------------+
+
++---------------------------------------------+----------------------------------------+
+| Double bond stereochemistry changed                                                  |
++---------------------------------------------+----------------------------------------+
+| |double_bond_stereo_fail|                   | |double_bond_stereo_true|              |
+|                                             |                                        |
+| Right most double bond should be cis        |                                        |
++---------------------------------------------+----------------------------------------+
+
+In de-novo molecular generator or docking the generated molecule should be placed
+with in a receptor's binding pocket without any steric clash.
 
 +---------------------------------------------+----------------------------------------+
 | Volume overlap                              |                                        |
@@ -134,18 +173,3 @@ For more information on the checks, see :ref:`checks`.
 |                                             |                                        |
 | Ligand and receptor clash                   |                                        |
 +---------------------------------------------+----------------------------------------+
-
-
-For more information on the checks, see :ref:`checks`.
-
-Contents
-====================================
-
-.. toctree::
-   :maxdepth: 2
-
-   Quick start <quick_start>
-   Checks <checks>
-   Command line tool <cli>
-   Python library <python_library>
-   User API <api>

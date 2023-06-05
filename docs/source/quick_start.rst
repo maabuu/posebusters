@@ -3,78 +3,51 @@
 Quick start
 ====================================
 
-This quick start guide will show you how to install and use MolBuster to
-check the quality of your docking result.
 
-Install MolBuster
+Installation
 ====================================
 
-Installing ``molbuster`` will install the command-line tool and the Python library.
-MolBuster is available via PyPI_, conda-forge_ and GitHub_.
+MolBuster can be installed from PyPI.
 
 .. code-block:: bash
 
-   # install with pip from PyPI
-   pip install molbuster
-
-   # install with conda from conda-forge
-   conda install molbuster -c conda-forge
-
-   # install from source
-   git clone https://github.com/maabuu/molbuster.git
-   cd molbuster
-   pip install flit
-   flit install
-
-.. todo::
-   Create and publish pip and conda packages.
-
-.. note::
-    MolBuster requires Python 3.7 or higher and depends on RDKit_ and pandas_.
+   >>> pip install molbuster
 
 
-Check a docked molecule
+Usage
 ====================================
 
-MolBuster is called through the ``bust`` command-line tool and it provides several
-sub-commands, for testing different sets of molecules, and each one accepts a different
-set of arguments and options.
+MolBuster can be used as via the ``bust`` command or as a Python Library.
 
-.. code-block:: bash
+Use ``bust mol`` to check molecules without conditioning.
 
-    # check re-docked ligand (new ligand into protein).
-    bust redock mol_pred.sdf mol_true.sdf mol_cond.pdb
+.. command-output:: bust mol generated_molecules.sdf --outfmt short
+  :cwd: inputs
+  :ellipsis: 12
 
-    # check docked ligand (where crystal protein-ligand structure is known).
-    bust dock mol_pred.sdf protein.pdb
+.. command-output:: bust mol generated_molecules.sdf --outfmt long
+  :cwd: inputs
+  :ellipsis: 12
 
-    # check generated molecule (only check ligand).
-    bust mol molecule_pred.sdf
+Use ``bust dock`` to check docked ligands or generated molecules conditioned on a protein.
 
-    # check multiple of the three above using a .csv input:
-    bust table file_table.csv
+.. command-output:: bust dock generated_ligands.sdf protein.pdb --outfmt short
+  :cwd: inputs
+  :ellipsis: 12
 
+.. command-output:: bust dock generated_ligands.sdf protein.pdb --outfmt long
+  :cwd: inputs
+  :ellipsis: 12
 
-MolBuster can also be used as a Python library by using the ``MolBuster`` class
-which stores the test options, calls the tests, and combines the test results.
+Use ``bust redock`` to check a series of re-docked ligands against the crystal ligand and protein.
 
-.. code-block:: python
+.. command-output:: bust redock redocked_ligand.sdf crystal_ligand.sdf protein.pdb --outfmt short
+  :cwd: inputs
+  :ellipsis: 12
 
-    from molbuster import MolBuster
+.. command-output:: bust redock redocked_ligand.sdf crystal_ligand.sdf protein.pdb --outfmt long
+  :cwd: inputs
+  :ellipsis: 25
 
-    # check re-docked ligand and use crystal ligand and crystal protein
-    MolBuster().bust_redock(mol_pred, mol_true, mol_cond)
-
-    # check docked ligand or generated molecule and use protein
-    MolBuster().bust_dock(mol_pred, mol_cond)
-
-    # check a generated molecule
-    MolBuster().bust_dock(mol_pred)
-
-
-.. _conda-forge: https://github.com/conda-forge/molbuster
-.. _GitHub: https://github.com/maabuu/molbuster
-.. _PyPI: https://pypi.org/project/molbuster
-
-.. _pandas: https://pandas.pydata.org/
-.. _RDKit: https://RDKit.org/
+For more usage examples and bulk processing see the documentation for the `command line tool  <cli.rst>`_
+and the `Python library <python_library.ipynb>`_.
