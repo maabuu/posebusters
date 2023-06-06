@@ -36,7 +36,7 @@ def main():
     "-o", "--out", "output", type=click.File("w"), default="-", help="Output file. Prints to stdout by default."
 )
 @click.option("-c", "--config", type=click.File("r"), default=None, help="Configuration file.")
-@click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
+# @click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
 @click.version_option()
 def bust(table, outfmt, output, config, debug=False, **mol_args):
     """MolBuster: check generated 3D molecules with or without conditioning."""
@@ -45,6 +45,7 @@ def bust(table, outfmt, output, config, debug=False, **mol_args):
 
     if table is None and mol_args.get("mol_pred") is None:
         # check that an input was provided
+        click.echo("Provide either MOL_PRED or a table using the --table option.\n")
         click.echo(bust.get_help(click.Context(bust)))
         return None
     elif table is not None:
