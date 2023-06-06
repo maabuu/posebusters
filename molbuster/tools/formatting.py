@@ -13,7 +13,7 @@ def _create_long_output(df: pd.DataFrame) -> str:
     return output
 
 
-def _create_short_results(df: pd.DataFrame) -> str:
+def _create_short_output(df: pd.DataFrame) -> str:
     results = df.copy()
     results.columns = results.columns.to_flat_index()
     columns = results.columns

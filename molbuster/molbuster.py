@@ -24,6 +24,7 @@ from .modules.rmsd import check_rmsd
 from .modules.sanity import check_chemistry
 from .modules.volume_overlap import check_volume_overlap
 from .tools.loading import safe_load_mol, safe_supply_mols
+from .tools.formatting import _create_long_output, _create_short_output
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ class MolBuster:
     def __init__(self, config: str | dict = "dock"):
         """Initialize MolBuster object."""
         self.module_func: dict[str, Callable]
-        self.module_args: dict[str, tuple[str]]
+        self.module_args: dict[str, set[str]]
 
         if isinstance(config, str) and config in {"dock", "redock", "mol"}:
             logger.info(f"Using default configuration for mode {config}.")
@@ -60,7 +61,7 @@ class MolBuster:
             logger.error(f"Configuration {config} not valid. Provide either 'dock', 'redock', 'mol' or a dictionary.")
         assert len(set(self.config.get("tests", {}).keys()) - set(module_dict.keys())) == 0
 
-    def bust(self, mol_pred: Mol | Path, mol_true: Mol | Path | None, mol_cond: Mol | Path | None) -> MolBuster:
+    def bust(self, mol_pred: Mol | Path, mol_true: Mol | Path | None, mol_cond: Mol | Path | None):
         """Run all tests on one molecule.
 
         Args:
@@ -72,10 +73,9 @@ class MolBuster:
             MolBuster object.
         """
         self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond]], columns=["mol_pred", "mol_true", "mol_cond"])
-        self.run()
-        return self
+        return self._run()
 
-    def bust_table(self, mol_table: pd.Dataframe) -> MolBuster:
+    def bust_table(self, mol_table: pd.DataFrame):
         """Run all tests on multiple molecules provided in pandas dataframe as paths or rdkit molecule objects.
 
         Args:
@@ -85,64 +85,60 @@ class MolBuster:
             MolBuster object.
         """
         self.file_paths = mol_table
-        self.run()
-        return self
+        return self._run()
 
-    def run(self) -> MolBuster:
-        """Run all modules on all molecules.
+    def _run(self):
+        """Run all tests on molecules provided in file paths.
 
-        Returns:
-            MolBuster object.
+        Yields:
+            Generator of pandas dataframes with results.
         """
         self._initialize_modules()
 
-        cols = [c for c in self.file_paths if c in {"mol_true", "mol_pred", "mol_cond"}]
-        out = self.file_paths[cols].apply(lambda x: self._run_all_modules(**x), axis=1)
-        results = _unfold_results_entry(out, "results")
+        output = defaultdict(dict)
+        for i, paths in self.file_paths.iterrows():
+            mol_args = {}
+            if "mol_cond" in paths and paths["mol_cond"] is not None:
+                mol_cond_load_params = self.config.get("loading_options", {}).get("mol_cond", {})
+                mol_args["mol_cond"] = safe_load_mol(path=paths["mol_cond"], **mol_cond_load_params)
+            if "mol_true" in paths and paths["mol_true"] is not None:
+                mol_true_load_params = self.config.get("loading_options", {}).get("mol_true", {})
+                mol_args["mol_true"] = safe_load_mol(path=paths["mol_true"], **mol_true_load_params)
 
-        selected_columns = [(m, c) for m in self.config["tests"].keys() for c in self.config["tests"][m]]
-        missing_columns = [c for c in selected_columns if c not in results]
-        results[missing_columns] = np.nan
-        self.results = self._apply_column_names_from_config(results[selected_columns])
-        self.results_detail = self._apply_column_names_from_config(results)
+            mol_pred_load_params = self.config.get("loading_options", {}).get("mol_pred", {})
+            for i, mol_pred in enumerate(safe_supply_mols(paths["mol_pred"], **mol_pred_load_params)):
+                mol_args["mol_pred"] = mol_pred
 
-        return self
+                results_key = (str(paths["mol_pred"]), self._get_name(mol_pred, i))
+
+                for module_name in self.config.get("tests", {}).keys():
+                    # pick needed arguments for module
+                    module_args = self.module_args[module_name]
+                    args = {k: v for k, v in mol_args.items() if k in module_args}
+                    # loading takes all inputs
+                    if module_name == "loading":
+                        args = {k: args.get(k, None) for k in module_args}
+                    # check that no arguments are missing
+                    if module_name != "loading" and not all(args.get(m, None) for m in module_args):
+                        output[results_key][module_name] = {"results": {}}
+                        continue
+                    # run module
+                    module_results = self.module_func[module_name](**args)
+
+                    # add to all results
+                    output[results_key][module_name] = module_results
+
+                # return partial results to print progress
+                yield self._get_partial_output(output, results_key)
 
     def _initialize_modules(self):
         self.module_func = {}
         self.module_args = {}
         for module_name in self.config.get("tests").keys():
-            config = self.config.get("parameters", {}).get(module_name, {})
-            self.module_func[module_name] = partial(module_dict[module_name], **config)
-            self.module_args[module_name] = inspect.signature(module_dict[module_name]).parameters.keys()
-
-    def _run_all_modules(self, **paths):
-        output = defaultdict(dict)
-        mol_pred_load_params = self.config.get("loading_options", {}).get("mol_pred", {})
-
-        for i, mol_pred in enumerate(safe_supply_mols(paths["mol_pred"], **mol_pred_load_params)):
-            mol_args = {"mol_pred": mol_pred}
-            name = _get_name(mol_pred, i)
-            results_key = (str(paths["mol_pred"]), name)
-
-            if "mol_cond" in paths and paths["mol_cond"] is not None:
-                mol_cond_load_params = self.config.get("loading_options", {}).get("mol_cond", {})
-                mol_args["mol_cond"] = safe_load_mol(path=paths["mol_cond"], **mol_cond_load_params)
-
-            if "mol_true" in paths and paths["mol_true"] is not None:
-                mol_true_load_params = self.config.get("loading_options", {}).get("mol_true", {})
-                mol_args["mol_true"] = safe_load_mol(path=paths["mol_true"], **mol_true_load_params)
-
-            for module_name in self.config.get("tests", {}).keys():
-                # check that all arguments can be provided
-                args = {k: v for k, v in mol_args.items() if k in self.module_args[module_name]}
-                if any(m is None for m in args.values()) and module_name != "loading":
-                    output[results_key][module_name] = {"results": {}}
-                    continue
-
-                output[results_key][module_name] = self.module_func[module_name](**args)
-
-        return dict(output)
+            module_config = self.config.get("parameters", {}).get(module_name, {})
+            self.module_func[module_name] = partial(module_dict[module_name], **module_config)
+            module_args = set(inspect.signature(self.module_func[module_name]).parameters)
+            self.module_args[module_name] = module_args.intersection({"mol_pred", "mol_true", "mol_cond"})
 
     def _apply_column_names_from_config(self, df):
         module_names = self.config["module_names"]
@@ -152,20 +148,26 @@ class MolBuster:
         df.columns = pd.MultiIndex.from_tuples(cols)
         return df
 
+    def _get_partial_output(self, output, results_key) -> pd.DataFrame:
+        results = self._unfold_results_entry({results_key: output[results_key]}, "results")
+        selected_columns = [(m, c) for m in self.config["tests"].keys() for c in self.config["tests"][m]]
+        missing_columns = [c for c in selected_columns if c not in results]
+        results[missing_columns] = np.nan
+        results = self._apply_column_names_from_config(results[selected_columns])
+        return results
 
-def _unfold_results_entry(d, field):
-    # combine
-    dd = reduce(operator.ior, d)
-    # pick field
-    ddd = {k: {(kk, kkk): vvv for kk, vv in v.items() for kkk, vvv in vv[field].items()} for k, v in dd.items()}
-    # make df
-    return pd.DataFrame.from_dict(ddd, orient="index")
+    @staticmethod
+    def _unfold_results_entry(d, field):
+        # pick field
+        ddd = {k: {(kk, kkk): vvv for kk, vv in v.items() for kkk, vvv in vv[field].items()} for k, v in d.items()}
+        # make df
+        return pd.DataFrame.from_dict(ddd, orient="index")
 
-
-def _get_name(mol: Mol, i: int) -> str:
-    if mol is None:
-        return f"invalid_mol_at_pos_{i}"
-    elif mol.GetProp("_Name") == "":
-        return f"mol_at_pos_{i}"
-    else:
-        return mol.GetProp("_Name")
+    @staticmethod
+    def _get_name(mol: Mol, i: int) -> str:
+        if mol is None:
+            return f"invalid_mol_at_pos_{i}"
+        elif mol.GetProp("_Name") == "":
+            return f"mol_at_pos_{i}"
+        else:
+            return mol.GetProp("_Name")

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "bust redock",
+            "name": "bust conditioned on protein and ligand",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -13,14 +13,15 @@
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
-                "redock",
                 "tests/conftest/1ia1/1ia1_ligand.sdf",
+                "-l",
                 "tests/conftest/1ia1/1ia1_ligands.sdf",
+                "-p",
                 "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb",
             ]
         },
         {
-            "name": "bust dock",
+            "name": "bust conditioned on protein",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -28,13 +29,13 @@
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
-                "dock",
                 "tests/conftest/1ia1/1ia1_ligand.sdf",
+                "-p",
                 "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb",
             ]
         },
         {
-            "name": "bust mol",
+            "name": "bust unconditioned",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -42,12 +43,11 @@
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
-                "mol",
                 "tests/conftest/1ia1/1ia1_ligands.sdf",
             ]
         },
         {
-            "name": "bust mol - yael test case",
+            "name": "bust unconditioned - yael test case",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -55,12 +55,11 @@
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
-                "mol",
                 "/Users/Martin/Projects/molbuster/notebooks/yael_testcase_short.sdf",
             ]
         },
         {
-            "name": "bust table",
+            "name": "bust table input",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -68,7 +67,7 @@
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
-                "table",
+                "-t",
                 "tests/conftest/sample_bust_docks_table.csv",
             ]
         },
@@ -81,7 +80,7 @@
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
-                "table",
+                "-t",
                 "tests/conftest/sample_bust_mols_table.csv",
                 "--outfmt",
                 "long",
@@ -96,7 +95,7 @@
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
-                "table",
+                "-t",
                 "tests/conftest/sample_bust_mols_table.csv",
                 "--outfmt",
                 "csv",
