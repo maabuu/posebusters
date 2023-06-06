@@ -48,11 +48,12 @@ language = "en"
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     "collapse_navigation": False,
-    "display_version": False,
+    "display_version": True,
     "prev_next_buttons_location": "both",
     "sticky_navigation": True,
     # 'analytics_id': 'UA-45051049-3',
-    # 'navigation_depth': 2,
+    # "navigation_depth": 2,
+    "includehidden": False,
 }
 html_static_path = ["_static"]
 html_logo = "./_static/logo_square.png"
