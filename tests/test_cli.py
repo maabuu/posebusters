@@ -36,8 +36,8 @@ def test_bust_table() -> None:
 
 
 def test_consistency() -> None:
-    result_2 = runner.invoke(bust, [mol_conf_2, "--outfmt", "csv"])
-    result_3 = runner.invoke(bust, [mol_conf_3, "--outfmt", "csv"])
+    result_2 = runner.invoke(bust, [mol_conf_2, "--outfmt", "long"]).output.splitlines()[2:]
+    result_3 = runner.invoke(bust, [mol_conf_3, "--outfmt", "long"]).output.splitlines()[2:]
 
     # check numbers are approximately equal
-    assert result_3.output == result_2.output
+    assert result_2 == result_3
