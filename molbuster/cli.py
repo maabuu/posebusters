@@ -79,9 +79,9 @@ def _print_results(df: pd.DataFrame, outfmt: str = "short", index: int = 0):
 def _select_mode(columns: list[str]) -> str:
     # decide on mode to run for provided input table
     if "mol_pred" in columns and "mol_true" in columns and "mol_cond" in columns:
-        mode = "dock"
-    elif "mol_pred" in columns and ("protein" in columns) or ("mol_cond" in columns):
         mode = "redock"
+    elif "mol_pred" in columns and ("protein" in columns) or ("mol_cond" in columns):
+        mode = "dock"
     elif any(column in columns for column in ("mol_pred", "ligand", "molecules", "molecule")):
         mode = "mol"
     else:
