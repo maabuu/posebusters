@@ -41,8 +41,8 @@ def check_energy_ratio(
 
     try:
         SanitizeMol(mol_pred)
-    except Exception as e:
-        logger.warning(f"RDKit failed to sanitize molecule.")
+    except Exception:
+        logger.warning("RDKit failed to sanitize molecule.")
 
     with CaptureLogger():
         inchi = MolToInchi(mol_pred)
