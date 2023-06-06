@@ -52,7 +52,6 @@ def safe_supply_mols(path: Path, load_all=True, sanitize=True, **load_params) ->
     Returns:
         Molecule object or None if loading failed.
     """
-
     path = Path(path)
 
     if path.suffix == ".sdf":
