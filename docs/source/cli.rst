@@ -61,10 +61,10 @@ For copying and saving the output use the ``csv`` option.
 Saving the output
 ====================================
 
-The ``--out`` option can be used to save the output to a file.
+The ``--out`` option can be used to save the output to a file::
 
-.. command-output:: bust generated_molecules.sdf --outfmt csv --out results.csv
-  :cwd: inputs
+  bust generated_molecules.sdf --outfmt csv --out results.csv
+
 
 
 
