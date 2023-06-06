@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from click.testing import CliRunner
 
-from molbuster.cli import bust_dock, bust_mol, bust_redock, bust_table
+from molbuster.cli import bust
 
 runner = CliRunner()
 
@@ -13,20 +13,20 @@ mols_table = "tests/conftest/sample_bust_docks_table.csv"
 
 
 def test_bust_redocks() -> None:
-    result = runner.invoke(bust_redock, [mol_pred, mol_true, mol_cond])
+    result = runner.invoke(bust, [mol_pred, "-l", mol_true, "-p", mol_cond])
     assert result.exit_code == 0
 
 
 def test_bust_docks() -> None:
-    result = runner.invoke(bust_dock, [mol_pred, mol_cond])
+    result = runner.invoke(bust, [mol_pred, "-p", mol_cond])
     assert result.exit_code == 0
 
 
 def test_bust_mols() -> None:
-    result = runner.invoke(bust_mol, [mol_pred])
+    result = runner.invoke(bust, [mol_pred])
     assert result.exit_code == 0
 
 
 def test_bust_table() -> None:
-    result = runner.invoke(bust_table, [mols_table])
+    result = runner.invoke(bust, ["-t", mols_table])
     assert result.exit_code == 0
