@@ -29,7 +29,6 @@ dependencies = [
     'rdkit >= 2020.09',
     'pandas',
     'numpy',
-    'tqdm',
 ]
 
 [project.optional-dependencies]
