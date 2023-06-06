@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import numpy as np
 from click.testing import CliRunner
 
 from molbuster.cli import bust
-import numpy as np
 
 runner = CliRunner()
 

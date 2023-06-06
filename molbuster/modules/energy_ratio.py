@@ -4,8 +4,8 @@ from __future__ import annotations
 import logging
 from copy import deepcopy
 from functools import lru_cache
+
 import numpy as np
-from rdkit.Chem.rdmolops import SanitizeMol
 from rdkit import ForceField  # noqa: F401
 from rdkit.Chem.inchi import MolFromInchi, MolToInchi
 from rdkit.Chem.rdchem import Mol
@@ -14,7 +14,7 @@ from rdkit.Chem.rdForceFieldHelpers import (
     UFFGetMoleculeForceField,
     UFFOptimizeMoleculeConfs,
 )
-from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D
+from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D, SanitizeMol
 
 from ..tools.logging import CaptureLogger
 

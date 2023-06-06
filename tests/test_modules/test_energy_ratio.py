@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 import numpy as np
+
 from molbuster.modules.energy_ratio import check_energy_ratio
 
 
