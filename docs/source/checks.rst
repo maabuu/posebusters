@@ -101,7 +101,7 @@ Checks
    :alt: Volume overlap true
 
 
-In molecular conformation generation or de-novo molecular generation, the generated molecule
+In molecular conformation generation, docking, and de-novo molecular generation the generated molecules
 conformation should have a reasonable geometry including standard bond lengths and angles and
 no steric clash.
 
