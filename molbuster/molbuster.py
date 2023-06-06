@@ -23,8 +23,8 @@ from .modules.loading import check_loading
 from .modules.rmsd import check_rmsd
 from .modules.sanity import check_chemistry
 from .modules.volume_overlap import check_volume_overlap
-from .tools.loading import safe_load_mol, safe_supply_mols
 from .tools.formatting import _create_long_output, _create_short_output
+from .tools.loading import safe_load_mol, safe_supply_mols
 
 logger = logging.getLogger(__name__)
 
