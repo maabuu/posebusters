@@ -7,7 +7,7 @@ Command line tool
 ====================================
 
 MolBuster provides the command ``bust`` which has four subcommands ``mol``, ``dock``, ``redock``, and
-``table`` for checking generated molecules with different deafult settings for different types
+``table`` for checking generated molecules with different default settings for different types
 of conditioning and input.
 
 You can run all commands with no arguments to get more info

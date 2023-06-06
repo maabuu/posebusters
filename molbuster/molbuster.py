@@ -3,9 +3,8 @@ from __future__ import annotations
 
 import inspect
 import logging
-import operator
 from collections import defaultdict
-from functools import partial, reduce
+from functools import partial
 from pathlib import Path
 from typing import Callable
 
@@ -23,7 +22,6 @@ from .modules.loading import check_loading
 from .modules.rmsd import check_rmsd
 from .modules.sanity import check_chemistry
 from .modules.volume_overlap import check_volume_overlap
-from .tools.formatting import _create_long_output, _create_short_output
 from .tools.loading import safe_load_mol, safe_supply_mols
 
 logger = logging.getLogger(__name__)

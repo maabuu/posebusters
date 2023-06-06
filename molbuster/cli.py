@@ -38,7 +38,6 @@ def main():
 @click.version_option()
 def bust(table, outfmt, output, config, debug=False, **mol_args):
     """MolBuster: check generated 3D molecules with or without conditioning."""
-
     if debug:
         click.echo("Debug mode is on.")
 
