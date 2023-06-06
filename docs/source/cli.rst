@@ -6,46 +6,34 @@
 Command line tool
 ====================================
 
-MolBuster provides the command ``bust`` which has four subcommands ``mol``, ``dock``, ``redock``, and
-``table`` for checking generated molecules with different default settings for different types
-of conditioning and input.
+MolBuster provides the command ``bust`` for checking generated molecules
+and optionally taking a conditioning protein or ligands into account.
 
-You can run all commands with no arguments to get more info
-about each command.
-
+You can run ``bust`` with no arguments to get more info.
 
 .. command-output:: bust
 
+Use ``bust`` to check a series of molecules within one ``.sdf`` file.
 
-.. command-output:: bust redock
-  :returncode: 2
-
-
-
-Sub-commands
-====================================
-
-Use ``bust mol`` to check a series of molecules within one ``.sdf`` file.
-
-.. command-output:: bust mol generated_molecules.sdf --outfmt long
+.. command-output:: bust generated_molecules.sdf --outfmt long
   :cwd: inputs
   :ellipsis: 21
 
-Use ``bust dock`` to check a docked ligand or generated molecule conditioned on a protein.
+Check a docked ligand or generated molecule conditioned on a protein.
 
-.. command-output:: bust dock generated_ligands.sdf protein.pdb --outfmt long
+.. command-output:: bust generated_ligands.sdf -p protein.pdb --outfmt long
   :cwd: inputs
   :ellipsis: 21
 
-Use ``bust redock`` to check a series of re-docked ligands against the crystal ligand and protein.
+Check a series of re-docked ligands against the crystal ligand and protein.
 
-.. command-output:: bust redock redocked_ligand.sdf crystal_ligand.sdf protein.pdb --outfmt long
+.. command-output:: bust redocked_ligand.sdf -l crystal_ligand.sdf -p protein.pdb --outfmt long
   :cwd: inputs
   :ellipsis: 21
 
-Use ``bust table`` to bulk check multiple sets of files for any of the three modes above
+Use the `-t` option to bulk check multiple sets of files.
 
-.. command-output:: bust table molecule_table.csv --outfmt long
+.. command-output:: bust -t molecule_table.csv --outfmt long
   :cwd: inputs
   :ellipsis: 21
 
@@ -53,22 +41,31 @@ Use ``bust table`` to bulk check multiple sets of files for any of the three mod
 Output format options
 ====================================
 
+The short format is the default output format.
+
+.. command-output:: bust generated_molecules.sdf --outfmt short
+  :cwd: inputs
 
 The long format lists each test result for each molecule/conformation.
 
-.. command-output:: bust mol generated_molecules.sdf --outfmt long
+.. command-output:: bust generated_molecules.sdf --outfmt long
   :cwd: inputs
   :ellipsis: 21
 
-The short format is the default output format.
-
-.. command-output:: bust mol generated_molecules.sdf --outfmt short
-  :cwd: inputs
-
 For copying and saving the output use the ``csv`` option.
 
-.. command-output:: bust mol generated_molecules.sdf --outfmt csv
+.. command-output:: bust generated_molecules.sdf --outfmt csv
   :cwd: inputs
+
+
+Saving the output
+====================================
+
+The ``--out`` option can be used to save the output to a file.
+
+.. command-output:: bust generated_molecules.sdf --outfmt csv --out results.csv
+  :cwd: inputs
+
 
 
 Configuration settings

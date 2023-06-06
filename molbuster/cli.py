@@ -31,9 +31,11 @@ def main():
 @click.option(
     "-t", "--table", type=click.Path(exists=True, path_type=Path), help="Run multiple inputs listed in a .csv file."
 )
-@click.option("--outfmt", type=click.Choice(["short", "long", "csv"]), default="short", help="Output format.")
-@click.option("--output", type=click.File("w"), default="-", help="Output file.")
-@click.option("--config", type=click.File("r"), default=None, help="Configuration file.")
+@click.option("-f", "--outfmt", type=click.Choice(["short", "long", "csv"]), default="short", help="Output format.")
+@click.option(
+    "-o", "--out", "output", type=click.File("w"), default="-", help="Output file. Prints to stdout by default."
+)
+@click.option("-c", "--config", type=click.File("r"), default=None, help="Configuration file.")
 @click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
 @click.version_option()
 def bust(table, outfmt, output, config, debug=False, **mol_args):
@@ -58,19 +60,19 @@ def bust(table, outfmt, output, config, debug=False, **mol_args):
         molbuster_results = molbuster.bust(**mol_args)
 
     for i, result in enumerate(molbuster_results):
-        _print_results(result, outfmt, i)
+        output.write(_print_results(result, outfmt, i))
 
     pass
 
 
-def _print_results(df: pd.DataFrame, outfmt: str = "short", index: int = 0):
+def _print_results(df: pd.DataFrame, outfmt: str = "short", index: int = 0) -> str:
     if outfmt == "long":
-        click.echo(_create_long_output(df))
+        return _create_long_output(df)
     elif outfmt == "csv":
         header = True if index == 0 else False
-        click.echo(df.to_csv(index=True, header=header).strip("\n"))
+        return df.to_csv(index=True, header=header)
     elif outfmt == "short":
-        click.echo(_create_short_output(df))
+        return _create_short_output(df)
     else:
         raise ValueError(f"Unknown output format {outfmt}")
 

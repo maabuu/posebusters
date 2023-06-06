@@ -12,7 +12,7 @@ def _create_long_output(df: pd.DataFrame) -> str:
     for col in cols:
         segments.append("Long summary for " + " ".join(col) + "\n" + df[[col]].to_string(index=True, header=False))
     output += "\n\n".join(segments)
-    return output
+    return output + "\n"
 
 
 def _create_short_output(df: pd.DataFrame) -> str:
@@ -24,4 +24,4 @@ def _create_short_output(df: pd.DataFrame) -> str:
     results["Pass"] = results[columns].all(axis=1)
     results.index.name = None
     results = results[["Passed tests"]]
-    return results.to_string(index=True, header=False)
+    return results.to_string(index=True, header=False) + "\n"
