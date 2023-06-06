@@ -135,7 +135,7 @@ test_names:
     no_volume_clash:                  "No volume clash within threshold"
   energy_ratio:
     ensemble_avg_energy:              "Ensemble average energy"
-    mol_pred_energy:                  "Docked ligand energy"
+    mol_pred_energy:                  "Predicted conformation energy"
     energy_ratio:                     "Energy ratio"
     energy_ratio_passes:              "Energy ratio within threshold"
   rmsd:
