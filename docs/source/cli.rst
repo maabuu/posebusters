@@ -31,7 +31,7 @@ Check a series of re-docked ligands against the crystal ligand and protein.
   :cwd: inputs
   :ellipsis: 21
 
-Use the `-t` option to bulk check multiple sets of files.
+Use the ``-t`` option to bulk check multiple sets of files.
 
 .. command-output:: bust -t molecule_table.csv --outfmt long
   :cwd: inputs
