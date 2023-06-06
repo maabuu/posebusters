@@ -41,6 +41,8 @@ def check_energy_ratio(
 
     try:
         SanitizeMol(mol_pred)
+        AddHs(mol_pred, addCoords=True)
+        # TODO: optimize only hydrogens
     except Exception:
         logger.warning("RDKit failed to sanitize molecule.")
 
