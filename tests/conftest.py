@@ -39,3 +39,13 @@ def protein_2bm2():
     return MolFromPDBFile(
         "tests/conftest/mol_2bm2_protein_one_ligand_removed.pdb", sanitize=False, removeHs=False, proximityBonding=False
     )
+
+
+@pytest.fixture
+def mol_1a30_clash_2():
+    return MolFromMolFile("tests/conftest/mol_1a30_clash_2.sdf")
+
+
+@pytest.fixture
+def mol_1a30_clash_3():
+    return MolFromMolFile("tests/conftest/mol_1a30_clash_3.sdf")

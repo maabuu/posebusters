@@ -4,8 +4,8 @@ from __future__ import annotations
 import logging
 from copy import deepcopy
 from functools import lru_cache
-
 import numpy as np
+from rdkit.Chem.rdmolops import SanitizeMol
 from rdkit import ForceField  # noqa: F401
 from rdkit.Chem.inchi import MolFromInchi, MolToInchi
 from rdkit.Chem.rdchem import Mol
@@ -37,8 +37,16 @@ def check_energy_ratio(
     Returns:
         MolBuster results dictionary.
     """
+    mol_pred = deepcopy(mol_pred)
+
+    try:
+        SanitizeMol(mol_pred)
+    except Exception as e:
+        logger.warning(f"RDKit failed to sanitize molecule.")
+
     with CaptureLogger():
         inchi = MolToInchi(mol_pred)
+
     try:
         conf_energy = get_conf_energy(mol_pred)
     except Exception as e:
