@@ -29,7 +29,7 @@ dependencies = [
     'rdkit >= 2020.09',
     'pandas',
     'numpy',
-    'yaml',
+    'pyyaml',
 ]
 
 [project.optional-dependencies]
