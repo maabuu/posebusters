@@ -61,6 +61,7 @@ def check_geometry(
     if sanitize:
         SanitizeMol(mol)
     else:
+        # also removes stereochemistry information which we check elsewhere
         mol = remove_all_charges_and_hydrogens(mol)
 
     # get bonds and angles
