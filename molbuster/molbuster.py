@@ -44,7 +44,7 @@ molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 class MolBuster:
     """Class to run all tests on a set of molecules."""
 
-    def __init__(self, config: str | dict = "dock"):
+    def __init__(self, config: str | dict = "dock", debug: bool = False):
         """Initialize MolBuster object."""
         self.module_func: dict[str, Callable]
         self.module_args: dict[str, set[str]]
