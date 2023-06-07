@@ -58,6 +58,15 @@ For copying and saving the output use the ``csv`` option.
   :cwd: inputs
 
 
+For the ``csv`` and ``long`` option, the ``--full-report`` option can
+be used to show extra information beyond the pass/fail status of each test.
+
+.. command-output:: bust generated_molecules.sdf --outfmt csv --full-report
+  :cwd: inputs
+  :ellipsis: 21
+
+
+
 Saving the output
 ====================================
 
