@@ -38,13 +38,9 @@ def check_energy_ratio(
         MolBuster results dictionary.
     """
     mol_pred = deepcopy(mol_pred)
-
-    try:
-        SanitizeMol(mol_pred)
-        AddHs(mol_pred, addCoords=True)
-        # TODO: optimize only hydrogens
-    except Exception:
-        logger.warning("RDKit failed to sanitize molecule.")
+    SanitizeMol(mol_pred)
+    AddHs(mol_pred, addCoords=True)
+    # TODO: optimize only hydrogens
 
     with CaptureLogger():
         inchi = MolToInchi(mol_pred)
