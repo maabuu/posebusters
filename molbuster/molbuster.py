@@ -121,7 +121,7 @@ class MolBuster:
                         args = {k: args.get(k, None) for k in module_args}
                     # run module when all needed input molecules are valid Mol objects
                     if module_name != "loading" and not all(args.get(m, None) for m in module_args):
-                        module_output = {"results": {}}
+                        module_output: dict[str, Any] = {"results": {}}
                     else:
                         module_output = self.module_func[module_name](**args)
 
