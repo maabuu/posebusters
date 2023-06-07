@@ -7,7 +7,7 @@ import click
 import pandas as pd
 
 from .molbuster import MolBuster
-from .tools.formatting import _create_long_output, _create_short_output
+from .tools.formatting import create_long_output, create_short_output
 
 
 def main():
@@ -68,12 +68,12 @@ def bust(table, outfmt, output, config, debug=False, **mol_args):
 
 def _print_results(df: pd.DataFrame, outfmt: str = "short", index: int = 0) -> str:
     if outfmt == "long":
-        return _create_long_output(df)
+        return create_long_output(df)
     elif outfmt == "csv":
         header = True if index == 0 else False
         return df.to_csv(index=True, header=header)
     elif outfmt == "short":
-        return _create_short_output(df)
+        return create_short_output(df)
     else:
         raise ValueError(f"Unknown output format {outfmt}")
 
