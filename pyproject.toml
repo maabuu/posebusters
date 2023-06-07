@@ -26,6 +26,7 @@ classifiers = [
 requires-python = "~=3.7"
 dynamic = ["version", "description"]
 dependencies = [
+    'click',
     'rdkit >= 2020.09',
     'pandas',
     'numpy',
@@ -33,9 +34,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-cli = [
-    "click",
-]
 dev = [
     "isort",
     "black",
