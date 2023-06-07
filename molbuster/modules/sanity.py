@@ -14,7 +14,7 @@ def check_chemistry(mol_pred: Mol) -> Mol:
     Returns:
         MolBuster results dictionary.
     """
-    assert mol_pred is not None
+    assert isinstance(mol_pred, Mol)
 
     RDLogger.DisableLog("rdApp.*")
     errors = DetectChemistryProblems(mol_pred, sanitizeOps=SanitizeFlags.SANITIZE_ALL)

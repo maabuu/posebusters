@@ -28,8 +28,8 @@ def check_rmsd(mol_pred: Mol, mol_true: Mol, rmsd_threshold: float = 2.0) -> dic
     Returns:
         MolBuster results dictionary.
     """
-    assert mol_true is not None, "Ground truth molecule is missing."
-    assert mol_pred is not None, "Predicted molecule is missing."
+    assert isinstance(mol_true, Mol), "Ground truth molecule is missing."
+    assert isinstance(mol_pred, Mol), "Predicted molecule is missing."
     num_conf = mol_true.GetNumConformers()
     assert num_conf > 0, "Crystal ligand needs at least one conformer."
     assert mol_pred.GetNumConformers() == 1, "Docked ligand should only have one conformer."

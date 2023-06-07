@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from rdkit.Chem.rdchem import Mol
+
 
 def check_loading(mol_pred: Any = None, mol_true: Any = None, mol_cond: Any = None) -> dict[str, dict[str, bool]]:
     """Check that molecule files were loaded successfully.
@@ -16,8 +18,8 @@ def check_loading(mol_pred: Any = None, mol_true: Any = None, mol_cond: Any = No
         MolBuster results dictionary.
     """
     results = {
-        "mol_pred_loaded": mol_pred is not None,
-        "mol_true_loaded": mol_true is not None,
-        "mol_cond_loaded": mol_cond is not None,
+        "mol_pred_loaded": isinstance(mol_pred, Mol),
+        "mol_true_loaded": isinstance(mol_true, Mol),
+        "mol_cond_loaded": isinstance(mol_cond, Mol),
     }
     return {"results": results}
