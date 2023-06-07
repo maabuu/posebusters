@@ -57,7 +57,7 @@ def safe_supply_mols(path: Path, load_all=True, sanitize=True, **load_params) ->
     if path.suffix == ".sdf":
         pass
     elif path.suffix in {".mol", ".mol2"}:
-        return safe_load_mol(path, sanitize=True, **load_params)
+        yield safe_load_mol(path, sanitize=True, **load_params)
     else:
         raise ValueError(f"Molecule file {path} has unknown format. Only .sdf, .mol and .mol2 are supported.")
 
