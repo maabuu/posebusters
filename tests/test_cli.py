@@ -11,6 +11,7 @@ mol_true = "tests/conftest/1ia1/1ia1_ligands.sdf"
 mol_cond = "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb"
 mols_table = "tests/conftest/sample_bust_docks_table.csv"
 
+mol_1a30_ligand = "tests/conftest/mol_1a30_ligand.mol2"
 mol_conf_2 = "tests/conftest/mol_1a30_clash_2.sdf"
 mol_conf_3 = "tests/conftest/mol_1a30_clash_3.sdf"
 

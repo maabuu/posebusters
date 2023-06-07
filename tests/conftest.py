@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from rdkit.Chem.rdmolfiles import MolFromMolFile, MolFromPDBFile
+from rdkit.Chem.rdmolfiles import MolFromMol2File, MolFromMolFile, MolFromPDBFile
 
 
 @pytest.fixture
@@ -42,10 +42,15 @@ def protein_2bm2():
 
 
 @pytest.fixture
+def mol_1a30_ligand():
+    return MolFromMol2File("tests/conftest/mol_1a30_ligand.mol2", sanitize=False)
+
+
+@pytest.fixture
 def mol_1a30_clash_2():
-    return MolFromMolFile("tests/conftest/mol_1a30_clash_2.sdf")
+    return MolFromMolFile("tests/conftest/mol_1a30_clash_2.sdf", sanitize=False)
 
 
 @pytest.fixture
 def mol_1a30_clash_3():
-    return MolFromMolFile("tests/conftest/mol_1a30_clash_3.sdf")
+    return MolFromMolFile("tests/conftest/mol_1a30_clash_3.sdf", sanitize=False)
