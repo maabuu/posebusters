@@ -10,6 +10,7 @@ import pandas as pd
 from rdkit.Chem.Lipinski import RotatableBondSmarts
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdDistGeom import GetMoleculeBoundsMatrix
+from rdkit.Chem.rdmolops import SanitizeMol
 
 from ..tools.molecules import remove_all_charges_and_hydrogens
 from ..tools.stats import bape, bpe, pe
@@ -37,6 +38,7 @@ def check_geometry(
     threshold_bad_angle: float = 0.2,
     bound_matrix_params: dict[str, Any] = bound_matrix_params,
     ignore_hydrogens: bool = True,
+    sanitize: bool = False,
 ) -> dict[str, Any]:
     """Use RDKit distance geometry bounds to check the geometry of a molecule.
 
@@ -52,39 +54,42 @@ def check_geometry(
     Returns:
         MolBuster results dictionary.
     """
-    molecule = deepcopy(mol_pred)
-    assert molecule.GetNumConformers() == 1, "Molecule must have exactly one conformer."
+    mol = deepcopy(mol_pred)
+    assert mol.GetNumConformers() == 1, "Molecule must have exactly one conformer."
 
-    # remove hydrogens, charges, stereochemistry tags
-    molecule = remove_all_charges_and_hydrogens(molecule)
+    # sanitize to ensure DG works or manually process molecule
+    if sanitize:
+        SanitizeMol(mol)
+    else:
+        mol = remove_all_charges_and_hydrogens(mol)
 
     # get bonds and angles
-    bond_set = sorted(_get_bond_atom_indices(molecule))  # tuples
+    bond_set = sorted(_get_bond_atom_indices(mol))  # tuples
     angles = sorted(_get_angle_atom_indices(bond_set))  # triples
     angle_set = {(a[0], a[2]): a for a in angles}  # {tuples : triples}
 
     # distance geometry bounds, lower triangle min distances, upper triangle max distances
-    bounds = GetMoleculeBoundsMatrix(molecule, **bound_matrix_params)
+    bounds = GetMoleculeBoundsMatrix(mol, **bound_matrix_params)
 
     # indices
-    lower_triangle_idcs = np.tril_indices(molecule.GetNumAtoms(), k=-1)
+    lower_triangle_idcs = np.tril_indices(mol.GetNumAtoms(), k=-1)
     upper_triangle_idcs = (lower_triangle_idcs[1], lower_triangle_idcs[0])
 
     # 1,2- distances
     df_12 = pd.DataFrame()
     df_12["atom_pair"] = list(zip(*upper_triangle_idcs))  # indices have i1 < i2
     df_12["atom_types"] = [
-        "--".join(tuple(molecule.GetAtomWithIdx(int(j)).GetSymbol() for j in i)) for i in df_12["atom_pair"]
+        "--".join(tuple(mol.GetAtomWithIdx(int(j)).GetSymbol() for j in i)) for i in df_12["atom_pair"]
     ]
     df_12["angle"] = df_12["atom_pair"].apply(lambda x: angle_set.get(x, None))
-    df_12["has_hydrogen"] = [_has_hydrogen(molecule, i) for i in df_12["atom_pair"]]
+    df_12["has_hydrogen"] = [_has_hydrogen(mol, i) for i in df_12["atom_pair"]]
     df_12["is_bond"] = [i in bond_set for i in df_12["atom_pair"]]
     df_12["is_angle"] = df_12["angle"].apply(lambda x: x is not None)
     df_12[col_lb] = bounds[lower_triangle_idcs]
     df_12[col_ub] = bounds[upper_triangle_idcs]
 
     # add observed dimensions
-    conformer = molecule.GetConformer()
+    conformer = mol.GetConformer()
     conf_distances = _pairwise_distance(conformer.GetPositions())
     df_12["conf_id"] = conformer.GetId()
     df_12["distance"] = conf_distances[lower_triangle_idcs]
