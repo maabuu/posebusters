@@ -36,9 +36,10 @@ def main():
     "-o", "--out", "output", type=click.File("w"), default="-", help="Output file. Prints to stdout by default."
 )
 @click.option("-c", "--config", type=click.File("r"), default=None, help="Configuration file.")
-# @click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
+@click.option("--full-report", type=bool, default=False, is_flag=True, help="Print full report.")
+@click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
 @click.version_option()
-def bust(table, outfmt, output, config, debug=False, **mol_args):
+def bust(table, outfmt, output, config, debug, full_report, **mol_args):
     """MolBuster: check generated 3D molecules with or without conditioning."""
     if debug:
         click.echo("Debug mode is on.")
@@ -52,7 +53,7 @@ def bust(table, outfmt, output, config, debug=False, **mol_args):
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
         mode = _select_mode(file_paths.columns.tolist()) if config is None else config
-        molbuster = MolBuster(mode)
+        molbuster = MolBuster(mode, debug=debug)
         molbuster_results = molbuster.bust_table(file_paths)
     else:
         # run on file inputs
@@ -60,13 +61,45 @@ def bust(table, outfmt, output, config, debug=False, **mol_args):
         molbuster = MolBuster(mode)
         molbuster_results = molbuster.bust(**mol_args)
 
-    for i, result in enumerate(molbuster_results):
-        output.write(_print_results(result, outfmt, i))
+    config = molbuster.config
+    config_columns = [(m, c) for m in config["tests"].keys() for c in config["tests"][m]]
 
-    pass
+    for i, results_dict in enumerate(molbuster_results):
+        results = _dataframe_from_output(results_dict, "results")
+
+        missing_columns = [c for c in config_columns if c not in results.columns]
+        results[missing_columns] = pd.NA
+        selected_columns = config_columns if not full_report or outfmt == "short" else results.columns
+
+        results = results[selected_columns]
+        results = _apply_column_names_from_config(results, config)
+        output.write(_format_results(results, outfmt, i))
 
 
-def _print_results(df: pd.DataFrame, outfmt: str = "short", index: int = 0) -> str:
+def _dataframe_from_output(results_dict, field):
+    return pd.DataFrame.from_dict(
+        {
+            id: {
+                (module_name, result_name): result_value
+                for module_name, module_results in results.items()
+                for result_name, result_value in module_results.items()
+            }
+            for id, results in results_dict.items()
+        },
+        orient="index",
+    )
+
+
+def _apply_column_names_from_config(df, config):
+    module_names = config["module_names"]
+    test_names = config["test_names"]
+    cols = df.columns
+    cols = [(module_names.get(module, module), test_names.get(module, {}).get(test, test)) for module, test in cols]
+    df.columns = pd.MultiIndex.from_tuples(cols)
+    return df
+
+
+def _format_results(df: pd.DataFrame, outfmt: str = "short", index: int = 0) -> str:
     if outfmt == "long":
         return create_long_output(df)
     elif outfmt == "csv":

@@ -6,9 +6,8 @@ import logging
 from collections import defaultdict
 from functools import partial
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable, Generator
 
-import numpy as np
 import pandas as pd
 from rdkit.Chem.rdchem import Mol
 from yaml import safe_load
@@ -59,7 +58,12 @@ class MolBuster:
             logger.error(f"Configuration {config} not valid. Provide either 'dock', 'redock', 'mol' or a dictionary.")
         assert len(set(self.config.get("tests", {}).keys()) - set(module_dict.keys())) == 0
 
-    def bust(self, mol_pred: Mol | Path, mol_true: Mol | Path | None, mol_cond: Mol | Path | None):
+        self.results: dict[tuple[str, str], dict[str, Any]] = defaultdict(dict)
+        self.details: dict[tuple[str, str], Any] = defaultdict(dict)
+
+    def bust(
+        self, mol_pred: Mol | Path, mol_true: Mol | Path | None, mol_cond: Mol | Path | None
+    ) -> Generator[dict, None, None]:
         """Run all tests on one molecule.
 
         Args:
@@ -73,7 +77,7 @@ class MolBuster:
         self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond]], columns=["mol_pred", "mol_true", "mol_cond"])
         return self._run()
 
-    def bust_table(self, mol_table: pd.DataFrame):
+    def bust_table(self, mol_table: pd.DataFrame) -> Generator[dict, None, None]:
         """Run all tests on multiple molecules provided in pandas dataframe as paths or rdkit molecule objects.
 
         Args:
@@ -85,7 +89,7 @@ class MolBuster:
         self.file_paths = mol_table
         return self._run()
 
-    def _run(self):
+    def _run(self) -> Generator[dict, None, None]:
         """Run all tests on molecules provided in file paths.
 
         Yields:
@@ -93,7 +97,6 @@ class MolBuster:
         """
         self._initialize_modules()
 
-        output = defaultdict(dict)
         for i, paths in self.file_paths.iterrows():
             mol_args = {}
             if "mol_cond" in paths and paths["mol_cond"] is not None:
@@ -116,20 +119,20 @@ class MolBuster:
                     # loading takes all inputs
                     if module_name == "loading":
                         args = {k: args.get(k, None) for k in module_args}
-                    # check that no arguments are missing
+                    # run module when all needed input molecules are valid Mol objects
                     if module_name != "loading" and not all(args.get(m, None) for m in module_args):
-                        output[results_key][module_name] = {"results": {}}
-                        continue
-                    # run module
-                    module_results = self.module_func[module_name](**args)
+                        module_output = {"results": {}}
+                    else:
+                        module_output = self.module_func[module_name](**args)
 
-                    # add to all results
-                    output[results_key][module_name] = module_results
+                    # save to object
+                    self.results[results_key][module_name] = module_output["results"]
+                    self.details[results_key][module_name] = module_output.get("details", {})
 
-                # return partial results to print progress
-                yield self._get_partial_output(output, results_key)
+                # return results for this entry
+                yield {results_key: self.results[results_key]}
 
-    def _initialize_modules(self):
+    def _initialize_modules(self) -> None:
         self.module_func = {}
         self.module_args = {}
         for module_name in self.config.get("tests").keys():
@@ -137,29 +140,6 @@ class MolBuster:
             self.module_func[module_name] = partial(module_dict[module_name], **module_config)
             module_args = set(inspect.signature(self.module_func[module_name]).parameters)
             self.module_args[module_name] = module_args.intersection({"mol_pred", "mol_true", "mol_cond"})
-
-    def _apply_column_names_from_config(self, df):
-        module_names = self.config["module_names"]
-        test_names = self.config["test_names"]
-        cols = df.columns
-        cols = [(module_names.get(module, module), test_names.get(module, {}).get(test, test)) for module, test in cols]
-        df.columns = pd.MultiIndex.from_tuples(cols)
-        return df
-
-    def _get_partial_output(self, output, results_key) -> pd.DataFrame:
-        results = self._unfold_results_entry({results_key: output[results_key]}, "results")
-        selected_columns = [(m, c) for m in self.config["tests"].keys() for c in self.config["tests"][m]]
-        missing_columns = [c for c in selected_columns if c not in results]
-        results[missing_columns] = np.nan
-        results = self._apply_column_names_from_config(results[selected_columns])
-        return results
-
-    @staticmethod
-    def _unfold_results_entry(d, field):
-        # pick field
-        ddd = {k: {(kk, kkk): vvv for kk, vv in v.items() for kkk, vvv in vv[field].items()} for k, v in d.items()}
-        # make df
-        return pd.DataFrame.from_dict(ddd, orient="index")
 
     @staticmethod
     def _get_name(mol: Mol, i: int) -> str:
