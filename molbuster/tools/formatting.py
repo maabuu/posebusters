@@ -3,8 +3,15 @@
 import pandas as pd
 
 
-def _create_long_output(df: pd.DataFrame) -> str:
-    # return df.T.to_string(index=True, header=False)
+def create_long_output(df: pd.DataFrame) -> str:
+    """Create a detailed output string for the long Molbuster reporting format.
+
+    Args:
+        df: Report dataframe.
+
+    Returns:
+        String with detailed report.
+    """
     df = df.T
     cols = df.columns
     output = ""
@@ -15,7 +22,15 @@ def _create_long_output(df: pd.DataFrame) -> str:
     return output + "\n"
 
 
-def _create_short_output(df: pd.DataFrame) -> str:
+def create_short_output(df: pd.DataFrame) -> str:
+    """Create a one line output string for the short Molbuster reporting format.
+
+    Args:
+        df: Report dataframe.
+
+    Returns:
+        String with one line report.
+    """
     results = df.copy()
     results.columns = results.columns.to_flat_index()
     columns = results.columns
