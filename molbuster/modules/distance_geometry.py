@@ -1,6 +1,7 @@
 """Module to check bond lengths, bond angles, and internal clash of ligand conformations."""
 from __future__ import annotations
 
+from copy import deepcopy
 from logging import getLogger
 from typing import Any, Iterable
 
@@ -51,8 +52,8 @@ def check_geometry(
     Returns:
         MolBuster results dictionary.
     """
-    molecule = mol_pred
-    assert molecule.GetNumConformers() == 1
+    molecule = deepcopy(mol_pred)
+    assert molecule.GetNumConformers() == 1, "Molecule must have exactly one conformer."
 
     # remove hydrogens, charges, stereochemistry tags
     molecule = remove_all_charges_and_hydrogens(molecule)
@@ -60,7 +61,7 @@ def check_geometry(
     # get bonds and angles
     bond_set = sorted(_get_bond_atom_indices(molecule))  # tuples
     angles = sorted(_get_angle_atom_indices(bond_set))  # triples
-    angle_set = {(a[0], a[2]): a for a in angles}  # tuples : triples
+    angle_set = {(a[0], a[2]): a for a in angles}  # {tuples : triples}
 
     # distance geometry bounds, lower triangle min distances, upper triangle max distances
     bounds = GetMoleculeBoundsMatrix(molecule, **bound_matrix_params)
@@ -82,102 +83,55 @@ def check_geometry(
     df_12[col_lb] = bounds[lower_triangle_idcs]
     df_12[col_ub] = bounds[upper_triangle_idcs]
 
-    # for internal clash - use 13 or 12 distances?
-    # # 1,3- distances
-    # df_13 = pd.DataFrame()
-    # df_13["atom_triple"] = angles
-    # df_13["has_hydrogen"] = [has_hydrogen(mol_pred, a) for a in angles]
-    # df_13[col_lb] = [calc_angle_bounds(bounds, angle)[0] for angle in angles]
-    # df_13[col_ub] = [calc_angle_bounds(bounds, angle)[1] for angle in angles]
-
-    # calculate values and violations of bounds
-    dfs_bonds, dfs_clash, dfs_angle = [], [], []
+    # add observed dimensions
     conformer = molecule.GetConformer()
-    # pairwise distances matrix (symmetric, zero diagonal)
     conf_distances = _pairwise_distance(conformer.GetPositions())
     df_12["conf_id"] = conformer.GetId()
     df_12["distance"] = conf_distances[lower_triangle_idcs]
-    dfs_bonds.append(_bond_check(df_12, ignore_h=False))  # makes copy
-    dfs_clash.append(_clash_check(df_12, ignore_h=False))  # makes copy
-    dfs_angle.append(_angle_check(df_12, ignore_h=False))  # makes copy
-    # conf_angles = [calc_angle(conf_distances, angle) for angle in angles]
-    # df_13["true"] = true_flag
-    # df_13["conf_id"] = conformer.GetId()
-    # df_13["angle"] = conf_angles
-    # dfs_angle.append(angle_check_old(df_13, ignore_h=False))  # makes copy
 
-    df_bonds = pd.concat(dfs_bonds, ignore_index=True).reset_index(drop=True)
-    df_clash = pd.concat(dfs_clash, ignore_index=True).reset_index(drop=True)
-    df_angle = pd.concat(dfs_angle, ignore_index=True).reset_index(drop=True)
+    if ignore_hydrogens:
+        df_12 = df_12[~df_12["has_hydrogen"]]
 
-    sum = summarize_geometry(
-        df_bonds,
-        df_angle,
-        df_clash,
-        ignore_hydrogens=ignore_hydrogens,
-        threshold_bad_bond_length=threshold_bad_bond_length,
-        threshold_clash=threshold_clash,
-        threshold_bad_angle=threshold_bad_angle,
-    )
+    # calculate violations
+    df_bonds = _bond_check(df_12)  # makes copy
+    df_clash = _clash_check(df_12)  # makes copy
+    df_angles = _angle_check(df_12)  # makes copy
 
-    bond_ratio = (sum["short_bonds"] + sum["long_bonds"]) / sum["number_bonds"]
-    angle_ratio = sum["off_angles"] / sum["number_angles"] if sum["number_angles"] != 0.0 else np.nan
-    clash_ratio = sum["number_clashes"] / sum["number_noncov_pairs"] if sum["number_noncov_pairs"] != 0.0 else np.nan
+    # bond statistics
+    number_bonds = len(df_bonds)
+    number_short_outlier_bonds = sum(df_bonds[col_pe] < -threshold_bad_bond_length)
+    number_long_outlier_bonds = sum(df_bonds[col_pe] > threshold_bad_bond_length)
+    number_valid_bonds = number_bonds - number_short_outlier_bonds - number_long_outlier_bonds
 
-    passes_bonds = bond_ratio <= 0.0
-    passes_angles = angle_ratio <= 0.0
-    passes_clash = clash_ratio <= 0.0
+    # angle statistics
+    number_angles = len(df_angles)
+    number_outlier_angles = sum(df_angles[col_bape] > threshold_bad_angle)
+    number_valid_angles = number_angles - number_outlier_angles
+
+    # steric clash statistics
+    number_noncov_pairs = len(df_clash)
+    number_clashes = sum(df_clash[col_bpe].abs() > threshold_clash)
+    number_valid_noncov_pairs = number_noncov_pairs - number_clashes
 
     results = {
-        "bond_lengths_within_bounds": passes_bonds,
-        "bond_angles_within_bounds": passes_angles,
-        "no_internal_clash": passes_clash,
-    }
-
-    return {"results": results, "details": {"bonds": df_bonds, "clash": df_clash, "angles": df_angle}}
-
-
-def summarize_geometry(
-    df_bonds: pd.DataFrame,
-    df_angles: pd.DataFrame,
-    df_clash: pd.DataFrame,
-    threshold_bad_bond_length: float = 0.2,
-    threshold_clash: float = 0.2,
-    threshold_bad_angle: float = 0.2,
-    ignore_hydrogens: bool = True,
-) -> dict[str, float]:
-    """Summarize the geometry checks of a molecule."""
-    # remove hydrogen entries if not needed
-    if ignore_hydrogens:
-        df_bonds = df_bonds[~df_bonds["has_hydrogen"]]
-        df_angles = df_angles[~df_angles["has_hydrogen"]]
-        df_clash = df_clash[~df_clash["has_hydrogen"]]
-
-    short_bonds = sum(df_bonds[col_pe] < -threshold_bad_bond_length)
-    long_bonds = sum(df_bonds[col_pe] > threshold_bad_bond_length)
-    number_clashes = sum(df_clash[col_bpe].abs() > threshold_clash)
-    off_angles = sum(df_angles[col_bape] > threshold_bad_angle)
-
-    return {
-        "number_bonds": len(df_bonds),
-        "good_bonds": len(df_bonds) - short_bonds - long_bonds,
-        "short_bonds": short_bonds,
-        "long_bonds": long_bonds,
-        "number_noncov_pairs": len(df_clash),
-        "good_noncovalent_pairs": len(df_clash) - number_clashes,
+        "number_bonds": number_bonds,
+        "number_short_outlier_bonds": number_short_outlier_bonds,
+        "number_long_outlier_bonds": number_long_outlier_bonds,
+        "bond_lengths_within_bounds": number_valid_bonds == number_bonds,
+        "number_angles": number_angles,
+        "number_outlier_angles": number_outlier_angles,
+        "bond_angles_within_bounds": number_valid_angles == number_angles,
+        "number_noncov_pairs": number_noncov_pairs,
         "number_clashes": number_clashes,
-        "number_angles": len(df_angles),
-        "good_angles": len(df_angles) - off_angles,
-        "off_angles": off_angles,
+        "no_internal_clash": number_valid_noncov_pairs == number_noncov_pairs,
     }
 
+    return {"results": results, "details": {"bonds": df_bonds, "clash": df_clash, "angles": df_angles}}
 
-def _bond_check(df: pd.DataFrame, ignore_h: bool = False) -> pd.DataFrame:
+
+def _bond_check(df: pd.DataFrame) -> pd.DataFrame:
     # covalent bond length
-    df = df[df["is_bond"]]
-    if ignore_h:
-        df = df[~df["has_hydrogen"]]
-    df = df.copy()
+    df = df[df["is_bond"]].copy()
 
     # bonds can be too short or too long
     df[col_pe] = df.apply(lambda x: bpe(*x[["distance", col_lb, col_ub]]), axis=1)
@@ -185,12 +139,9 @@ def _bond_check(df: pd.DataFrame, ignore_h: bool = False) -> pd.DataFrame:
     return df
 
 
-def _angle_check(df: pd.DataFrame, ignore_h: bool = False) -> pd.DataFrame:
+def _angle_check(df: pd.DataFrame) -> pd.DataFrame:
     # noncovalent bonds (1,2-distances informed by van der Waals radii)
-    df = df[(~df["is_bond"]) & (df["is_angle"])]
-    if ignore_h:
-        df = df[~df["has_hydrogen"]]
-    df = df.copy()
+    df = df[(~df["is_bond"]) & (df["is_angle"])].copy()
 
     # angles have no direction (we do not know if larger or bigger beyond bounds)
     df[col_bape] = df.apply(lambda x: bape(*x[["distance", col_lb, col_ub]]), axis=1)
@@ -198,14 +149,11 @@ def _angle_check(df: pd.DataFrame, ignore_h: bool = False) -> pd.DataFrame:
     return df
 
 
-def _clash_check(df: pd.DataFrame, ignore_h: bool = False) -> pd.DataFrame:
+def _clash_check(df: pd.DataFrame) -> pd.DataFrame:
     # noncovalent bonds (1,2-distances informed by van der Waals radii)
-    df = df[(~df["is_bond"]) & (~df["is_angle"])]
-    if ignore_h:
-        df = df[~df["has_hydrogen"]]
-    df = df.copy()
+    df = df[(~df["is_bond"]) & (~df["is_angle"])].copy()
 
-    # clash is when lower bound is violated
+    # clash is only when lower bound is violated
     def _lb_pe(value, lower_bound):
         if value >= lower_bound:
             return 0.0
