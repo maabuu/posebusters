@@ -4,19 +4,19 @@
 User API
 ====================================
 
-MolBuster class
+MolBusters class
 ====================================
 
-The MolBuster class collects the molecules to test, runs the *modules*, and reports the test results.
+The MolBusters class collects the molecules to test, runs the *modules*, and reports the test results.
 
-.. autoclass:: molbuster.molbuster.MolBuster
+.. autoclass:: molbusters.molbusters.MolBusters
     :members:
     :undoc-members:
 
 Modules
 ====================================
 
-A MolBuster *module* is a function that takes one or more of ``mol_pred``, ``mol_true``, and ``mol_cond`` as input and returns one or more test results as a dictionary.
+A MolBusters *module* is a function that takes one or more of ``mol_pred``, ``mol_true``, and ``mol_cond`` as input and returns one or more test results as a dictionary.
 
 Inputs
     - Must take one of ``mol_pred``, ``mol_true``, and ``mol_cond`` provided as RDKit molecules.
@@ -29,32 +29,32 @@ Outputs
 
 Distance Geometry
 ------------------------------------
-.. autofunction:: molbuster.modules.distance_geometry.check_geometry
+.. autofunction:: molbusters.modules.distance_geometry.check_geometry
 
 Energy Ratio
 ------------------------------------
-.. autofunction:: molbuster.modules.energy_ratio.check_energy_ratio
+.. autofunction:: molbusters.modules.energy_ratio.check_energy_ratio
 
 Flatness
 ------------------------------------
-.. autofunction:: molbuster.modules.flatness.check_flatness
+.. autofunction:: molbusters.modules.flatness.check_flatness
 
 Identity
 ------------------------------------
-.. autofunction:: molbuster.modules.identity.check_identity
+.. autofunction:: molbusters.modules.identity.check_identity
 
 Intermolecular Distance
 ------------------------------------
-.. autofunction:: molbuster.modules.intermolecular_distance.check_intermolecular_distance
+.. autofunction:: molbusters.modules.intermolecular_distance.check_intermolecular_distance
 
 Loading
 ------------------------------------
-.. autofunction:: molbuster.modules.loading.check_loading
+.. autofunction:: molbusters.modules.loading.check_loading
 
 RMSD
 ------------------------------------
-.. autofunction:: molbuster.modules.rmsd.check_rmsd
+.. autofunction:: molbusters.modules.rmsd.check_rmsd
 
 Volume Overlap
 ------------------------------------
-.. autofunction:: molbuster.modules.volume_overlap.check_volume_overlap
+.. autofunction:: molbusters.modules.volume_overlap.check_volume_overlap

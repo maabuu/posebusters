@@ -6,7 +6,7 @@
 Command line tool
 ====================================
 
-MolBuster provides the command ``bust`` for checking generated molecules
+MolBusters provides the command ``bust`` for checking generated molecules
 and optionally taking a conditioning protein or ligands into account.
 
 You can run ``bust`` with no arguments to get more info.
@@ -80,13 +80,13 @@ The ``--out`` option can be used to save the output to a file::
 Configuration settings
 ====================================
 
-MolBuster will look for configuration parameters in a yaml file ``molbuster.yml``
+MolBusters will look for configuration parameters in a yaml file ``molbusters.yml``
 in standard locations:
 
-1. ``/etc/molbuster.cfg`` or ``c:\molbuster\molbuster.cfg`` (system-wide),
-2. ``~/.config/molbuster.cfg`` (``$XDG_CONFIG_HOME``) and ``~/.molbuster.cfg`` (``$HOME``)
+1. ``/etc/molbusters.cfg`` or ``c:\molbusters\molbusters.cfg`` (system-wide),
+2. ``~/.config/molbusters.cfg`` (``$XDG_CONFIG_HOME``) and ``~/.molbusters.cfg`` (``$HOME``)
    for global (user-wide) settings, and
-3. ``molbuster.cfg`` inside the working directory.
+3. ``molbusters.cfg`` inside the working directory.
 4. File location provided by the ``--config`` command line option.
 
 Settings from these files are merged in the listed order of preference:

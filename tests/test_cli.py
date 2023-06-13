@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from click.testing import CliRunner
 
-from molbuster.cli import bust
+from molbusters.cli import bust
 
 runner = CliRunner()
 

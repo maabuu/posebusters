@@ -35,7 +35,7 @@ def check_intermolecular_distance(
             5.0.
 
     Returns:
-        MolBuster results dictionary.
+        MolBusters results dictionary.
     """
     coords_ligand = mol_pred.GetConformer().GetPositions()
     coords_protein = mol_cond.GetConformer().GetPositions()

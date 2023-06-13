@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from molbuster.modules.volume_overlap import check_volume_overlap
+from molbusters.modules.volume_overlap import check_volume_overlap
 
 
 def test_check_volume_overlap(mol_rq3_x00, mol_rq3_x01, mol_rq3_x10):

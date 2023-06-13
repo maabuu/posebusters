@@ -12,7 +12,7 @@ def check_chemistry(mol_pred: Mol) -> Mol:
         mol_pred: Molecule.
 
     Returns:
-        MolBuster results dictionary.
+        MolBusters results dictionary.
     """
     assert isinstance(mol_pred, Mol)
 

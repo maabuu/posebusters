@@ -1,11 +1,11 @@
-# MolBuster template configuration.
+# MolBusters configuration for mols command.
 
 # Selected modules and tests for results table
 tests:
   loading:
     - mol_pred_loaded
     # - mol_true_loaded
-    - mol_cond_loaded
+    # - mol_cond_loaded
   sanity:
     - chemically_valid
     - all_atoms_connected
@@ -39,9 +39,9 @@ tests:
     # - num_pairwise_clashes
     # - max_relative_overlap
     # - no_clashes
-  volume_overlap:
+  # volume_overlap:
     # - vol_overlap
-    - no_volume_clash
+    # - no_volume_clash
   # rmsd:
     # - rmsd
     # - kabsch_rmsd
@@ -135,7 +135,7 @@ test_names:
     no_volume_clash:                  "No volume clash within threshold"
   energy_ratio:
     ensemble_avg_energy:              "Ensemble average energy"
-    mol_pred_energy:                  "Docked ligand energy"
+    mol_pred_energy:                  "Predicted conformation energy"
     energy_ratio:                     "Energy ratio"
     energy_ratio_passes:              "Energy ratio within threshold"
   rmsd:

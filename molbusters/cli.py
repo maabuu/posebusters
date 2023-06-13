@@ -1,4 +1,4 @@
-"""Command line interface for MolBuster."""
+"""Command line interface for MolBusters."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,12 +6,12 @@ from pathlib import Path
 import click
 import pandas as pd
 
-from .molbuster import MolBuster
+from .molbusters import MolBusters
 from .tools.formatting import create_long_output, create_short_output
 
 
 def main():
-    """Run MolBuster from the command line."""
+    """Run MolBusters from the command line."""
     bust()
 
 
@@ -40,7 +40,7 @@ def main():
 @click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
 @click.version_option()
 def bust(table, outfmt, output, config, debug, full_report, **mol_args):
-    """MolBuster: check generated 3D molecules with or without conditioning."""
+    """MolBusters: check generated 3D molecules with or without conditioning."""
     if debug:
         click.echo("Debug mode is on.")
 
@@ -53,18 +53,18 @@ def bust(table, outfmt, output, config, debug, full_report, **mol_args):
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
         mode = _select_mode(file_paths.columns.tolist()) if config is None else config
-        molbuster = MolBuster(mode, debug=debug)
-        molbuster_results = molbuster.bust_table(file_paths)
+        molbusters = MolBusters(mode, debug=debug)
+        molbusters_results = molbusters.bust_table(file_paths)
     else:
         # run on file inputs
         mode = _select_mode([m for m, v in mol_args.items() if v is not None]) if config is None else config
-        molbuster = MolBuster(mode)
-        molbuster_results = molbuster.bust(**mol_args)
+        molbusters = MolBusters(mode)
+        molbusters_results = molbusters.bust(**mol_args)
 
-    config = molbuster.config
+    config = molbusters.config
     config_columns = [(m, c) for m in config["tests"].keys() for c in config["tests"][m]]
 
-    for i, results_dict in enumerate(molbuster_results):
+    for i, results_dict in enumerate(molbusters_results):
         results = _dataframe_from_output(results_dict, "results")
 
         missing_columns = [c for c in config_columns if c not in results.columns]

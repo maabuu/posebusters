@@ -22,7 +22,7 @@ def check_volume_overlap(
         vdw_scale: Scaling factor for the van der Waals radii which define the volume around each atom. Defaults to 0.8.
 
     Returns:
-        MolBuster results dictionary.
+        MolBusters results dictionary.
     """
     assert isinstance(mol_pred, Mol)
     assert isinstance(mol_cond, Mol)

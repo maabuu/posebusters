@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from molbuster.modules.rmsd import check_rmsd
+from molbusters.modules.rmsd import check_rmsd
 
 
 def test_check_rmsd(mol_rq3_x00, mol_rq3_x01, mol_rq3_x10):

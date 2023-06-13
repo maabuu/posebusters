@@ -2,7 +2,7 @@ ci:
   autoupdate_commit_msg: "chore: update pre-commit hooks"
   autofix_commit_msg: "style: pre-commit fixes"
 
-exclude: ^tests/conftest/|^.vscode/|^molbuster/datasets/pdb
+exclude: ^tests/conftest/|^.vscode/|^molbusters/datasets/pdb
 
 repos:
 

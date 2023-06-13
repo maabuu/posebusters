@@ -15,7 +15,7 @@ def check_loading(mol_pred: Any = None, mol_true: Any = None, mol_cond: Any = No
         mol_cond: Conditioning molecule. Defaults to None.
 
     Returns:
-        MolBuster results dictionary.
+        MolBusters results dictionary.
     """
     results = {
         "mol_pred_loaded": isinstance(mol_pred, Mol),

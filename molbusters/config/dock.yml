@@ -1,26 +1,26 @@
-# MolBuster template configuration.
+# MolBusters template configuration.
 
 # Selected modules and tests for results table
 tests:
   loading:
     - mol_pred_loaded
-    - mol_true_loaded
+    # - mol_true_loaded
     - mol_cond_loaded
   sanity:
     - chemically_valid
-    # - all_atoms_connected
-  identity:
+    - all_atoms_connected
+  # identity:
     # - inchi_crystal
     # - inchi_docked
-    - formula
-    - connections
+    # - formula
+    # - connections
     # - hydrogens
     # - net_charge
     # - protonation
-    - tetrahedral
-    - double_bonds
-    - stereo_relative_inchi_enatiomer
-    - stereo_absolute
+    # - tetrahedral
+    # - double_bonds
+    # - stereo_relative_inchi_enatiomer
+    # - stereo_absolute
     # - isotopic
   distance_geometry:
     - bond_lengths_within_bounds
@@ -42,10 +42,10 @@ tests:
   volume_overlap:
     # - vol_overlap
     - no_volume_clash
-  rmsd:
+  # rmsd:
     # - rmsd
     # - kabsch_rmsd
-    - rmsd_within_threshold
+    # - rmsd_within_threshold
 
 # Module parameters
 parameters:
@@ -78,7 +78,6 @@ parameters:
   volume_overlap:
     clash_cutoff: 0.05
     vdw_scale: 0.8
-    ignore_hydrogens: true
   rmsd:
     rmsd_threshold: 2.0
 
@@ -136,7 +135,7 @@ test_names:
     no_volume_clash:                  "No volume clash within threshold"
   energy_ratio:
     ensemble_avg_energy:              "Ensemble average energy"
-    mol_pred_energy:                  "Predicted conformation energy"
+    mol_pred_energy:                  "Docked ligand energy"
     energy_ratio:                     "Energy ratio"
     energy_ratio_passes:              "Energy ratio within threshold"
   rmsd:

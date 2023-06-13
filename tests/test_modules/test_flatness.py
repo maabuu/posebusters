@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from molbuster.modules.flatness import check_flatness
+from molbusters.modules.flatness import check_flatness
 
 
 def test_check_flatness(mol_pm2, mol_cgb):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from rdkit.Chem.rdmolfiles import MolFromSmiles
 
-from molbuster.modules.identity import (
+from molbusters.modules.identity import (
     _is_valid_inchi,
     _split_inchi,
     check_identity,

@@ -1,9 +1,9 @@
 
 ============================================================================================================
-MolBuster: chemical and physical sensibility checks for generated molecules.
+MolBusters: chemical and physical sensibility checks for generated molecules.
 ============================================================================================================
 
-MolBuster is a command line tool and Python library to check the output of molecular conformation generators, docking programs, or other programs that generate molecules in 3D.
+MolBusters is a command line tool and Python library to check the output of molecular conformation generators, docking programs, or other programs that generate molecules in 3D.
 
 .. |tetrahedral_stereo_fail| image:: images/tankbind_astex_1hww.png
    :height: 500 px
@@ -105,11 +105,11 @@ MolBuster is a command line tool and Python library to check the output of molec
 Quick start
 ====================================
 
-MolBuster can be installed from PyPI.
+MolBusters can be installed from PyPI.
 
 .. code-block:: bash
 
-   >>> pip install molbuster
+   >>> pip install molbusters
 
 
 Use the ``bust`` command to check molecules, docked ligands or generated molecules conditioned on a protein.

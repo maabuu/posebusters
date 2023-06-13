@@ -1,4 +1,4 @@
-# MolBuster template configuration.
+# MolBusters template configuration.
 
 # Selected modules and tests for results table
 tests:
@@ -33,9 +33,9 @@ tests:
     # - docked_ligand_energy
     # - energy_ratio
     - energy_ratio_passes
-  intermolecular_distance:
+  # intermolecular_distance:
     # - smallest_distance
-    - not_too_far_away
+    # - not_too_far_away
     # - num_pairwise_clashes
     # - max_relative_overlap
     # - no_clashes
@@ -72,7 +72,6 @@ parameters:
     vdw_scale: 0.8
     clash_cutoff: 0.05
     max_distance: 5.0
-
   energy_ratio:
     threshold_energy_ratio: 7.0
     ensemble_number_conformations: 50
@@ -82,12 +81,6 @@ parameters:
     ignore_hydrogens: true
   rmsd:
     rmsd_threshold: 2.0
-
-# Name for the inputs
-input_names:
-  mol_pred: "Docked ligand"
-  mol_true: "Crystal ligand"
-  mol_cond: "Crystal protein"
 
 # Module names for results table
 module_names:
@@ -143,7 +136,7 @@ test_names:
     no_volume_clash:                  "No volume clash within threshold"
   energy_ratio:
     ensemble_avg_energy:              "Ensemble average energy"
-    mol_pred_energy:                  "Docked ligand energy"
+    mol_pred_energy:                  "Predicted conformation energy"
     energy_ratio:                     "Energy ratio"
     energy_ratio_passes:              "Energy ratio within threshold"
   rmsd:

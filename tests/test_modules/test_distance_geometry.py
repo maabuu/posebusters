@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from molbuster.modules.distance_geometry import _two_bonds_to_angle, check_geometry
+from molbusters.modules.distance_geometry import _two_bonds_to_angle, check_geometry
 
 
 def test_check_geometry(mol_pm2):

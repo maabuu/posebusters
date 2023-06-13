@@ -1,4 +1,4 @@
-"""MolBuster datasets."""
+"""MolBusters datasets."""
 
 from .load_datasets import four_docks, four_mols, four_redocks
 

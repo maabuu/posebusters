@@ -1,4 +1,4 @@
-"""Functions for formatting the output of the molbuster tools."""
+"""Functions for formatting the output of the molbusters tools."""
 
 import pandas as pd
 

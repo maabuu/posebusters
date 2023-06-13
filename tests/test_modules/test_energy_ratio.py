@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from molbuster.modules.energy_ratio import check_energy_ratio
+from molbusters.modules.energy_ratio import check_energy_ratio
 
 
 def test_check_energy_ratio(mol_pm2):

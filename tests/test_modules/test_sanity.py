@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from rdkit.Chem.rdmolfiles import MolFromSmiles
 
-from molbuster.modules.sanity import check_chemistry
+from molbusters.modules.sanity import check_chemistry
 
 
 def test_check_rmsd():

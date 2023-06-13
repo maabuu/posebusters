@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbuster",
+            "module": "molbusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -25,7 +25,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbuster",
+            "module": "molbusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -39,7 +39,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbuster",
+            "module": "molbusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -51,11 +51,11 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbuster",
+            "module": "molbusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
-                "/Users/Martin/Projects/molbuster/notebooks/yael_testcase_short.sdf",
+                "/Users/Martin/Projects/molbusters/notebooks/yael_testcase_short.sdf",
             ]
         },
         {
@@ -63,7 +63,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbuster",
+            "module": "molbusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -76,7 +76,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbuster",
+            "module": "molbusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -91,7 +91,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbuster",
+            "module": "molbusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
