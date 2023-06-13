@@ -43,7 +43,7 @@ molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 class MolBusters:
     """Class to run all tests on a set of molecules."""
 
-    def __init__(self, config: str | dict = "dock", debug: bool = False):
+    def __init__(self, config: str | dict = "dock", debug: bool = False, top_n: int | None = None):
         """Initialize MolBusters object."""
         self.module_func: dict[str, Callable]
         self.module_args: dict[str, set[str]]
@@ -57,6 +57,9 @@ class MolBusters:
         else:
             logger.error(f"Configuration {config} not valid. Provide either 'dock', 'redock', 'mol' or a dictionary.")
         assert len(set(self.config.get("tests", {}).keys()) - set(module_dict.keys())) == 0
+
+        self.config["debug"] = self.config.get("debug", debug)
+        self.config["top_n"] = self.config.get("top_n", top_n)
 
         self.results: dict[tuple[str, str], dict[str, Any]] = defaultdict(dict)
         self.details: dict[tuple[str, str], Any] = defaultdict(dict)
@@ -108,6 +111,9 @@ class MolBusters:
 
             mol_pred_load_params = self.config.get("loading_options", {}).get("mol_pred", {})
             for i, mol_pred in enumerate(safe_supply_mols(paths["mol_pred"], **mol_pred_load_params)):
+                if self.config["top_n"] is not None and i >= self.config["top_n"]:
+                    break
+
                 mol_args["mol_pred"] = mol_pred
 
                 results_key = (str(paths["mol_pred"]), self._get_name(mol_pred, i))

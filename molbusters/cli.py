@@ -38,9 +38,10 @@ def main():
 @click.option("-c", "--config", type=click.File("r"), default=None, help="Configuration file.")
 @click.option("--full-report", type=bool, default=False, is_flag=True, help="Print full report.")
 @click.option("--no-header", type=bool, default=False, is_flag=True, help="Print without header.")
+@click.option("--top-n", type=int, default=None, help="Run on top N results in MOL_PRED only.")
 @click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
 @click.version_option()
-def bust(table, outfmt, output, config, debug, no_header, full_report, **mol_args):
+def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **mol_args):
     """MolBusters: check generated 3D molecules with or without conditioning."""
     if debug:
         click.echo("Debug mode is on.")
@@ -54,12 +55,12 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, **mol_arg
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
         mode = _select_mode(file_paths.columns.tolist()) if config is None else config
-        molbusters = MolBusters(mode, debug=debug)
+        molbusters = MolBusters(mode, top_n=top_n, debug=debug)
         molbusters_results = molbusters.bust_table(file_paths)
     else:
         # run on file inputs
         mode = _select_mode([m for m, v in mol_args.items() if v is not None]) if config is None else config
-        molbusters = MolBusters(mode)
+        molbusters = MolBusters(mode, top_n=top_n, debug=debug)
         molbusters_results = molbusters.bust(**mol_args)
 
     config = molbusters.config
