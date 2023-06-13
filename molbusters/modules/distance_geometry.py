@@ -123,12 +123,15 @@ def check_geometry(
         "number_bonds": number_bonds,
         "number_short_outlier_bonds": number_short_outlier_bonds,
         "number_long_outlier_bonds": number_long_outlier_bonds,
+        "shortest_bond_relative_length": df_bonds[col_pe].min(),
+        "longest_bond_relative_length": df_bonds[col_pe].min(),
         "bond_lengths_within_bounds": number_valid_bonds == number_bonds,
         "number_angles": number_angles,
         "number_outlier_angles": number_outlier_angles,
         "bond_angles_within_bounds": number_valid_angles == number_angles,
         "number_noncov_pairs": number_noncov_pairs,
         "number_clashes": number_clashes,
+        "most_overlap_noncov_pais": df_clash[col_bpe].abs().max(),
         "no_internal_clash": number_valid_noncov_pairs == number_noncov_pairs,
     }
 
