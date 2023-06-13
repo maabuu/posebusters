@@ -37,9 +37,10 @@ def main():
 )
 @click.option("-c", "--config", type=click.File("r"), default=None, help="Configuration file.")
 @click.option("--full-report", type=bool, default=False, is_flag=True, help="Print full report.")
+@click.option("--no-header", type=bool, default=False, is_flag=True, help="Print without header.")
 @click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
 @click.version_option()
-def bust(table, outfmt, output, config, debug, full_report, **mol_args):
+def bust(table, outfmt, output, config, debug, no_header, full_report, **mol_args):
     """MolBusters: check generated 3D molecules with or without conditioning."""
     if debug:
         click.echo("Debug mode is on.")
@@ -73,7 +74,7 @@ def bust(table, outfmt, output, config, debug, full_report, **mol_args):
 
         results = results[selected_columns]
         results = _apply_column_names_from_config(results, config)
-        output.write(_format_results(results, outfmt, i))
+        output.write(_format_results(results, outfmt, no_header, i))
 
 
 def _dataframe_from_output(results_dict, field):
@@ -99,11 +100,11 @@ def _apply_column_names_from_config(df, config):
     return df
 
 
-def _format_results(df: pd.DataFrame, outfmt: str = "short", index: int = 0) -> str:
+def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = False, index: int = 0) -> str:
     if outfmt == "long":
         return create_long_output(df)
     elif outfmt == "csv":
-        header = True if index == 0 else False
+        header = (not no_header) and (index == 0)
         return df.to_csv(index=True, header=header)
     elif outfmt == "short":
         return create_short_output(df)
