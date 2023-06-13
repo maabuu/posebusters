@@ -48,7 +48,11 @@ def check_flatness(
         "flatness_passes": flatness_passes,
     }
 
-    results = {"flatness_passes": all(flatness_passes)}
+    results = {
+        "num_systems_checked": len(planar_groups),
+        "num_systems_passed": sum(flatness_passes),
+        "flatness_passes": all(flatness_passes),
+    }
 
     return {"results": results, "details": details}
 
