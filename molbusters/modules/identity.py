@@ -81,6 +81,7 @@ layer_names = {
     "/s": "stereo_absolute",
     "/i": "isotopic",
 }
+stereo_layers = ["tetrahedral", "double_bonds", "stereo_relative_inchi_enatiomer", "stereo_absolute"]
 
 
 def standardize_and_get_inchi(mol: Mol, options: str = "", log_level=None, warnings_as_errors=False) -> str:
@@ -114,6 +115,7 @@ def _compare_inchis(inchi_true: str, inchi_pred: str, layers: list[str] = standa
         results["inchi_overall"] = True
         for layer in layers:
             results[layer_names[layer]] = True
+            results["stereo"] = True
         return results
 
     # otherwise comparison by layer
@@ -127,6 +129,7 @@ def _compare_inchis(inchi_true: str, inchi_pred: str, layers: list[str] = standa
             results[name] = (layer not in layers_true) and (layer not in layers_pred)
         else:
             results[name] = layers_true[layer] == layers_pred[layer]
+    results["stereo"] = all(results[name] for name in stereo_layers if name in results)  # combine stereo layers
 
     return results
 

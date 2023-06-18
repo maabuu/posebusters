@@ -118,6 +118,7 @@ test_names:
     double_bonds:                     "Double bond stereo preserved"
     stereo_relative_inchi_enatiomer:  "Relative stereo preserved"
     stereo_absolute:                  "Absolute stereo preserved"
+    stereo:                           "Stereochemistry preserved"
   distance_geometry:
     bond_lengths_within_bounds:       "Bond lengths within bounds"
     bond_angles_within_bounds:        "Bond angles within bounds"

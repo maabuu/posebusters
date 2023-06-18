@@ -17,10 +17,11 @@ tests:
     # - hydrogens
     # - net_charge
     # - protonation
-    - tetrahedral
-    - double_bonds
-    - stereo_relative_inchi_enatiomer
-    - stereo_absolute
+    # - tetrahedral
+    # - double_bonds
+    # - stereo_relative_inchi_enatiomer
+    # - stereo_absolute
+    - stereo
     # - isotopic
   distance_geometry:
     - bond_lengths_within_bounds
@@ -38,7 +39,7 @@ tests:
     - not_too_far_away
     # - num_pairwise_clashes
     # - max_relative_overlap
-    # - no_clashes
+    - no_clashes
   volume_overlap:
     # - vol_overlap
     - no_volume_clash
@@ -126,6 +127,7 @@ test_names:
     double_bonds:                     "Double bond stereo preserved"
     stereo_relative_inchi_enatiomer:  "Relative stereo preserved"
     stereo_absolute:                  "Absolute stereo preserved"
+    stereo:                           "Stereochemistry preserved"
   distance_geometry:
     bond_lengths_within_bounds:       "Bond lengths within bounds"
     bond_angles_within_bounds:        "Bond angles within bounds"
