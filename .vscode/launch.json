@@ -21,6 +21,24 @@
             ]
         },
         {
+            "name": "bust conditioned on protein and ligand -- long",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "molbusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1ia1/1ia1_ligand.sdf",
+                "-l",
+                "tests/conftest/1ia1/1ia1_ligands.sdf",
+                "-p",
+                "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
             "name": "bust conditioned on protein",
             "type": "python",
             "request": "launch",
