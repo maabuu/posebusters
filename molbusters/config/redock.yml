@@ -70,7 +70,7 @@ parameters:
       # - trigonal_planar_double_bonds: "[#6;X3;D2,D3;^2]=[#6;X3;D2,D3;^2]"
     threshold_flatness: 0.1 # max distance in A to closest shared plane
   intermolecular_distance:
-    vdw_scale: 0.8
+    vdw_scale: 1.0
     clash_cutoff: 0.4
     max_distance: 5.0
 
