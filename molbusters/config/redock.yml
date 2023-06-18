@@ -71,7 +71,7 @@ parameters:
     threshold_flatness: 0.1 # max distance in A to closest shared plane
   intermolecular_distance:
     vdw_scale: 0.8
-    clash_cutoff: 0.05
+    clash_cutoff: 0.4
     max_distance: 5.0
 
   energy_ratio:
