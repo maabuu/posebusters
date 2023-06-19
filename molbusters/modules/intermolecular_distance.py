@@ -91,14 +91,14 @@ def check_intermolecular_distance(
 
     # identify clashes after scaling vdw and applying cutoff
     details["sum_vdw_scaled"] = details["sum_vdw"] * vdw_scale
-    details["difference"] = details["distance"] - details["sum_vdw_scaled"]
-    details["clash"] = details["difference"] < -clash_cutoff
+    details["gap"] = details["distance"] - details["sum_vdw_scaled"]
+    details["clash"] = details["gap"] < -clash_cutoff
 
     results = {
         "smallest_distance": smallest_distance,
         "not_too_far_away": max_distance >= smallest_distance,
         "num_pairwise_clashes": details["clash"].sum(),
-        "max_relative_overlap": abs(details["difference"].min()),
+        "min_gap": details["gap"].min(),
         "no_clashes": not details["clash"].any(),
     }
 
