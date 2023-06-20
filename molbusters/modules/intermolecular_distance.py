@@ -102,7 +102,12 @@ def check_intermolecular_distance(
         "no_clashes": not details["clash"].any(),
     }
 
-    most_extreme = {"most_extreme_" + k: v for k, v in details.loc[np.argmin(details.absolute_gap)].to_dict().items()}
+    if len(details) > 0:
+        most_extreme = {
+            "most_extreme_" + k: v for k, v in details.loc[np.argmin(details.absolute_gap)].to_dict().items()
+        }
+    else:
+        most_extreme = {"mol_extreme" + c: np.nan for c in details.columns}
     results = results | most_extreme
 
     return {"results": results, "details": details}
