@@ -16,7 +16,7 @@ __all__ = [
     "check_chemistry",
     "check_energy_ratio",
     "check_flatness",
-    "check_geometry",0
+    "check_geometry",
     "check_identity",
     "check_intermolecular_distance",
     "check_loading",
@@ -24,4 +24,4 @@ __all__ = [
     "check_volume_overlap",
 ]
 
-__version__ = "0.1.14"
+__version__ = "0.1.15"

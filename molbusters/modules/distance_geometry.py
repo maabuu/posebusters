@@ -109,29 +109,39 @@ def check_geometry(
     number_long_outlier_bonds = sum(df_bonds[col_pe] > threshold_bad_bond_length)
     number_valid_bonds = number_bonds - number_short_outlier_bonds - number_long_outlier_bonds
 
+    shortest_bond_relative_length = (df_bonds["distance"] / df_bonds["lower_bound"]).min()
+    longest_bond_relative_length = (df_bonds["distance"] / df_bonds["upper_bound"]).max()
+
     # angle statistics
     number_angles = len(df_angles)
     number_outlier_angles = sum(df_angles[col_bape] > threshold_bad_angle)
     number_valid_angles = number_angles - number_outlier_angles
 
+    lb_extreme_angle = 2 - (df_angles["distance"] / df_angles["lower_bound"]).min()
+    ub_extreme_angle = (df_angles["distance"] / df_angles["upper_bound"]).max()
+    most_extreme_angle = max(lb_extreme_angle, ub_extreme_angle)
+
     # steric clash statistics
     number_noncov_pairs = len(df_clash)
-    number_clashes = sum(df_clash[col_bpe].abs() > threshold_clash)
+    number_clashes = sum(df_clash[col_bpe] < -threshold_clash)
     number_valid_noncov_pairs = number_noncov_pairs - number_clashes
+
+    shortest_noncovalent_distance = (df_clash["distance"] / df_clash["lower_bound"]).min()
 
     results = {
         "number_bonds": number_bonds,
+        "shortest_bond_relative_length": shortest_bond_relative_length,
+        "longest_bond_relative_length": longest_bond_relative_length,
         "number_short_outlier_bonds": number_short_outlier_bonds,
         "number_long_outlier_bonds": number_long_outlier_bonds,
-        "shortest_bond_relative_length": df_bonds[col_pe].min(),
-        "longest_bond_relative_length": df_bonds[col_pe].max(),
         "bond_lengths_within_bounds": number_valid_bonds == number_bonds,
         "number_angles": number_angles,
+        "most_extreme_relative_angle": most_extreme_angle,
         "number_outlier_angles": number_outlier_angles,
         "bond_angles_within_bounds": number_valid_angles == number_angles,
         "number_noncov_pairs": number_noncov_pairs,
+        "shortest_noncovalent_relative_distance": shortest_noncovalent_distance,
         "number_clashes": number_clashes,
-        "most_overlap_noncov_pais": df_clash[col_bpe].abs().max(),
         "no_internal_clash": number_valid_noncov_pairs == number_noncov_pairs,
     }
 

@@ -71,7 +71,7 @@ def check_intermolecular_distance(
     smallest_distance = distances_all.min()
 
     # select atoms that are close to ligand to check for clash
-    mask_protein = distances_all.min(axis=0) <= 4.5
+    mask_protein = distances_all.min(axis=0) <= 5.5 * vdw_scale
     distances = distances_all[:, mask_protein]
     vdw_protein = vdw_protein_all[mask_protein]
 
@@ -91,16 +91,19 @@ def check_intermolecular_distance(
 
     # identify clashes after scaling vdw and applying cutoff
     details["sum_vdw_scaled"] = details["sum_vdw"] * vdw_scale
-    details["gap"] = details["distance"] - details["sum_vdw_scaled"]
-    details["clash"] = details["gap"] < -clash_cutoff
+    details["absolute_gap"] = details["distance"] - details["sum_vdw_scaled"]
+    details["relative_gap"] = details["absolute_gap"] / details["sum_vdw_scaled"]
+    details["clash"] = details["absolute_gap"] < -clash_cutoff
 
     results = {
         "smallest_distance": smallest_distance,
         "not_too_far_away": max_distance >= smallest_distance,
         "num_pairwise_clashes": details["clash"].sum(),
-        "min_gap": details["gap"].min(),
         "no_clashes": not details["clash"].any(),
     }
+
+    most_extreme = {"most_extreme_" + k: v for k, v in details.loc[np.argmin(details.absolute_gap)].to_dict().items()}
+    results = results | most_extreme
 
     return {"results": results, "details": details}
 
