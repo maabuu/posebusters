@@ -124,7 +124,7 @@ def check_geometry(
         "number_short_outlier_bonds": number_short_outlier_bonds,
         "number_long_outlier_bonds": number_long_outlier_bonds,
         "shortest_bond_relative_length": df_bonds[col_pe].min(),
-        "longest_bond_relative_length": df_bonds[col_pe].min(),
+        "longest_bond_relative_length": df_bonds[col_pe].max(),
         "bond_lengths_within_bounds": number_valid_bonds == number_bonds,
         "number_angles": number_angles,
         "number_outlier_angles": number_outlier_angles,
