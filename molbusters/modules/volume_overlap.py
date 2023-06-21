@@ -37,10 +37,10 @@ def check_volume_overlap(
     assert isinstance(mol_cond, Mol)
 
     if ignore_atom_type == "HETATM":
-        indices = [a.GetIdx() for a in mol_cond.GetAtoms() if not a.GetPDBResidueInfo().GetIsHeteroAtom()]
+        indices = [a.GetIdx() for a in mol_cond.GetAtoms() if a.GetPDBResidueInfo().GetIsHeteroAtom()]
         mol_cond = delete_atoms(mol_cond, indices)
     elif ignore_atom_type == "ATOM":
-        indices = [a.GetIdx() for a in mol_cond.GetAtoms() if a.GetPDBResidueInfo().GetIsHeteroAtom()]
+        indices = [a.GetIdx() for a in mol_cond.GetAtoms() if not a.GetPDBResidueInfo().GetIsHeteroAtom()]
         mol_cond = delete_atoms(mol_cond, indices)
     elif ignore_atom_type is not None:
         raise ValueError(f"Unknown ignore_atom_type: {ignore_atom_type}")
