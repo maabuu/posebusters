@@ -90,7 +90,7 @@ modules:
       - no_clashes
     rename_outputs:
       not_too_far_away: "Not too far away"
-      no_clashes: "No clashes"
+      no_clashes: "No clashes with protein"
   - name: "Distance to cofactors"
     function: "intermolecular_distance"
     parameters:
@@ -102,7 +102,7 @@ modules:
     selected_outputs:
       - no_clashes
     rename_outputs:
-      no_clashes: "No clashes"
+      no_clashes: "No clashes with cofactors"
   - name: "Volume overlap with protein"
     function: volume_overlap
     parameters:
@@ -113,8 +113,8 @@ modules:
     selected_outputs:
       - no_volume_clash
     rename_outputs:
-      volume_overlap: "Volume overlap"
-      no_volume_clash: "No volume"
+      volume_overlap: "Volume overlap with protein"
+      no_volume_clash: "No volume clash with protein"
   - name: "Volume overlap with cofactors"
     function: volume_overlap
     parameters:
@@ -125,8 +125,8 @@ modules:
     selected_outputs:
       - no_volume_clash
     rename_outputs:
-      volume_overlap: "Volume overlap"
-      no_volume_clash: "No volume clash"
+      volume_overlap: "Volume overlap with cofactors"
+      no_volume_clash: "No volume clash with cofactors"
   - name: "RMSD"
     function: rmsd
     parameters:

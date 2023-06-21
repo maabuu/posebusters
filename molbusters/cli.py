@@ -65,6 +65,7 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
 
     config = molbusters.config
     selected_columns = [(c["name"], n) for c in config["modules"] for n in c["selected_outputs"]]
+    names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c["rename_outputs"].items()}
 
     for i, results_dict in enumerate(molbusters_results):
         results = _dataframe_from_output(results_dict, "results")
@@ -74,7 +75,7 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
         selected_columns = selected_columns if not full_report or outfmt == "short" else results.columns
 
         results = results[selected_columns]
-        # results = _apply_column_names_from_config(results, config)
+        results.columns = [names_lookup[c] for c in results.columns]
         output.write(_format_results(results, outfmt, no_header, i))
 
 
@@ -90,15 +91,6 @@ def _dataframe_from_output(results_dict, field):
         },
         orient="index",
     )
-
-
-def _apply_column_names_from_config(df, config):
-    module_names = config["module_names"]
-    test_names = config["test_names"]
-    cols = df.columns
-    cols = [(module_names.get(module, module), test_names.get(module, {}).get(test, test)) for module, test in cols]
-    df.columns = pd.MultiIndex.from_tuples(cols)
-    return df
 
 
 def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = False, index: int = 0) -> str:
