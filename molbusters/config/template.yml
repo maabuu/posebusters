@@ -1,159 +1,151 @@
-# MolBusters template configuration.
 
-# Selected modules and tests for results table
-tests:
-  loading:
-    - mol_pred_loaded
-    - mol_true_loaded
-    - mol_cond_loaded
-  sanity:
-    - chemically_valid
-    # - all_atoms_connected
-  identity:
-    # - inchi_crystal
-    # - inchi_docked
-    - formula
-    - connections
-    # - hydrogens
-    # - net_charge
-    # - protonation
-    - tetrahedral
-    - double_bonds
-    - stereo_relative_inchi_enatiomer
-    - stereo_absolute
-    # - isotopic
-  distance_geometry:
-    - bond_lengths_within_bounds
-    - bond_angles_within_bounds
-    - no_internal_clash
-  flatness:
-    - flatness_passes
-  energy_ratio:
-    # - ensemble_avg_energy
-    # - docked_ligand_energy
-    # - energy_ratio
-    - energy_ratio_passes
-  # intermolecular_distance:
-    # - smallest_distance
-    # - not_too_far_away
-    # - num_pairwise_clashes
-    # - max_relative_overlap
-    # - no_clashes
-  volume_overlap:
-    # - vol_overlap
-    - no_volume_clash
-  rmsd:
-    # - rmsd
-    # - kabsch_rmsd
-    - rmsd_within_threshold
+# Setup test modules
+# needs:
+#   name
+#   function
+#   parameters (optional)
+#   selected_outputs (optional)
+#   rename_outputs (optional)
 
-# Module parameters
-parameters:
-  identity:
-    inchi_options: "w" # options passed to InChI generation
-  distance_geometry:
-    bound_matrix_params:
-      set15bounds: true # topology based bounds also for 1,5- not just until 1,4-
-      scaleVDW: true # scale down lower bounds for atoms less than 5 bonds apart
-      doTriangleSmoothing: true
-      useMacrocycle14config: false
-    threshold_bad_bond_length: 0.2 # widens DG bound by this factor
-    threshold_bad_angle: 0.2 # widens DG bound by this factor
-    threshold_clash: 0.2 # widens DG bound by this factor
-    ignore_hydrogens: true # ignore hydrogens
-  flatness:
-    # TODO: allow passing SMARTS strings here
-    flat_systems: # list atoms which together should lie on plane as SMARTS matches
-      aromatic_5_membered_rings_sp2: "[ar5^2]1[ar5^2][ar5^2][ar5^2][ar5^2]1"
-      aromatic_6_membered_rings_sp2: "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1"
-      # - trigonal_planar_double_bonds: "[#6;X3;D2,D3;^2]=[#6;X3;D2,D3;^2]"
-    threshold_flatness: 0.1 # max distance in A to closest shared plane
-  intermolecular_distance:
-    vdw_scale: 0.8
-    clash_cutoff: 0.05
-    max_distance: 5.0
-  energy_ratio:
-    threshold_energy_ratio: 7.0
-    ensemble_number_conformations: 50
-  volume_overlap:
-    clash_cutoff: 0.05
-    vdw_scale: 0.8
-    ignore_hydrogens: true
-  rmsd:
-    rmsd_threshold: 2.0
-
-# Module names for results table
-module_names:
-  loading: "Loading"
-  sanity: "Chemistry"
-  identity: "Identity"
-  distance_geometry: "Geometry"
-  flatness: "Flatness"
-  intermolecular_distance: "Intermolecular distance"
-  energy_ratio: "Energy ratio"
-  volume_overlap: "Volume overlap"
-  rmsd: "RMSD"
-
-# Test names for results table
-test_names:
-  loading:
-    mol_pred_loaded:                  "Docked ligand successfully loaded"
-    mol_true_loaded:                  "Crystal ligand successfully loaded"
-    mol_cond_loaded:                  "Crystal protein successfully loaded"
-  sanity:
-    chemically_valid:                 "Predicted molecule chemically valid"
-    all_atoms_connected:              "All atoms connected"
-  identity:
-    inchi_docked:                     "Prediction InChI"
-    inchi_crystal:                    "Ground truth InChI"
-    inchi_docked_valid:               "Prediction InChI valid"
-    inchi_crystal_valid:              "Ground truth InChI valid"
-    inchi_overall:                    "InChi strings are identical"
-    inchi_version:                    "InChI versions are identical"
-    formula:                          "Molecular formula preserved"
-    connections:                      "Molecular bonds preserved"
-    hydrogens:                        "Hydrogens preserved"
-    net_charge:                       "Net charge preserved"
-    protons:                          "Protonation preserved"
-    tetrahedral:                      "Tetrahedral chirality preserved"
-    double_bonds:                     "Double bond stereo preserved"
-    stereo_relative_inchi_enatiomer:  "Relative stereo preserved"
-    stereo_absolute:                  "Absolute stereo preserved"
-    stereo:                           "Stereochemistry preserved"
-  distance_geometry:
-    bond_lengths_within_bounds:       "Bond lengths within bounds"
-    bond_angles_within_bounds:        "Bond angles within bounds"
-    no_internal_clash:                "No internal steric clash"
-  flatness:
-    flatness_passes:                  "Aromatic rings flat"
-  intermolecular_distance:
-    smallest_distance:                "Smallest distance between ligand and protein"
-    not_too_far_away:                 "Ligand close to protein"
-    num_pairwise_clashes:             "Number of clashes"
-    max_relative_overlap:             "Maximal overlap"
-    no_clashes:                       "No clashes within threshold"
-  volume_overlap:
-    volume_overlap:                   "Share of volume overlap"
-    no_volume_clash:                  "No volume clash within threshold"
-  energy_ratio:
-    ensemble_avg_energy:              "Ensemble average energy"
-    mol_pred_energy:                  "Predicted conformation energy"
-    energy_ratio:                     "Energy ratio"
-    energy_ratio_passes:              "Energy ratio within threshold"
-  rmsd:
-    rmsd:                             "RMSD"
-    kabsch_rmsd:                      "Kabsch RMSD"
-    rmsd_within_threshold:            "RMSD within threshold"
+modules:
+  - name: "Loading"
+    function: loading
+    selected_outputs:
+      - mol_pred_loaded
+      - mol_true_loaded
+      - mol_cond_loaded
+    rename_outputs:
+      mol_pred_loaded: "Docked ligand successfully loaded"
+      mol_true_loaded: "Crystal ligand successfully loaded"
+      mol_cond_loaded: "Crystal protein successfully loaded"
+  - name: "Chemistry"
+    function: sanity
+    selected_outputs:
+      - chemically_valid
+      - all_atoms_connected
+    rename_outputs:
+      chemically_valid: "Predicted molecule chemically valid"
+  - name: "Chemistry"
+    function: identity
+    parameters:
+      inchi_options: "w" # options passed to InChI generation
+    selected_outputs:
+      - formula
+      - connections
+      - stereo
+    rename_outputs:
+      formula: "Molecular formula preserved"
+      connections: "Molecular bonds preserved"
+      stereo: "Stereochemistry preserved"
+  - name: "Geometry"
+    function: "distance_geometry"
+    parameters:
+      bound_matrix_params:
+        set15bounds: True # topology based bounds also for 1,5- not just until 1,4-
+        scaleVDW: True # scale down lower bounds for atoms less than 5 bonds apart
+        doTriangleSmoothing: True
+        useMacrocycle14config: False
+      threshold_bad_bond_length: 0.2 # widens DG bound by this factor
+      threshold_bad_angle: 0.2 # widens DG bound by this factor
+      threshold_clash: 0.2 # widens DG bound by this factor
+      ignore_hydrogens: True # ignore hydrogens
+    selected_outputs:
+      - bond_lengths_within_bounds
+      - bond_angles_within_bounds
+      - no_internal_clash
+    rename_outputs:
+      bond_lengths_within_bounds: "Bond lengths within bounds"
+      bond_angles_within_bounds: "Bond angles within bounds"
+      no_internal_clash: "No internal clashes"
+  - name: "Flatness"
+    function: "flatness"
+    parameters:
+      flat_systems: # list atoms which together should lie on plane as SMARTS matches
+        aromatic_5_membered_rings_sp2: "[ar5^2]1[ar5^2][ar5^2][ar5^2][ar5^2]1"
+        aromatic_6_membered_rings_sp2: "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1"
+        # - trigonal_planar_double_bonds: "[#6;X3;D2,D3;^2]=[#6;X3;D2,D3;^2]"
+      threshold_flatness: 0.1 # max distance in A to closest shared plane
+    selected_outputs:
+      - flatness_passes
+    rename_outputs:
+      flatness_passes: "Flatness passes"
+  - name: "Energy ratio"
+    function: energy_ratio
+    paramters:
+      threshold_energy_ratio: 7.0
+      ensemble_number_conformations: 50
+    selected_outputs:
+      - energy_ratio_passes
+    rename_outputs:
+      energy_ratio_passes: "Energy ratio passes"
+  - name: "Distance to protein"
+    function: "intermolecular_distance"
+    parameters:
+      vdw_scale: 0.8
+      clash_cutoff: 0.05
+      ignore_hydrogens: True
+      ignore_atom_type: HETATM
+      max_distance: 5.0
+    selected_outputs:
+      - not_too_far_away
+      - no_clashes
+    rename_outputs:
+      not_too_far_away: "Not too far away"
+      no_clashes: "No clashes"
+  - name: "Distance to cofactors"
+    function: "intermolecular_distance"
+    parameters:
+      vdw_scale: 0.8
+      clash_cutoff: 0.05
+      ignore_hydrogens: True
+      ignore_atom_type: ATOM
+      max_distance: 5.0
+    selected_outputs:
+      - no_clashes
+    rename_outputs:
+      no_clashes: "No clashes"
+  - name: "Volume overlap with protein"
+    function: volume_overlap
+    parameters:
+      clash_cutoff: 0.05
+      vdw_scale: 0.8
+      ignore_hydrogens: True
+      ignore_atom_type: HETATM
+    selected_outputs:
+      - no_volume_clash
+    rename_outputs:
+      volume_overlap: "Volume overlap"
+      no_volume_clash: "No volume"
+  - name: "Volume overlap with cofactors"
+    function: volume_overlap
+    parameters:
+      clash_cutoff: 0.05
+      vdw_scale: 0.8
+      ignore_hydrogens: True
+      ignore_atom_type: ATOM
+    selected_outputs:
+      - no_volume_clash
+    rename_outputs:
+      volume_overlap: "Volume overlap"
+      no_volume_clash: "No volume clash"
+  - name: "RMSD"
+    function: rmsd
+    parameters:
+      rmsd_threshold: 2.0
+    selected_outputs:
+      - rmsd_within_threshold
+    rename_outputs:
+      rmsd_within_threshold: "RMSD within threshold"
 
 # Options for loading molecule files with RDKit
-loading_options:
+loading:
   mol_pred:
     cleanup: False
     sanitize: False
     add_hs: False
     assign_stereo: False
     load_all: True
-  mol_true:
+  mol_True:
     cleanup: False
     sanitize: False
     add_hs: False

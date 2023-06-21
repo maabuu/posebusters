@@ -64,17 +64,17 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
         molbusters_results = molbusters.bust(**mol_args)
 
     config = molbusters.config
-    config_columns = [(m, c) for m in config["tests"].keys() for c in config["tests"][m]]
+    selected_columns = [(c["name"], n) for c in config["modules"] for n in c["selected_outputs"]]
 
     for i, results_dict in enumerate(molbusters_results):
         results = _dataframe_from_output(results_dict, "results")
 
-        missing_columns = [c for c in config_columns if c not in results.columns]
+        missing_columns = [c for c in selected_columns if c not in results.columns]
         results[missing_columns] = pd.NA
-        selected_columns = config_columns if not full_report or outfmt == "short" else results.columns
+        selected_columns = selected_columns if not full_report or outfmt == "short" else results.columns
 
         results = results[selected_columns]
-        results = _apply_column_names_from_config(results, config)
+        # results = _apply_column_names_from_config(results, config)
         output.write(_format_results(results, outfmt, no_header, i))
 
 

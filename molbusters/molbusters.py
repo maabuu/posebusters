@@ -43,10 +43,10 @@ molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 class MolBusters:
     """Class to run all tests on a set of molecules."""
 
-    def __init__(self, config: str | dict = "dock", debug: bool = False, top_n: int | None = None):
+    def __init__(self, config: str | dict = "redock", debug: bool = False, top_n: int | None = None):
         """Initialize MolBusters object."""
-        self.module_func: dict[str, Callable]
-        self.module_args: dict[str, set[str]]
+        self.module_func: list  # dict[str, Callable]
+        self.module_args: list  # dict[str, set[str]]
 
         if isinstance(config, str) and config in {"dock", "redock", "mol"}:
             logger.info(f"Using default configuration for mode {config}.")
@@ -103,13 +103,13 @@ class MolBusters:
         for i, paths in self.file_paths.iterrows():
             mol_args = {}
             if "mol_cond" in paths and paths["mol_cond"] is not None:
-                mol_cond_load_params = self.config.get("loading_options", {}).get("mol_cond", {})
+                mol_cond_load_params = self.config.get("loading", {}).get("mol_cond", {})
                 mol_args["mol_cond"] = safe_load_mol(path=paths["mol_cond"], **mol_cond_load_params)
             if "mol_true" in paths and paths["mol_true"] is not None:
-                mol_true_load_params = self.config.get("loading_options", {}).get("mol_true", {})
+                mol_true_load_params = self.config.get("loading", {}).get("mol_true", {})
                 mol_args["mol_true"] = safe_load_mol(path=paths["mol_true"], **mol_true_load_params)
 
-            mol_pred_load_params = self.config.get("loading_options", {}).get("mol_pred", {})
+            mol_pred_load_params = self.config.get("loading", {}).get("mol_pred", {})
             for i, mol_pred in enumerate(safe_supply_mols(paths["mol_pred"], **mol_pred_load_params)):
                 if self.config["top_n"] is not None and i >= self.config["top_n"]:
                     break
@@ -118,34 +118,38 @@ class MolBusters:
 
                 results_key = (str(paths["mol_pred"]), self._get_name(mol_pred, i))
 
-                for module_name in self.config.get("tests", {}).keys():
+                for name, func, args in zip(self.module_name, self.module_func, self.module_args):
                     # pick needed arguments for module
-                    module_args = self.module_args[module_name]
-                    args = {k: v for k, v in mol_args.items() if k in module_args}
+                    args = {k: v for k, v in mol_args.items() if k in args}
                     # loading takes all inputs
-                    if module_name == "loading":
-                        args = {k: args.get(k, None) for k in module_args}
+                    if name == "loading":
+                        args = {k: args.get(k, None) for k in args}
                     # run module when all needed input molecules are valid Mol objects
-                    if module_name != "loading" and not all(args.get(m, None) for m in module_args):
+                    if name != "loading" and not all(args.get(m, None) for m in args):
                         module_output: dict[str, Any] = {"results": {}}
                     else:
-                        module_output = self.module_func[module_name](**args)
+                        module_output = func(**args)
 
                     # save to object
-                    self.results[results_key][module_name] = module_output["results"]
-                    self.details[results_key][module_name] = module_output.get("details", {})
+                    self.results[results_key][name] = self.results[results_key].get(name, {}) | module_output["results"]
+                    # self.details[results_key][name] |= module_output.get("details", {})
 
                 # return results for this entry
                 yield {results_key: self.results[results_key]}
 
     def _initialize_modules(self) -> None:
-        self.module_func = {}
-        self.module_args = {}
-        for module_name in self.config.get("tests").keys():
-            module_config = self.config.get("parameters", {}).get(module_name, {})
-            self.module_func[module_name] = partial(module_dict[module_name], **module_config)
-            module_args = set(inspect.signature(self.module_func[module_name]).parameters)
-            self.module_args[module_name] = module_args.intersection({"mol_pred", "mol_true", "mol_cond"})
+        self.module_name = []
+        self.module_func = []
+        self.module_args = []
+        for module in self.config["modules"]:
+            function = module_dict[module["function"]]
+            parameters = module.get("parameters", {})
+            module_args = set(inspect.signature(function).parameters).intersection({"mol_pred", "mol_true", "mol_cond"})
+
+            self.module_name.append(module["name"])
+            self.module_func.append(partial(function, **parameters))
+            self.module_args.append(module_args)
+        pass
 
     @staticmethod
     def _get_name(mol: Mol, i: int) -> str:

@@ -18,7 +18,7 @@ def check_intermolecular_distance(
     vdw_scale: float = 0.8,
     clash_cutoff: float = 0.05,
     ignore_hydrogens: bool = True,
-    ignore_hetatms: bool = False,
+    ignore_atom_type: str | None = None,
     max_distance: float = 5.0,
 ) -> dict[str, Any]:
     """Calculate pairwise intermolecular distances between ligand and protein atoms.
@@ -30,7 +30,7 @@ def check_intermolecular_distance(
         clash_cutoff: Threshold for how much scaled van der Waal radii may overlap before a clash is reported. Defaults
             to 0.05.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
-        ignore_hetatms: Whether to ignore heteroatoms in protein. Defaults to False.
+        ignore_atom_type: Whether to ignore HETATM or ATOM entries. Defaults to None.
         max_distance: Maximum distance (in Angstrom) between ligand and protein to be considered as valid. Defaults to
             5.0.
 
@@ -46,7 +46,7 @@ def check_intermolecular_distance(
     vdw_ligand = _get_vdw_radii(mol_pred)
     vdw_protein_all = _get_vdw_radii(mol_cond)
 
-    hetatm_mask = [not a.GetPDBResidueInfo().GetIsHeteroAtom() for a in mol_cond.GetAtoms()]
+    hetatm_mask = [a.GetPDBResidueInfo().GetIsHeteroAtom() for a in mol_cond.GetAtoms()]
 
     if ignore_hydrogens:
         heavy_atoms_mask_ligand = np.asarray(atoms_ligand != "H")
@@ -63,15 +63,22 @@ def check_intermolecular_distance(
 
         hetatm_mask = np.asarray(hetatm_mask)[heavy_atoms_mask_protein]
 
-    if ignore_hetatms:
+    if ignore_atom_type == "HETATM":
+        atom_mask = [not m for m in hetatm_mask]
+        coords_protein = coords_protein[atom_mask, :]
+        atoms_protein = atoms_protein[atom_mask]
+        vdw_protein_all = vdw_protein_all[atom_mask]
+    elif ignore_atom_type == "ATOM":
         coords_protein = coords_protein[hetatm_mask, :]
         atoms_protein = atoms_protein[hetatm_mask]
         vdw_protein_all = vdw_protein_all[hetatm_mask]
+    elif ignore_atom_type is not None:
+        raise ValueError(f"Unknown ignore_atom_type: {ignore_atom_type}")
 
     distances_all = _pairwise_distance(coords_ligand, coords_protein)
 
     # minimum distance
-    smallest_distance = distances_all.min()
+    smallest_distance = distances_all.min() if distances_all.size else np.inf
 
     # select atoms that are close to ligand to check for clash
     mask_protein = distances_all.min(axis=0) <= 5.5 * vdw_scale

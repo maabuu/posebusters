@@ -129,22 +129,16 @@ def get_hbond_donors(mol: Mol) -> set[int]:
     return {s[0] for s in mol.GetSubstructMatches(HDonorSmarts, uniquify=1)}
 
 
-def delete_hetatoms(mol: Mol) -> Mol:
-    """Delete heteroatoms from molecule.
+def delete_atoms(mol: Mol, indices: list[int]) -> Mol:
+    """Delete atoms from molecule.
 
     Args:
-        mol: Molecule to delete heteroatoms from.
+        mol: Molecule to delete atoms from.
 
     Returns:
-        Molecule without heteroatoms.
+        Molecule without atoms.
     """
-    # if no PDB residue info is present, return the molecule as is
-    if mol.GetAtoms()[0].GetPDBResidueInfo() is None:
-        logger.warning("No PDB residue info present. Skipping deletion of heteroatoms.")
-        return mol
-
-    indices = [a.GetIdx() for a in mol.GetAtoms() if a.GetPDBResidueInfo().GetIsHeteroAtom()]
-    if len(indices):
+    if len(indices) == 0:
         return mol
 
     mol = RWMol(mol)
