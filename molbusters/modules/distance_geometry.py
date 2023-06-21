@@ -69,6 +69,9 @@ def check_geometry(
     angles = sorted(_get_angle_atom_indices(bond_set))  # triples
     angle_set = {(a[0], a[2]): a for a in angles}  # {tuples : triples}
 
+    if len(bond_set) == 0:
+        raise ValueError("Molecule has no bonds.")
+
     # distance geometry bounds, lower triangle min distances, upper triangle max distances
     bounds = GetMoleculeBoundsMatrix(mol, **bound_matrix_params)
 
