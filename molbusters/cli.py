@@ -75,7 +75,7 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
         selected_columns = selected_columns if not full_report or outfmt == "short" else results.columns
 
         results = results[selected_columns]
-        results.columns = [names_lookup[c] for c in results.columns]
+        results.columns = [names_lookup.get(c, c[-1]) for c in results.columns]
         output.write(_format_results(results, outfmt, no_header, i))
 
 
