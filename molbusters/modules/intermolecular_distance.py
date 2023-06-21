@@ -18,7 +18,7 @@ def check_intermolecular_distance(
     vdw_scale: float = 0.8,
     clash_cutoff: float = 0.05,
     ignore_hydrogens: bool = True,
-    ignore_hydrogen_bonds: bool = False,
+    ignore_hetatms: bool = False,
     max_distance: float = 5.0,
 ) -> dict[str, Any]:
     """Calculate pairwise intermolecular distances between ligand and protein atoms.
@@ -30,7 +30,7 @@ def check_intermolecular_distance(
         clash_cutoff: Threshold for how much scaled van der Waal radii may overlap before a clash is reported. Defaults
             to 0.05.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
-        ignore_hydrogen_bonds: Whether to ignore hydrogens which may be involved in hydrogen bonding. Defaults to False.
+        ignore_hetatms: Whether to ignore heteroatoms in protein. Defaults to False.
         max_distance: Maximum distance (in Angstrom) between ligand and protein to be considered as valid. Defaults to
             5.0.
 
@@ -46,6 +46,8 @@ def check_intermolecular_distance(
     vdw_ligand = _get_vdw_radii(mol_pred)
     vdw_protein_all = _get_vdw_radii(mol_cond)
 
+    hetatm_mask = [not a.GetPDBResidueInfo().GetIsHeteroAtom() for a in mol_cond.GetAtoms()]
+
     if ignore_hydrogens:
         heavy_atoms_mask_ligand = np.asarray(atoms_ligand != "H")
         heavy_atoms_mask_protein = np.asarray(atoms_protein != "H")
@@ -59,11 +61,12 @@ def check_intermolecular_distance(
         vdw_ligand = vdw_ligand[heavy_atoms_mask_ligand]
         vdw_protein_all = vdw_protein_all[heavy_atoms_mask_protein]
 
-    elif ignore_hydrogen_bonds:
-        raise NotImplementedError
-        # hbonds = _is_hbond(mol_pred, mol_cond, zip(violation_ligand, violation_protein))
-        # details["has_h"] = details.apply(_has_h, axis=1)
-        # details["hbond_donor_acceptor"] = hbonds
+        hetatm_mask = np.asarray(hetatm_mask)[heavy_atoms_mask_protein]
+
+    if ignore_hetatms:
+        coords_protein = coords_protein[hetatm_mask, :]
+        atoms_protein = atoms_protein[hetatm_mask]
+        vdw_protein_all = vdw_protein_all[hetatm_mask]
 
     distances_all = _pairwise_distance(coords_ligand, coords_protein)
 

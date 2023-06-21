@@ -14,6 +14,7 @@ from rdkit.Chem.rdchem import (
     Conformer,
     GetPeriodicTable,
     Mol,
+    RWMol,
 )
 from rdkit.Chem.rdMolAlign import GetBestAlignmentTransform
 from rdkit.Chem.rdmolfiles import MolFromSmarts
@@ -126,6 +127,31 @@ def get_hbond_acceptors(mol: Mol) -> set[int]:
 def get_hbond_donors(mol: Mol) -> set[int]:
     """Return indices of atoms that can act as hydrogen bond donors."""
     return {s[0] for s in mol.GetSubstructMatches(HDonorSmarts, uniquify=1)}
+
+
+def delete_hetatoms(mol: Mol) -> Mol:
+    """Delete heteroatoms from molecule.
+
+    Args:
+        mol: Molecule to delete heteroatoms from.
+
+    Returns:
+        Molecule without heteroatoms.
+    """
+    # if no PDB residue info is present, return the molecule as is
+    if mol.GetAtoms()[0].GetPDBResidueInfo() is None:
+        logger.warning("No PDB residue info present. Skipping deletion of heteroatoms.")
+        return mol
+
+    indices = [a.GetIdx() for a in mol.GetAtoms() if a.GetPDBResidueInfo().GetIsHeteroAtom()]
+    if len(indices):
+        return mol
+
+    mol = RWMol(mol)
+    # delete in reverse order to avoid reindexing issues
+    for index in sorted(indices, reverse=True):
+        mol.RemoveAtom(index)
+    return Mol(mol)
 
 
 def _align_and_renumber(mol_true: Mol, mol_pred: Mol) -> Mol:
