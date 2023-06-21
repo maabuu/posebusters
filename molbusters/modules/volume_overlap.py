@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import logging
 
-import numpy as np
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdShapeHelpers import ShapeProtrudeDist
 

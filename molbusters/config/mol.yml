@@ -55,7 +55,7 @@ modules:
       flatness_passes: "Flatness passes"
   - name: "Energy ratio"
     function: energy_ratio
-    paramters:
+    parameters:
       threshold_energy_ratio: 7.0
       ensemble_number_conformations: 50
     selected_outputs:
