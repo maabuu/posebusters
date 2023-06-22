@@ -8,27 +8,9 @@ from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdShapeHelpers import ShapeProtrudeDist
 
 from ..tools.molecules import delete_atoms
+from ..tools.protein import get_mask
 
 logger = logging.getLogger(__name__)
-_inorganic_cofactors = {
-    "Li",
-    "Be",
-    "Na",
-    "Mg",
-    "Cl",
-    "K",
-    "Ca",
-    "Mn",
-    "Fe",
-    "Co",
-    "Ni",
-    "Cu",
-    "Zn",
-    "Br",
-    "Rb",
-    "Cd",
-    "I",
-}
 
 
 def check_volume_overlap(
@@ -44,7 +26,7 @@ def check_volume_overlap(
     Args:
         mol_pred: Predicted molecule (docked ligand) with one conformer.
         mol_cond: Conditioning molecule (protein) with one conformer.
-        clash_cutoff: Threshold for how much volume overlap is allowed. This is the maxumum share of volume of
+        clash_cutoff: Threshold for how much volume overlap is allowed. This is the maximum share of volume of
             `mol_pred` allowed to overlap with `mol_cond`. Defaults to 0.05.
         vdw_scale: Scaling factor for the van der Waals radii which define the volume around each atom. Defaults to 0.8.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
@@ -57,22 +39,11 @@ def check_volume_overlap(
     assert isinstance(mol_pred, Mol)
     assert isinstance(mol_cond, Mol)
 
-    if ignore := set(ignore_types) - {"protein", "organic_cofactors", "inorganic_cofactors"}:
-        raise ValueError(f"Ignore types {ignore} not supported.")
-    indices = set()
-    if "protein" in ignore_types:
-        indices.update(a.GetIdx() for a in mol_cond.GetAtoms() if not a.GetPDBResidueInfo().GetIsHeteroAtom())
-    if "organic_cofactors" in ignore_types:
-        indices.update(a.GetIdx() for a in mol_cond.GetAtoms() if a.GetPDBResidueInfo().GetIsHeteroAtom())
-    if "inorganic_cofactors" in ignore_types:
-        indices.update(a.GetIdx() for a in mol_cond.GetAtoms() if a.GetSymbol() in _inorganic_cofactors)
-    else:
-        # hetero atoms include inorganic cofactors so remove again if not ignored
-        [indices.discard(a.GetIdx()) for a in mol_cond.GetAtoms() if a.GetSymbol() in _inorganic_cofactors]
-    mol_cond = delete_atoms(mol_cond, indices)
-
-    if mol_cond.GetNumAtoms() == 0:
+    keep_mask = np.array(get_mask(mol_cond, ignore_hydrogens, ignore_types))
+    if keep_mask.sum() == 0:
         return {"results": {"volume_overlap": np.nan, "no_volume_clash": True}}
+    if keep_mask.sum() < len(keep_mask):
+        mol_cond = delete_atoms(mol_cond, np.where(~keep_mask)[0].tolist())
 
     overlap = 1 - ShapeProtrudeDist(mol_pred, mol_cond, vdwScale=vdw_scale, ignoreHs=ignore_hydrogens)
 

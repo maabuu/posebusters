@@ -1,10 +1,10 @@
-"""Functions for formatting the output of the posebusters tools."""
+"""Functions for formatting the output of the PoseBusters tools."""
 
 import pandas as pd
 
 
 def create_long_output(df: pd.DataFrame) -> str:
-    """Create a detailed output string for the long Molbuster reporting format.
+    """Create a detailed output string for the long PoseBusters reporting format.
 
     Args:
         df: Report dataframe.
@@ -23,7 +23,7 @@ def create_long_output(df: pd.DataFrame) -> str:
 
 
 def create_short_output(df: pd.DataFrame) -> str:
-    """Create a one line output string for the short Molbuster reporting format.
+    """Create a one line output string for the short PoseBusters reporting format.
 
     Args:
         df: Report dataframe.

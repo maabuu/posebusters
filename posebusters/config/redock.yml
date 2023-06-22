@@ -10,7 +10,7 @@
 modules:
   - name: "Loading"
     function: loading
-    selected_outputs:
+    chosen_binary_test_output:
       - mol_pred_loaded
       - mol_true_loaded
       - mol_cond_loaded
@@ -20,7 +20,7 @@ modules:
       mol_cond_loaded: "Crystal protein successfully loaded"
   - name: "Chemistry"
     function: sanity
-    selected_outputs:
+    chosen_binary_test_output:
       - chemically_valid
     rename_outputs:
       chemically_valid: "Predicted molecule chemically valid"
@@ -28,7 +28,7 @@ modules:
     function: identity
     parameters:
       inchi_options: "w" # options passed to InChI generation
-    selected_outputs:
+    chosen_binary_test_output:
       - formula
       - connections
       - stereo
@@ -48,7 +48,7 @@ modules:
       threshold_bad_angle: 0.2 # widens DG bound by this factor
       threshold_clash: 0.2 # widens DG bound by this factor
       ignore_hydrogens: True # ignore hydrogens
-    selected_outputs:
+    chosen_binary_test_output:
       - bond_lengths_within_bounds
       - bond_angles_within_bounds
       - no_internal_clash
@@ -64,7 +64,7 @@ modules:
         aromatic_6_membered_rings_sp2: "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1"
         # - trigonal_planar_double_bonds: "[#6;X3;D2,D3;^2]=[#6;X3;D2,D3;^2]"
       threshold_flatness: 0.1 # max distance in A to closest shared plane
-    selected_outputs:
+    chosen_binary_test_output:
       - flatness_passes
     rename_outputs:
       flatness_passes: "Flatness passes"
@@ -73,7 +73,7 @@ modules:
     parameters:
       threshold_energy_ratio: 7.0
       ensemble_number_conformations: 50
-    selected_outputs:
+    chosen_binary_test_output:
       - energy_ratio_passes
     rename_outputs:
       energy_ratio_passes: "Energy ratio passes"
@@ -87,7 +87,7 @@ modules:
       - organic_cofactors
       - inorganic_cofactors
       max_distance: 5.0
-    selected_outputs:
+    chosen_binary_test_output:
       - not_too_far_away
       - no_clashes
     rename_outputs:
@@ -104,7 +104,7 @@ modules:
       - protein
       - inorganic_cofactors
       max_distance: 5.0
-    selected_outputs:
+    chosen_binary_test_output:
       - no_clashes
     rename_outputs:
       no_clashes: "No clashes with organic cofactors"
@@ -119,7 +119,7 @@ modules:
       - protein
       - organic_cofactors
       max_distance: 5.0
-    selected_outputs:
+    chosen_binary_test_output:
       - no_clashes
     rename_outputs:
       no_clashes: "No clashes with inorganic cofactors"
@@ -133,7 +133,7 @@ modules:
       ignore_types:
       - organic_cofactors
       - inorganic_cofactors
-    selected_outputs:
+    chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
       volume_overlap: "Volume overlap with protein"
@@ -148,7 +148,7 @@ modules:
       ignore_types:
       - protein
       - inorganic_cofactors
-    selected_outputs:
+    chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
       volume_overlap: "Volume overlap with organic cofactors"
@@ -163,7 +163,7 @@ modules:
       ignore_types:
       - protein
       - organic_cofactors
-    selected_outputs:
+    chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
       volume_overlap: "Volume overlap with inorganic cofactors"
@@ -173,7 +173,7 @@ modules:
     function: rmsd
     parameters:
       rmsd_threshold: 2.0
-    selected_outputs:
+    chosen_binary_test_output:
       - rmsd_within_threshold
     rename_outputs:
       rmsd_within_threshold: "RMSD within threshold"

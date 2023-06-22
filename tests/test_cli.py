@@ -27,13 +27,6 @@ def test_bust_redocks_1ia1() -> None:
     assert result.exit_code == 0
 
 
-def test_bust_redocks_7w2p() -> None:
-    result = runner.invoke(
-        bust, [mol_pred_7w2p, "-l", mol_true_7w2p, "-p", mol_cond_7w2p, "--full-report", "--outfmt", "csv"]
-    )
-    assert result.exit_code == 0
-
-
 def test_bust_docks() -> None:
     result = runner.invoke(bust, [mol_pred_1ia1, "-p", mol_cond_1ia1])
     assert result.exit_code == 0

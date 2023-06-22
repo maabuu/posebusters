@@ -5,30 +5,12 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from rdkit.Chem.rdchem import Atom, GetPeriodicTable, Mol
+from rdkit.Chem.rdchem import GetPeriodicTable, Mol
 
 from ..tools.molecules import get_hbond_acceptors, get_hbond_donors
+from ..tools.protein import get_mask
 
 _periodic_table = GetPeriodicTable()
-_inorganic_cofactors = {
-    "Li",
-    "Be",
-    "Na",
-    "Mg",
-    "Cl",
-    "K",
-    "Ca",
-    "Mn",
-    "Fe",
-    "Co",
-    "Ni",
-    "Cu",
-    "Zn",
-    "Br",
-    "Rb",
-    "Cd",
-    "I",
-}
 
 
 def check_intermolecular_distance(
@@ -72,13 +54,7 @@ def check_intermolecular_distance(
         atoms_ligand = atoms_ligand[heavy_atoms_mask_ligand]
         vdw_ligand = vdw_ligand[heavy_atoms_mask_ligand]
 
-    mask = _get_mask(
-        mol_cond,
-        ignore_hydrogens,
-        "protein" in ignore_types,
-        "organic_cofactors" in ignore_types,
-        "inorganic_cofactors" in ignore_types,
-    )
+    mask = get_mask(mol_cond, ignore_hydrogens, ignore_types)
     coords_protein = coords_protein[mask, :]
     atoms_protein = atoms_protein[mask]
     vdw_protein_all = vdw_protein_all[mask]
@@ -161,26 +137,3 @@ def _is_hbond(ligand, protein, atom_pairs) -> list[bool]:
         else:
             out.append(False)
     return out
-
-
-def _get_mask(
-    mol: Mol, ignore_h=True, ignore_protein=False, ignore_organic_cofactors=False, ignore_inorganic_cofactors=False
-) -> list[bool]:
-    return [
-        _check_atom(a, ignore_h, ignore_protein, ignore_organic_cofactors, ignore_inorganic_cofactors)
-        for a in mol.GetAtoms()
-    ]
-
-
-def _check_atom(
-    atom: Atom, ignore_h=True, ignore_protein=False, ignore_organic_cofactors=False, ignore_inorganic_cofactors=False
-) -> bool:
-    symbol = atom.GetSymbol()
-    if ignore_h and symbol == "H":
-        return False
-    is_hetero = atom.GetPDBResidueInfo().GetIsHeteroAtom()
-    if ignore_protein and not is_hetero:
-        return False
-    if ignore_inorganic_cofactors and symbol in _inorganic_cofactors:
-        return False
-    return True

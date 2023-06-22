@@ -64,7 +64,7 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
         posebusters_results = posebusters.bust(**mol_args)
 
     config = posebusters.config
-    selected_columns = [(c["name"], n) for c in config["modules"] for n in c["selected_outputs"]]
+    test_columns = [(c["name"], n) for c in config["modules"] for n in c["chosen_binary_test_output"]]
     names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c["rename_outputs"].items()}
     suffix_lookup = {c["name"]: c["rename_suffix"] for c in config["modules"] if "rename_suffix" in c}
 
@@ -72,9 +72,9 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
         results = _dataframe_from_output(results_dict)
 
         available_columns = results.columns.tolist()
-        missing_columns = [c for c in selected_columns if c not in available_columns]
-        extra_columns = [c for c in available_columns if c not in selected_columns]
-        columns = selected_columns + extra_columns if full_report and outfmt != "short" else selected_columns
+        missing_columns = [c for c in test_columns if c not in available_columns]
+        extra_columns = [c for c in available_columns if c not in test_columns]
+        columns = test_columns + extra_columns if full_report and outfmt != "short" else test_columns
 
         results[missing_columns] = pd.NA
         results = results[columns]
