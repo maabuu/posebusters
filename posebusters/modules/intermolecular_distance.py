@@ -10,7 +10,25 @@ from rdkit.Chem.rdchem import Atom, GetPeriodicTable, Mol
 from ..tools.molecules import get_hbond_acceptors, get_hbond_donors
 
 _periodic_table = GetPeriodicTable()
-_inorganic_cofactors = {"Li", "Be", "Na", "Mg", "Cl", "K", "Ca", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Br", "Rb", "I"}
+_inorganic_cofactors = {
+    "Li",
+    "Be",
+    "Na",
+    "Mg",
+    "Cl",
+    "K",
+    "Ca",
+    "Mn",
+    "Fe",
+    "Co",
+    "Ni",
+    "Cu",
+    "Zn",
+    "Br",
+    "Rb",
+    "Cd",
+    "I",
+}
 
 
 def check_intermolecular_distance(

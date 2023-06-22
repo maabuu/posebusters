@@ -9,7 +9,25 @@ from rdkit.Chem.rdShapeHelpers import ShapeProtrudeDist
 from ..tools.molecules import delete_atoms
 
 logger = logging.getLogger(__name__)
-_inorganic_cofactors = {"Li", "Be", "Na", "Mg", "Cl", "K", "Ca", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Br", "Rb", "I"}
+_inorganic_cofactors = {
+    "Li",
+    "Be",
+    "Na",
+    "Mg",
+    "Cl",
+    "K",
+    "Ca",
+    "Mn",
+    "Fe",
+    "Co",
+    "Ni",
+    "Cu",
+    "Zn",
+    "Br",
+    "Rb",
+    "Cd",
+    "I",
+}
 
 
 def check_volume_overlap(
