@@ -20,6 +20,7 @@ def check_volume_overlap(
     vdw_scale: float = 0.8,
     ignore_hydrogens: bool = True,
     ignore_types: set[str] = set(),
+    search_distance: float = 6.0,
 ) -> dict[str, dict]:
     """Check volume overlap between ligand and protein.
 
@@ -39,11 +40,18 @@ def check_volume_overlap(
     assert isinstance(mol_pred, Mol)
     assert isinstance(mol_cond, Mol)
 
+    # filter by atom types
     keep_mask = np.array(get_mask(mol_cond, ignore_hydrogens, ignore_types))
-    if keep_mask.sum() == 0:
+    mol_cond = _filter_by_mask(mol_cond, keep_mask)
+    if mol_cond.GetNumAtoms() == 0:
         return {"results": {"volume_overlap": np.nan, "no_volume_clash": True}}
-    if keep_mask.sum() < len(keep_mask):
-        mol_cond = delete_atoms(mol_cond, np.where(~keep_mask)[0].tolist())
+
+    # filter by distance
+    distances = _pairwise_distance(mol_pred.GetConformer().GetPositions(), mol_cond.GetConformer().GetPositions())
+    keep_mask = distances.min(axis=0) <= search_distance * vdw_scale
+    mol_cond = _filter_by_mask(mol_cond, keep_mask)
+    if mol_cond.GetNumAtoms() == 0:
+        return {"results": {"volume_overlap": np.nan, "no_volume_clash": True}}
 
     overlap = 1 - ShapeProtrudeDist(mol_pred, mol_cond, vdwScale=vdw_scale, ignoreHs=ignore_hydrogens)
 
@@ -53,3 +61,13 @@ def check_volume_overlap(
     }
 
     return {"results": results}
+
+
+def _pairwise_distance(x, y):
+    return np.linalg.norm(x[:, None, :] - y[None, :, :], axis=-1)
+
+
+def _filter_by_mask(mol: Mol, mask: np.ndarray) -> Mol:
+    if mask.sum() < len(mask):
+        mol = delete_atoms(mol, np.where(~mask)[0].tolist())
+    return mol

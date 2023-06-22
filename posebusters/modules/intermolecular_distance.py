@@ -21,6 +21,7 @@ def check_intermolecular_distance(
     ignore_hydrogens: bool = True,
     ignore_types: set[str] = set(),
     max_distance: float = 5.0,
+    search_distance: float = 6.0,
 ) -> dict[str, Any]:
     """Calculate pairwise intermolecular distances between ligand and protein atoms.
 
@@ -65,7 +66,7 @@ def check_intermolecular_distance(
     smallest_distance = distances_all.min() if distances_all.size else np.inf
 
     # select atoms that are close to ligand to check for clash
-    mask_protein = distances_all.min(axis=0) <= 5.5 * vdw_scale
+    mask_protein = distances_all.min(axis=0) <= search_distance * vdw_scale
     distances = distances_all[:, mask_protein]
     vdw_protein = vdw_protein_all[mask_protein]
 

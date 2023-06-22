@@ -1,6 +1,9 @@
-from rdkit.Chem.rdchem import Atom, Mol
+import logging
 from typing import Iterable
 
+from rdkit.Chem.rdchem import Atom, Mol
+
+logger = logging.getLogger(__name__)
 _inorganic_cofactor_elements = {
     "Li",
     "Be",
@@ -38,6 +41,9 @@ def get_mask(mol: Mol, ignore_h: bool, ignore_types: Iterable[str]) -> list[bool
     if ignore := ignore_types - {"protein", "organic_cofactors", "inorganic_cofactors"}:
         raise ValueError(f"Ignore types {ignore} not supported.")
 
+    if mol.GetAtomWithIdx(0).GetPDBResidueInfo() is None:
+        logger.warning("No PDB information found. Assuming organic molecule.")
+
     ignore_protein = "protein" in ignore_types
     ignore_org_cof = "organic_cofactors" in ignore_types
     ignore_inorg_cof = "inorganic_cofactors" in ignore_types
@@ -47,22 +53,25 @@ def get_mask(mol: Mol, ignore_h: bool, ignore_types: Iterable[str]) -> list[bool
 
 def _keep_atom(atom: Atom, ignore_h: bool, ignore_protein: bool, ignore_org_cof: bool, ignore_inorg_cof: bool) -> bool:
     """Whether to keep atom for given ignore flags."""
-    if ignore_h and atom.GetSymbol() == "H":
-        return False
-
-    inorganic = atom.GetSymbol() in _inorganic_cofactor_elements
-    if (inorganic and ignore_inorg_cof) or (not inorganic and ignore_org_cof):
+    symbol = atom.GetSymbol()
+    if ignore_h and symbol == "H":
         return False
 
     # if loaded from PDB, we can use the residue names and the hetero flag
     info = atom.GetPDBResidueInfo()
-    if info is not None:
-        is_hetero = info.GetIsHeteroAtom()
-        if ignore_protein and not is_hetero:
+    if info is None:
+        if ignore_org_cof:
             return False
+        return True
 
-        inorganic = info.GetResidueName() in _inorganic_cofactor_ccd_codes
-        if (inorganic and ignore_inorg_cof) or (not inorganic and ignore_org_cof):
+    is_hetero = info.GetIsHeteroAtom()
+    if not is_hetero:
+        if ignore_protein:
             return False
+        return True
+
+    inorganic = symbol in _inorganic_cofactor_elements or info.GetResidueName() in _inorganic_cofactor_ccd_codes
+    if (inorganic and ignore_inorg_cof) or (not inorganic and ignore_org_cof):
+        return False
 
     return True
