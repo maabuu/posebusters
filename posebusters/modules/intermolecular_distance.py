@@ -45,14 +45,14 @@ def check_intermolecular_distance(
     Args:
         mol_pred: Predicted molecule (docked ligand) with one conformer.
         mol_cond: Conditioning molecule (protein) with one conformer.
-        vdw_scale: Scaling factor for the van der Waals radii which define the volume around each atom. Defaults to 0.8.
-        clash_cutoff: Threshold for how much scaled van der Waal radii may overlap before a clash is reported. Defaults
+        vdw_scale: Scaling factor for the van der Waals radii. Defaults to 0.8.
+        clash_cutoff: Threshold for how much the atoms may overlap before a clash is reported. Defaults
             to 0.05.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
-        ignore_types: Whether to ignore certain atom types in mol_cond. Defaults to empty set. Possible values to
-            include are "protein", "organic_cofactors", "inorganic_cofactors".
-        max_distance: Maximum distance (in Angstrom) between ligand and protein to be considered as valid. Defaults to
-            5.0.
+        ignore_types: Which types of atoms to ignore. Possible values are "protein", "organic_cofactors",
+            "inorganic_cofactors". Defaults to none (empty set).
+        max_distance: Maximum distance (in Angstrom) ligand and protein may be apart to be considered as valid.
+            Defaults to 5.0.
 
     Returns:
         PoseBusters results dictionary.

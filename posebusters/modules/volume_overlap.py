@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 
+import numpy as np
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdShapeHelpers import ShapeProtrudeDist
 
@@ -43,12 +44,12 @@ def check_volume_overlap(
     Args:
         mol_pred: Predicted molecule (docked ligand) with one conformer.
         mol_cond: Conditioning molecule (protein) with one conformer.
-        clash_cutoff: Threshold for how much volume overlap is allowed. This is the share of volume of `mol_pred`
-            that overlaps with `mol_cond`. Defaults to 0.05.
+        clash_cutoff: Threshold for how much volume overlap is allowed. This is the maxumum share of volume of
+            `mol_pred` allowed to overlap with `mol_cond`. Defaults to 0.05.
         vdw_scale: Scaling factor for the van der Waals radii which define the volume around each atom. Defaults to 0.8.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
-        ignore_types: Which types of atoms to ignore. Defaults to {}. Possible values are "protein",
-            "organic_cofactors", "inorganic_cofactors".
+        ignore_types: Which types of atoms to ignore. Possible values are "protein", "organic_cofactors",
+            "inorganic_cofactors". Defaults to none (empty set).
 
     Returns:
         PoseBusters results dictionary.
@@ -69,6 +70,9 @@ def check_volume_overlap(
         # hetero atoms include inorganic cofactors so remove again if not ignored
         [indices.discard(a.GetIdx()) for a in mol_cond.GetAtoms() if a.GetSymbol() in _inorganic_cofactors]
     mol_cond = delete_atoms(mol_cond, indices)
+
+    if mol_cond.GetNumAtoms() == 0:
+        return {"results": {"volume_overlap": np.nan, "no_volume_clash": True}}
 
     overlap = 1 - ShapeProtrudeDist(mol_pred, mol_cond, vdwScale=vdw_scale, ignoreHs=ignore_hydrogens)
 
