@@ -61,8 +61,7 @@ class MolBusters:
         self.config["debug"] = self.config.get("debug", debug)
         self.config["top_n"] = self.config.get("top_n", top_n)
 
-        self.results: dict[tuple[str, str], dict[str, Any]] = defaultdict(dict)
-        self.details: dict[tuple[str, str], Any] = defaultdict(dict)
+        self.results: dict[tuple[str, str], list[tuple[str, str, Any]]] = defaultdict(list)
 
     def bust(
         self, mol_pred: Mol | Path, mol_true: Mol | Path | None, mol_cond: Mol | Path | None
@@ -118,21 +117,21 @@ class MolBusters:
 
                 results_key = (str(paths["mol_pred"]), self._get_name(mol_pred, i))
 
-                for name, func, args in zip(self.module_name, self.module_func, self.module_args):
+                for name, fname, func, args in zip(self.module_name, self.fname, self.module_func, self.module_args):
                     # pick needed arguments for module
                     args = {k: v for k, v in mol_args.items() if k in args}
                     # loading takes all inputs
-                    if name == "loading":
+                    if fname == "loading":
                         args = {k: args.get(k, None) for k in args}
                     # run module when all needed input molecules are valid Mol objects
-                    if name != "loading" and not all(args.get(m, None) for m in args):
+                    if fname != "loading" and not all(args.get(m, None) for m in args):
                         module_output: dict[str, Any] = {"results": {}}
                     else:
                         module_output = func(**args)
 
                     # save to object
-                    self.results[results_key][name] = self.results[results_key].get(name, {}) | module_output["results"]
-                    # self.details[results_key][name] |= module_output.get("details", {})
+                    self.results[results_key].extend([(name, k, v) for k, v in module_output["results"].items()])
+                    # self.results[results_key]["details"].append(module_output["details"])
 
                 # return results for this entry
                 yield {results_key: self.results[results_key]}
@@ -141,12 +140,14 @@ class MolBusters:
         self.module_name = []
         self.module_func = []
         self.module_args = []
+        self.fname = []
         for module in self.config["modules"]:
             function = module_dict[module["function"]]
             parameters = module.get("parameters", {})
             module_args = set(inspect.signature(function).parameters).intersection({"mol_pred", "mol_true", "mol_cond"})
 
             self.module_name.append(module["name"])
+            self.fname.append(module["function"])
             self.module_func.append(partial(function, **parameters))
             self.module_args.append(module_args)
         pass

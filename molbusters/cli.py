@@ -68,29 +68,22 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
     names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c["rename_outputs"].items()}
 
     for i, results_dict in enumerate(molbusters_results):
-        results = _dataframe_from_output(results_dict, "results")
+        results = _dataframe_from_output(results_dict)
 
-        missing_columns = [c for c in selected_columns if c not in results.columns]
+        available_columns = results.columns.tolist()
+        missing_columns = [c for c in selected_columns if c not in available_columns]
+        extra_columns = [c for c in available_columns if c not in selected_columns]
+        columns = selected_columns + extra_columns if full_report and outfmt != "short" else selected_columns
+
         results[missing_columns] = pd.NA
-        selected_columns = selected_columns if not full_report or outfmt == "short" else results.columns
-
-        results = results[selected_columns]
+        results = results[columns]
         results.columns = [names_lookup.get(c, c[-1]) for c in results.columns]
         output.write(_format_results(results, outfmt, no_header, i))
 
 
-def _dataframe_from_output(results_dict, field):
-    return pd.DataFrame.from_dict(
-        {
-            id: {
-                (module_name, result_name): result_value
-                for module_name, module_results in results.items()
-                for result_name, result_value in module_results.items()
-            }
-            for id, results in results_dict.items()
-        },
-        orient="index",
-    )
+def _dataframe_from_output(results_dict):
+    d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}
+    return pd.DataFrame.from_dict(d, orient="index")
 
 
 def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = False, index: int = 0) -> str:
