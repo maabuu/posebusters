@@ -5,7 +5,7 @@ import logging
 
 import numpy as np
 from rdkit.Chem.rdchem import Mol
-from rdkit.Chem.rdShapeHelpers import ShapeProtrudeDist
+from rdkit.Chem.rdShapeHelpers import ShapeTverskyIndex
 
 from ..tools.molecules import delete_atoms
 from ..tools.protein import get_mask
@@ -46,14 +46,14 @@ def check_volume_overlap(
     if mol_cond.GetNumAtoms() == 0:
         return {"results": {"volume_overlap": np.nan, "no_volume_clash": True}}
 
-    # filter by distance
+    # filter by distance --> this is slowing this function down
     distances = _pairwise_distance(mol_pred.GetConformer().GetPositions(), mol_cond.GetConformer().GetPositions())
     keep_mask = distances.min(axis=0) <= search_distance * vdw_scale
     mol_cond = _filter_by_mask(mol_cond, keep_mask)
     if mol_cond.GetNumAtoms() == 0:
         return {"results": {"volume_overlap": np.nan, "no_volume_clash": True}}
 
-    overlap = 1 - ShapeProtrudeDist(mol_pred, mol_cond, vdwScale=vdw_scale, ignoreHs=ignore_hydrogens)
+    overlap = ShapeTverskyIndex(mol_pred, mol_cond, alpha=1, beta=0, vdwScale=vdw_scale, ignoreHs=ignore_hydrogens)
 
     results = {
         "volume_overlap": overlap,

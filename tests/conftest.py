@@ -54,3 +54,13 @@ def mol_1a30_clash_2():
 @pytest.fixture
 def mol_1a30_clash_3():
     return MolFromMolFile("tests/conftest/mol_1a30_clash_3.sdf", sanitize=False)
+
+
+@pytest.fixture
+def mol_calcium():
+    return MolFromMolFile("tests/conftest/mol_calcium.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_cholesterol():
+    return MolFromMolFile("tests/conftest/mol_cholesterol.sdf", sanitize=True)
