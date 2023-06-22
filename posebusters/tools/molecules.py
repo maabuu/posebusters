@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from logging import getLogger
+from typing import Iterable
 
 import numpy as np
 from rdkit import RDLogger
@@ -129,7 +130,7 @@ def get_hbond_donors(mol: Mol) -> set[int]:
     return {s[0] for s in mol.GetSubstructMatches(HDonorSmarts, uniquify=1)}
 
 
-def delete_atoms(mol: Mol, indices: list[int]) -> Mol:
+def delete_atoms(mol: Mol, indices: Iterable[int]) -> Mol:
     """Delete atoms from molecule.
 
     Args:
@@ -138,12 +139,12 @@ def delete_atoms(mol: Mol, indices: list[int]) -> Mol:
     Returns:
         Molecule without atoms.
     """
+    # delete in reverse order to avoid reindexing issues
+    indices = sorted(indices, reverse=True)
     if len(indices) == 0:
         return mol
-
     mol = RWMol(mol)
-    # delete in reverse order to avoid reindexing issues
-    for index in sorted(indices, reverse=True):
+    for index in indices:
         mol.RemoveAtom(index)
     return Mol(mol)
 

@@ -5,7 +5,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from rdkit.Chem.rdchem import GetPeriodicTable, Mol
+from rdkit.Chem.rdchem import Atom, GetPeriodicTable, Mol
 
 from ..tools.molecules import get_hbond_acceptors, get_hbond_donors
 
@@ -19,8 +19,7 @@ def check_intermolecular_distance(
     vdw_scale: float = 0.8,
     clash_cutoff: float = 0.05,
     ignore_hydrogens: bool = True,
-    ignore_atom_type: str | None = None,
-    ignore_elements: set[str] = _inorganic_cofactors,
+    ignore_types: set[str] = set(),
     max_distance: float = 5.0,
 ) -> dict[str, Any]:
     """Calculate pairwise intermolecular distances between ligand and protein atoms.
@@ -32,8 +31,7 @@ def check_intermolecular_distance(
         clash_cutoff: Threshold for how much scaled van der Waal radii may overlap before a clash is reported. Defaults
             to 0.05.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
-        ignore_atom_type: Ignore HETATM or ATOM entries. Defaults to None.
-        ignore_elements: Set of elements in protein molecule to ignore. Defaults to _inorganic_cofactors.
+        ignore_types: Whether to ignore certain atom types in mol_cond. Defaults to empty set. Possible values to include are "protein", "organic_cofactors", "inorganic_cofactors".
         max_distance: Maximum distance (in Angstrom) between ligand and protein to be considered as valid. Defaults to
             5.0.
 
@@ -49,40 +47,22 @@ def check_intermolecular_distance(
     vdw_ligand = _get_vdw_radii(mol_pred)
     vdw_protein_all = _get_vdw_radii(mol_cond)
 
-    hetatm_mask = [a.GetPDBResidueInfo().GetIsHeteroAtom() for a in mol_cond.GetAtoms()]
-
     if ignore_hydrogens:
         heavy_atoms_mask_ligand = np.asarray(atoms_ligand != "H")
-        heavy_atoms_mask_protein = np.asarray(atoms_protein != "H")
-
         coords_ligand = coords_ligand[heavy_atoms_mask_ligand, :]
-        coords_protein = coords_protein[heavy_atoms_mask_protein, :]
-
         atoms_ligand = atoms_ligand[heavy_atoms_mask_ligand]
-        atoms_protein = atoms_protein[heavy_atoms_mask_protein]
-
         vdw_ligand = vdw_ligand[heavy_atoms_mask_ligand]
-        vdw_protein_all = vdw_protein_all[heavy_atoms_mask_protein]
 
-        hetatm_mask = np.asarray(hetatm_mask)[heavy_atoms_mask_protein]
-
-    if ignore_atom_type == "HETATM":
-        atom_mask = [not m for m in hetatm_mask]
-        coords_protein = coords_protein[atom_mask, :]
-        atoms_protein = atoms_protein[atom_mask]
-        vdw_protein_all = vdw_protein_all[atom_mask]
-    elif ignore_atom_type == "ATOM":
-        coords_protein = coords_protein[hetatm_mask, :]
-        atoms_protein = atoms_protein[hetatm_mask]
-        vdw_protein_all = vdw_protein_all[hetatm_mask]
-    elif ignore_atom_type is not None:
-        raise ValueError(f"Unknown ignore_atom_type: {ignore_atom_type}")
-
-    if ignore_elements:
-        element_mask = [a not in ignore_elements for a in atoms_protein]
-        coords_protein = coords_protein[element_mask, :]
-        atoms_protein = atoms_protein[element_mask]
-        vdw_protein_all = vdw_protein_all[element_mask]
+    mask = _get_mask(
+        mol_cond,
+        ignore_hydrogens,
+        "protein" in ignore_types,
+        "organic_cofactors" in ignore_types,
+        "inorganic_cofactors" in ignore_types,
+    )
+    coords_protein = coords_protein[mask, :]
+    atoms_protein = atoms_protein[mask]
+    vdw_protein_all = vdw_protein_all[mask]
 
     distances_all = _pairwise_distance(coords_ligand, coords_protein)
 
@@ -162,3 +142,26 @@ def _is_hbond(ligand, protein, atom_pairs) -> list[bool]:
         else:
             out.append(False)
     return out
+
+
+def _get_mask(
+    mol: Mol, ignore_h=True, ignore_protein=False, ignore_organic_cofactors=False, ignore_inorganic_cofactors=False
+) -> list[bool]:
+    return [
+        _check_atom(a, ignore_h, ignore_protein, ignore_organic_cofactors, ignore_inorganic_cofactors)
+        for a in mol.GetAtoms()
+    ]
+
+
+def _check_atom(
+    atom: Atom, ignore_h=True, ignore_protein=False, ignore_organic_cofactors=False, ignore_inorganic_cofactors=False
+) -> bool:
+    symbol = atom.GetSymbol()
+    if ignore_h and symbol == "H":
+        return False
+    is_hetero = atom.GetPDBResidueInfo().GetIsHeteroAtom()
+    if ignore_protein and not is_hetero:
+        return False
+    if ignore_inorganic_cofactors and symbol in _inorganic_cofactors:
+        return False
+    return True

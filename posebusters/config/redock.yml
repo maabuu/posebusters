@@ -83,7 +83,9 @@ modules:
       vdw_scale: 0.8
       clash_cutoff: 0.05
       ignore_hydrogens: True
-      ignore_atom_type: HETATM
+      ignore_types:
+      - organic_cofactors
+      - inorganic_cofactors
       max_distance: 5.0
     selected_outputs:
       - not_too_far_away
@@ -91,42 +93,76 @@ modules:
     rename_outputs:
       not_too_far_away: "Not too far away"
       no_clashes: "No clashes with protein"
-  - name: "Distance to cofactors"
+  - name: "Distance to organic cofactors"
     function: "intermolecular_distance"
     parameters:
       vdw_scale: 0.8
       clash_cutoff: 0.05
       ignore_hydrogens: True
-      ignore_atom_type: ATOM
+      ignore_types:
+      - protein
+      - inorganic_cofactors
       max_distance: 5.0
     selected_outputs:
       - no_clashes
     rename_outputs:
-      no_clashes: "No clashes with cofactors"
+      no_clashes: "No clashes with organic cofactors"
+  - name: "Distance to inorganic cofactors"
+    function: "intermolecular_distance"
+    parameters:
+      vdw_scale: 0.8
+      clash_cutoff: 0.05
+      ignore_hydrogens: True
+      ignore_types:
+      - protein
+      - organic_cofactors
+      max_distance: 5.0
+    selected_outputs:
+      - no_clashes
+    rename_outputs:
+      no_clashes: "No clashes with inorganic cofactors"
   - name: "Volume overlap with protein"
     function: volume_overlap
     parameters:
       clash_cutoff: 0.05
       vdw_scale: 0.8
       ignore_hydrogens: True
-      ignore_atom_type: HETATM
+      ignore_types:
+      - organic_cofactors
+      - inorganic_cofactors
     selected_outputs:
       - no_volume_clash
     rename_outputs:
       volume_overlap: "Volume overlap with protein"
       no_volume_clash: "No volume clash with protein"
-  - name: "Volume overlap with cofactors"
+  - name: "Volume overlap with organic cofactors"
     function: volume_overlap
     parameters:
       clash_cutoff: 0.05
       vdw_scale: 0.8
       ignore_hydrogens: True
-      ignore_atom_type: ATOM
+      ignore_types:
+      - protein
+      - inorganic_cofactors
     selected_outputs:
       - no_volume_clash
     rename_outputs:
-      volume_overlap: "Volume overlap with cofactors"
-      no_volume_clash: "No volume clash with cofactors"
+      volume_overlap: "Volume overlap with organic cofactors"
+      no_volume_clash: "No volume clash with organic cofactors"
+  - name: "Volume overlap with inorganic cofactors"
+    function: volume_overlap
+    parameters:
+      clash_cutoff: 0.05
+      vdw_scale: 0.8
+      ignore_hydrogens: True
+      ignore_types:
+      - protein
+      - organic_cofactors
+    selected_outputs:
+      - no_volume_clash
+    rename_outputs:
+      volume_overlap: "Volume overlap with inorganic cofactors"
+      no_volume_clash: "No volume clash with inorganic cofactors"
   - name: "RMSD"
     function: rmsd
     parameters:
