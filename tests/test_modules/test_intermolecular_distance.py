@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from molbusters.modules.intermolecular_distance import check_intermolecular_distance
+from posebusters.modules.intermolecular_distance import check_intermolecular_distance
 
 
 def test_check_intermolecular_distance(protein_2bm2, ligand_2bm2):

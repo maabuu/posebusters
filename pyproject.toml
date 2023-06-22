@@ -3,11 +3,11 @@ requires = ["flit_core"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name =  "molbusters"
+name =  "posebusters"
 authors = [
     {name = "Martin Buttenschoen", email = "martin.buttenschoen@stats.ox.ac.uk"},
 ]
-keywords =["molbusters", "docking", "tests", "metric"]
+keywords =["posebusters", "docking", "tests", "metric"]
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = [
@@ -51,22 +51,22 @@ test = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/maabuu/molbusters/tree/main#readme"
-Source = "https://github.com/maabuu/molbusters"
-Tracker = "https://github.com/maabuu/molbusters/issues"
+Documentation = "https://github.com/maabuu/posebusters/tree/main#readme"
+Source = "https://github.com/maabuu/posebusters"
+Tracker = "https://github.com/maabuu/posebusters/issues"
 
 [project.scripts]
-bust = "molbusters.cli:bust"
+bust = "posebusters.cli:bust"
 
-#[project.entry-points.molbusters]
-#bust = "molbusters.cli:bust"
+#[project.entry-points.posebusters]
+#bust = "posebusters.cli:bust"
 
 [tool.flit.module]
-name = "molbusters"
+name = "posebusters"
 
 [tool.isort]
 profile = "black"
-src_paths = ["molbusters", "tests"]
+src_paths = ["posebusters", "tests"]
 
 [tool.black]
 line-length = 120
@@ -88,8 +88,8 @@ branch = true
 fail_under = 100
 
 [tool.pytest.ini_options]
-addopts = "--cov-report xml:coverage.xml --cov molbusters --cov-fail-under 0 --cov-append -m 'not integration'"
-pythonpath = "molbusters"
+addopts = "--cov-report xml:coverage.xml --cov posebusters --cov-fail-under 0 --cov-append -m 'not integration'"
+pythonpath = "posebusters"
 testpaths = "tests"
 
 [tool.pycln]
@@ -103,5 +103,5 @@ quiet-level = 3
 [tool.bandit]
 number = 4
 recursive = true
-targets = "molbusters"
+targets = "posebusters"
 skips = ['B101']

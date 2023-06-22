@@ -1,4 +1,4 @@
-"""Command line interface for MolBusters."""
+"""Command line interface for PoseBusters."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,12 +6,12 @@ from pathlib import Path
 import click
 import pandas as pd
 
-from .molbusters import MolBusters
+from .posebusters import PoseBusters
 from .tools.formatting import create_long_output, create_short_output
 
 
 def main():
-    """Run MolBusters from the command line."""
+    """Run PoseBusters from the command line."""
     bust()
 
 
@@ -42,7 +42,7 @@ def main():
 @click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
 @click.version_option()
 def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **mol_args):
-    """MolBusters: check generated 3D molecules with or without conditioning."""
+    """PoseBusters: check generated 3D molecules with or without conditioning."""
     if debug:
         click.echo("Debug mode is on.")
 
@@ -55,19 +55,19 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
         mode = _select_mode(file_paths.columns.tolist()) if config is None else config
-        molbusters = MolBusters(mode, top_n=top_n, debug=debug)
-        molbusters_results = molbusters.bust_table(file_paths)
+        posebusters = PoseBusters(mode, top_n=top_n, debug=debug)
+        posebusters_results = posebusters.bust_table(file_paths)
     else:
         # run on file inputs
         mode = _select_mode([m for m, v in mol_args.items() if v is not None]) if config is None else config
-        molbusters = MolBusters(mode, top_n=top_n, debug=debug)
-        molbusters_results = molbusters.bust(**mol_args)
+        posebusters = PoseBusters(mode, top_n=top_n, debug=debug)
+        posebusters_results = posebusters.bust(**mol_args)
 
-    config = molbusters.config
+    config = posebusters.config
     selected_columns = [(c["name"], n) for c in config["modules"] for n in c["selected_outputs"]]
     names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c["rename_outputs"].items()}
 
-    for i, results_dict in enumerate(molbusters_results):
+    for i, results_dict in enumerate(posebusters_results):
         results = _dataframe_from_output(results_dict)
 
         available_columns = results.columns.tolist()

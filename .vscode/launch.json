@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -25,7 +25,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -43,7 +43,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -57,7 +57,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -69,11 +69,11 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
-                "/Users/Martin/Projects/molbusters/notebooks/yael_testcase_short.sdf",
+                "/Users/Martin/Projects/posebusters/notebooks/yael_testcase_short.sdf",
             ]
         },
         {
@@ -81,7 +81,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -94,7 +94,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -109,7 +109,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -140,7 +140,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -159,7 +159,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [
@@ -178,7 +178,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "molbusters",
+            "module": "posebusters",
             "justMyCode": true,
             "stopOnEntry": false,
             "args": [

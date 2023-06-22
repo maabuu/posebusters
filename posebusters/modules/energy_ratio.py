@@ -35,7 +35,7 @@ def check_energy_ratio(
             average. Defaults to 100.
 
     Returns:
-        MolBusters results dictionary.
+        PoseBusters results dictionary.
     """
     mol_pred = deepcopy(mol_pred)
     SanitizeMol(mol_pred)

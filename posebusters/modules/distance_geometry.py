@@ -52,7 +52,7 @@ def check_geometry(
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
 
     Returns:
-        MolBusters results dictionary.
+        PoseBusters results dictionary.
     """
     mol = deepcopy(mol_pred)
     assert mol.GetNumConformers() == 1, "Molecule must have exactly one conformer."

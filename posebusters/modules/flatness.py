@@ -26,7 +26,7 @@ def check_flatness(
         flat_systems: _description_. Defaults to None.
 
     Returns:
-        MolBusters results dictionary.
+        PoseBusters results dictionary.
     """
     planar_groups = []
     types = []

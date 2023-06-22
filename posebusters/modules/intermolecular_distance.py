@@ -10,6 +10,7 @@ from rdkit.Chem.rdchem import GetPeriodicTable, Mol
 from ..tools.molecules import get_hbond_acceptors, get_hbond_donors
 
 _periodic_table = GetPeriodicTable()
+_inorganic_cofactors = {"Li", "Be", "Na", "Mg", "Cl", "K", "Ca", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Br", "Rb", "I"}
 
 
 def check_intermolecular_distance(
@@ -19,6 +20,7 @@ def check_intermolecular_distance(
     clash_cutoff: float = 0.05,
     ignore_hydrogens: bool = True,
     ignore_atom_type: str | None = None,
+    ignore_elements: set[str] = _inorganic_cofactors,
     max_distance: float = 5.0,
 ) -> dict[str, Any]:
     """Calculate pairwise intermolecular distances between ligand and protein atoms.
@@ -30,12 +32,13 @@ def check_intermolecular_distance(
         clash_cutoff: Threshold for how much scaled van der Waal radii may overlap before a clash is reported. Defaults
             to 0.05.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
-        ignore_atom_type: Whether to ignore HETATM or ATOM entries. Defaults to None.
+        ignore_atom_type: Ignore HETATM or ATOM entries. Defaults to None.
+        ignore_elements: Set of elements in protein molecule to ignore. Defaults to _inorganic_cofactors.
         max_distance: Maximum distance (in Angstrom) between ligand and protein to be considered as valid. Defaults to
             5.0.
 
     Returns:
-        MolBusters results dictionary.
+        PoseBusters results dictionary.
     """
     coords_ligand = mol_pred.GetConformer().GetPositions()
     coords_protein = mol_cond.GetConformer().GetPositions()
@@ -74,6 +77,12 @@ def check_intermolecular_distance(
         vdw_protein_all = vdw_protein_all[hetatm_mask]
     elif ignore_atom_type is not None:
         raise ValueError(f"Unknown ignore_atom_type: {ignore_atom_type}")
+
+    if ignore_elements:
+        element_mask = [a not in ignore_elements for a in atoms_protein]
+        coords_protein = coords_protein[element_mask, :]
+        atoms_protein = atoms_protein[element_mask]
+        vdw_protein_all = vdw_protein_all[element_mask]
 
     distances_all = _pairwise_distance(coords_ligand, coords_protein)
 

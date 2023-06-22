@@ -26,7 +26,7 @@ def check_rmsd(mol_pred: Mol, mol_true: Mol, rmsd_threshold: float = 2.0) -> dic
         rmsd_threshold: Threshold in angstrom for reporting whether RMSD is within threshold. Defaults to 2.0.
 
     Returns:
-        MolBusters results dictionary.
+        PoseBusters results dictionary.
     """
     assert isinstance(mol_true, Mol), "Ground truth molecule is missing."
     assert isinstance(mol_pred, Mol), "Predicted molecule is missing."

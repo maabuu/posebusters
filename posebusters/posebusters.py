@@ -1,4 +1,4 @@
-"""MolBusters class for running all tests on a set of molecules."""
+"""PoseBusters class for running all tests on a set of molecules."""
 from __future__ import annotations
 
 import inspect
@@ -40,11 +40,11 @@ module_dict: dict[str, Callable] = {
 molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 
 
-class MolBusters:
+class PoseBusters:
     """Class to run all tests on a set of molecules."""
 
     def __init__(self, config: str | dict = "redock", debug: bool = False, top_n: int | None = None):
-        """Initialize MolBusters object."""
+        """Initialize PoseBusters object."""
         self.module_func: list  # dict[str, Callable]
         self.module_args: list  # dict[str, set[str]]
 
@@ -74,7 +74,7 @@ class MolBusters:
             mol_cond: _description_
 
         Returns:
-            MolBusters object.
+            PoseBusters object.
         """
         self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond]], columns=["mol_pred", "mol_true", "mol_cond"])
         return self._run()
@@ -86,7 +86,7 @@ class MolBusters:
             mol_table: _description_
 
         Returns:
-            MolBusters object.
+            PoseBusters object.
         """
         self.file_paths = mol_table
         return self._run()

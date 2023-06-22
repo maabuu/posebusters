@@ -37,7 +37,7 @@ def check_identity(mol_pred: Mol, mol_true: Mol, inchi_options: str = "") -> dic
         inchi_options: String of options to pass to the InChI module. Defaults to "".
 
     Returns:
-        MolBusters results dictionary.
+        PoseBusters results dictionary.
     """
     # generate inchis
     inchi_crystal = standardize_and_get_inchi(mol_true, options=inchi_options)

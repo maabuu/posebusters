@@ -2,13 +2,13 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "MolBusters"
+project = "PoseBusters"
 copyright = "2023, Martin Buttenschoen"
 author = "Martin Buttenschoen"
 
 # get version and release from library. ref https://peps.python.org/pep-0440/
 version, release = "major.minor.micro", "major.minor"
-with open("../../molbusters/__init__.py") as init_file:
+with open("../../posebusters/__init__.py") as init_file:
     for line in init_file:
         if line.startswith("__version__"):
             version = line.split("=")[1].strip().strip('"')
@@ -57,7 +57,7 @@ html_theme_options = {
 }
 html_static_path = ["_static"]
 html_logo = "./_static/logo_square.png"
-htmlhelp_basename = "molbusters_doc"
+htmlhelp_basename = "posebusters_doc"
 html_last_updated_fmt = "%d %B %Y"
 
 # -- Options for EPUB output -------------------------------------------------
