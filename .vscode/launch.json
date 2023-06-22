@@ -155,25 +155,6 @@
             ]
         },
         {
-            "name": "bust conditioned on protein and ligand -- 7w2p",
-            "type": "python",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "module": "posebusters",
-            "justMyCode": true,
-            "stopOnEntry": false,
-            "args": [
-                "tests/conftest/7W2P_8AI/7W2P_8AI_ligand.sdf",
-                "-l",
-                "tests/conftest/7W2P_8AI/7W2P_8AI_ligands.sdf",
-                "-p",
-                "tests/conftest/7W2P_8AI/7W2P_8AI_no_ligand_no_solvent.pdb",
-                "--outfmt",
-                "long",
-                "--full-report",
-            ]
-        },
-        {
             "name": "bust conditioned on protein -- 1ia1",
             "type": "python",
             "request": "launch",
