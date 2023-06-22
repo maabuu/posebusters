@@ -31,7 +31,8 @@ def check_intermolecular_distance(
         clash_cutoff: Threshold for how much scaled van der Waal radii may overlap before a clash is reported. Defaults
             to 0.05.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
-        ignore_types: Whether to ignore certain atom types in mol_cond. Defaults to empty set. Possible values to include are "protein", "organic_cofactors", "inorganic_cofactors".
+        ignore_types: Whether to ignore certain atom types in mol_cond. Defaults to empty set. Possible values to
+            include are "protein", "organic_cofactors", "inorganic_cofactors".
         max_distance: Maximum distance (in Angstrom) between ligand and protein to be considered as valid. Defaults to
             5.0.
 

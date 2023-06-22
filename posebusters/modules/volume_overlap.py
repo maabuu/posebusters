@@ -29,7 +29,8 @@ def check_volume_overlap(
             that overlaps with `mol_cond`. Defaults to 0.05.
         vdw_scale: Scaling factor for the van der Waals radii which define the volume around each atom. Defaults to 0.8.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
-        ignore_types: Which types of atoms to ignore. Defaults to {}. Possible values are "protein", "organic_cofactors", "inorganic_cofactors".
+        ignore_types: Which types of atoms to ignore. Defaults to {}. Possible values are "protein",
+            "organic_cofactors", "inorganic_cofactors".
 
     Returns:
         PoseBusters results dictionary.
@@ -47,7 +48,7 @@ def check_volume_overlap(
     if "inorganic_cofactors" in ignore_types:
         indices.update(a.GetIdx() for a in mol_cond.GetAtoms() if a.GetSymbol() in _inorganic_cofactors)
     else:
-        # hetero atoms includes inorganic cofactors which if not explicitly called to be ignored are included in the volume overlap
+        # hetero atoms include inorganic cofactors so remove again if not ignored
         [indices.discard(a.GetIdx()) for a in mol_cond.GetAtoms() if a.GetSymbol() in _inorganic_cofactors]
     mol_cond = delete_atoms(mol_cond, indices)
 
