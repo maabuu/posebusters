@@ -93,6 +93,7 @@ modules:
     rename_outputs:
       not_too_far_away: "Not too far away"
       no_clashes: "No clashes with protein"
+    rename_suffix: "_protein"
   - name: "Distance to organic cofactors"
     function: "intermolecular_distance"
     parameters:
@@ -107,6 +108,7 @@ modules:
       - no_clashes
     rename_outputs:
       no_clashes: "No clashes with organic cofactors"
+    rename_suffix: "_organic_cofactors"
   - name: "Distance to inorganic cofactors"
     function: "intermolecular_distance"
     parameters:
@@ -121,6 +123,7 @@ modules:
       - no_clashes
     rename_outputs:
       no_clashes: "No clashes with inorganic cofactors"
+    rename_suffix: "_inorganic_cofactors"
   - name: "Volume overlap with protein"
     function: volume_overlap
     parameters:
@@ -135,6 +138,7 @@ modules:
     rename_outputs:
       volume_overlap: "Volume overlap with protein"
       no_volume_clash: "No volume clash with protein"
+    rename_suffix: "_protein"
   - name: "Volume overlap with organic cofactors"
     function: volume_overlap
     parameters:
@@ -149,6 +153,7 @@ modules:
     rename_outputs:
       volume_overlap: "Volume overlap with organic cofactors"
       no_volume_clash: "No volume clash with organic cofactors"
+    rename_suffix: "_organic_cofactors"
   - name: "Volume overlap with inorganic cofactors"
     function: volume_overlap
     parameters:
@@ -163,6 +168,7 @@ modules:
     rename_outputs:
       volume_overlap: "Volume overlap with inorganic cofactors"
       no_volume_clash: "No volume clash with inorganic cofactors"
+    rename_suffix: "_inorganic_cofactors"
   - name: "RMSD"
     function: rmsd
     parameters:

@@ -66,6 +66,7 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
     config = posebusters.config
     selected_columns = [(c["name"], n) for c in config["modules"] for n in c["selected_outputs"]]
     names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c["rename_outputs"].items()}
+    suffix_lookup = {c["name"]: c["rename_suffix"] for c in config["modules"] if "rename_suffix" in c}
 
     for i, results_dict in enumerate(posebusters_results):
         results = _dataframe_from_output(results_dict)
@@ -77,7 +78,7 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
 
         results[missing_columns] = pd.NA
         results = results[columns]
-        results.columns = [names_lookup.get(c, c[-1]) for c in results.columns]
+        results.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in results.columns]
         output.write(_format_results(results, outfmt, no_header, i))
 
 
