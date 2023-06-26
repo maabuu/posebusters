@@ -169,6 +169,25 @@
             ]
         },
         {
+            "name": "bust conditioned on protein -- 1w1p crystal",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1W1P_GIO/1W1P_GIO_ligand.sdf",
+                "-l",
+                "tests/conftest/1W1P_GIO/1W1P_GIO_ligands.sdf",
+                "-p",
+                "tests/conftest/1W1P_GIO/1W1P_GIO_protein.pdb",
+                "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        }
+        {
             "name": "bust conditioned on protein -- 1g9v gold",
             "type": "python",
             "request": "launch",

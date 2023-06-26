@@ -71,7 +71,7 @@ loading:
     add_hs: False
     assign_stereo: False
     load_all: True
-  mol_True:
+  mol_true:
     cleanup: False
     sanitize: False
     add_hs: False

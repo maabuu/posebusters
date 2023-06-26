@@ -186,12 +186,12 @@ loading:
     add_hs: False
     assign_stereo: False
     load_all: True
-  mol_True:
+  mol_true:
     cleanup: False
     sanitize: False
     add_hs: False
     assign_stereo: False
-    load_all: True
+    load_all: True # important to set if there are multiple ligands that could be correct
   mol_cond:
     cleanup: False
     sanitize: False

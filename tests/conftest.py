@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from rdkit.Chem.rdmolfiles import MolFromMol2File, MolFromMolFile, MolFromPDBFile
+from rdkit.Chem.rdmolfiles import MolFromMol2File, MolFromMolFile, MolFromPDBFile, SDMolSupplier
 
 
 @pytest.fixture
@@ -64,3 +64,21 @@ def mol_calcium():
 @pytest.fixture
 def mol_cholesterol():
     return MolFromMolFile("tests/conftest/mol_cholesterol.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_true_1w1p():
+    path = "tests/conftest/1W1P_GIO/1W1P_GIO_ligands.sdf"
+    supplier = SDMolSupplier(str(path), sanitize=True, removeHs=True, strictParsing=True)
+    mol = next(supplier)
+    while mol is None and supplier.atEnd() is False:
+        mol = next(supplier)
+    for mol_next in supplier:
+        if mol_next is not None:
+            mol.AddConformer(mol_next.GetConformer(), assignId=True)
+    return mol
+
+
+@pytest.fixture
+def mol_pred_1w1p():
+    return MolFromMolFile("tests/conftest/1W1P_GIO/1W1P_GIO_ligand.sdf", sanitize=True)

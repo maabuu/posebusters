@@ -15,6 +15,10 @@ mol_pred_1ia1 = "tests/conftest/1IA1_TQ3/1IA1_TQ3_ligand.sdf"
 mol_true_1ia1 = "tests/conftest/1IA1_TQ3/1IA1_TQ3_ligands.sdf"
 mol_cond_1ia1 = "tests/conftest/1IA1_TQ3/1IA1_TQ3_no_ligand_no_solvent.pdb"
 
+mol_pred_1w1p = "tests/conftest/1W1P_GIO/1W1P_GIO_ligand.sdf"
+mol_true_1w1p = "tests/conftest/1W1P_GIO/1W1P_GIO_ligands.sdf"
+mol_cond_1w1p = "tests/conftest/1W1P_GIO/1W1P_GIO_protein.pdb"
+
 mol_pred_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_ligand.sdf"
 mol_true_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_ligands.sdf"
 mol_cond_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_no_ligand_no_solvent.pdb"
@@ -23,6 +27,13 @@ mol_cond_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_no_ligand_no_solvent.pdb"
 def test_bust_redocks_1ia1() -> None:
     result = runner.invoke(
         bust, [mol_pred_1ia1, "-l", mol_true_1ia1, "-p", mol_cond_1ia1, "--full-report", "--outfmt", "csv"]
+    )
+    assert result.exit_code == 0
+
+
+def test_bust_redocks_1w1p() -> None:
+    result = runner.invoke(
+        bust, [mol_pred_1w1p, "-l", mol_true_1w1p, "-p", mol_cond_1w1p, "--full-report", "--outfmt", "csv"]
     )
     assert result.exit_code == 0
 
