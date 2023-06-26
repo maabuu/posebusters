@@ -50,8 +50,9 @@ def check_flatness(
 
     results = {
         "num_systems_checked": len(planar_groups),
+        "max_distance": max(max_distances) if max_distances else np.nan,
         "num_systems_passed": sum(flatness_passes),
-        "flatness_passes": all(flatness_passes),
+        "flatness_passes": all(flatness_passes) if len(flatness_passes) > 0 else True,
     }
 
     return {"results": results, "details": details}
