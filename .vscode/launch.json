@@ -167,6 +167,27 @@
                 "-p",
                 "tests/conftest/1IA1_TQ3/1IA1_TQ3_no_ligand_no_solvent.pdb",
             ]
+        },
+        {
+            "name": "bust conditioned on protein -- 1g9v gold",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1G9V_RQ3/1G9V_RQ3_gold_redock.sdf",
+                "-l",
+                "tests/conftest/1G9V_RQ3/1G9V_RQ3_ligands.sdf",
+                "-p",
+                "tests/conftest/1G9V_RQ3/1G9V_RQ3_protein.pdb",
+                "--top-n",
+                "1",
+                "--full-report",
+                "--outfmt",
+                "long",
+            ]
         }
     ]
 }

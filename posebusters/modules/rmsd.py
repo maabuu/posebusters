@@ -5,8 +5,12 @@ import logging
 from copy import deepcopy
 
 import numpy as np
+from rdkit.Chem import AllChem
+from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdMolAlign import CalcRMS, GetBestRMS
+from rdkit.Chem.rdmolops import AddHs, RemoveHs
+from rdkit.Chem import RemoveStereochemistry
 from rdkit.rdBase import LogToPythonLogger
 
 from ..tools.logging import CaptureLogger
@@ -52,6 +56,7 @@ def robust_rmsd(
     mol_ref: Mol,
     conf_id_probe: int = -1,
     conf_id_ref: int = -1,
+    drop_stereo: bool = True,
     heavy_only: bool = True,
     kabsch: bool = False,
     symmetrizeConjugatedTerminalGroups=True,
@@ -61,9 +66,19 @@ def robust_rmsd(
     mol_probe = deepcopy(mol_probe)
     mol_ref = deepcopy(mol_ref)
 
+    if drop_stereo:
+        RemoveStereochemistry(mol_probe)
+        RemoveStereochemistry(mol_ref)
+
     if heavy_only:
-        mol_probe = remove_all_charges_and_hydrogens(mol_probe)
-        mol_ref = remove_all_charges_and_hydrogens(mol_ref)
+        mol_probe = RemoveHs(mol_probe)
+        mol_ref = RemoveHs(mol_ref)
+    else:
+        mol_probe = AddHs(mol_probe)
+        mol_ref = AddHs(mol_ref)
+
+    mol_ref = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_ref)
+    mol_probe = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_probe)
 
     params = dict(symmetrizeConjugatedTerminalGroups=symmetrizeConjugatedTerminalGroups, **params)
 
