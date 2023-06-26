@@ -81,21 +81,33 @@ def robust_rmsd(
     #     mol_probe = AddHs(mol_probe)
     #     mol_ref = AddHs(mol_ref)
 
-    # mol_ref = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_ref)
-    # mol_probe = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_probe)
-
     params = dict(symmetrizeConjugatedTerminalGroups=symmetrizeConjugatedTerminalGroups, **params)
 
     try:
-        if kabsch is True:
-            with CaptureLogger():
-                return GetBestRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
-        else:
-            with CaptureLogger():
-                return CalcRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
+        return _call_rdkit_rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, params, kabsch)
+    except RuntimeError as error:
+        pass
+    except ValueError as error:
+        pass
+
+    # try again but on canonical tautomers
+    mol_ref = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_ref)
+    mol_probe = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_probe)
+
+    try:
+        return _call_rdkit_rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, params, kabsch)
     except RuntimeError as error:
         logger.info(f"Could not calculate RMSD due to {error}")
         return np.nan
     except ValueError as error:
         logger.info(f"Could not calculate RMSD due to {error}")
         return np.nan
+
+
+def _call_rdkit_rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_ref: int, params, kabsch: bool = False):
+    if kabsch is True:
+        with CaptureLogger():
+            return GetBestRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
+    else:
+        with CaptureLogger():
+            return CalcRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
