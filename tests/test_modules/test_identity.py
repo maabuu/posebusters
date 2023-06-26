@@ -20,17 +20,36 @@ mol_ethylamine = MolFromSmiles("CCN")
 mol_ethylaminium = MolFromSmiles("CC[NH3+]")
 mol_ethanaminide = MolFromSmiles("CC[NH-]")
 
+mol_sp3_anticlockwise = MolFromSmiles("N[C@H](C)C(=O)O")
+mol_sp3_clockwise = MolFromSmiles("N[C@@H](C)C(=O)O")
+
 mol_thiamine = MolFromSmiles("CC1=C(SC=[N+]1CC2=CN=C(N=C2N)C)CCO")
 
 
-def test_check_identity():
+def test_check_identity_positive():
     out = check_identity(mol_benzene, mol_benzene)
     assert out["results"]["inchi_overall"] is True
 
+
+def test_check_identity_negative():
     out = check_identity(mol_benzene, mol_cyclohexane)
     assert out["results"]["inchi_overall"] is False
     assert out["results"]["formula"] is False
     assert out["results"]["connections"] is True
+
+
+def test_check_identity_tetrahedral():
+    out = check_identity(mol_sp3_clockwise, mol_sp3_clockwise)
+    assert out["results"]["inchi_overall"] is True
+    assert out["results"]["stereo_type"] is True
+    assert out["results"]["stereo_sp3"] is True
+    assert out["results"]["stereo_sp3_inverted"] is True
+    assert out["results"]["stereo_tetrahedral"] is True
+
+    out = check_identity(mol_sp3_clockwise, mol_sp3_anticlockwise)
+    assert out["results"]["inchi_overall"] is False
+    assert out["results"]["stereo_type"] is True
+    assert out["results"]["stereo_tetrahedral"] is False
 
 
 def test_standardize_and_get_inchi():

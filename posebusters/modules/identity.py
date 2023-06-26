@@ -75,13 +75,14 @@ layer_names = {
     "/h": "hydrogens",
     "/q": "net_charge",
     "/p": "protons",
-    "/t": "tetrahedral",
-    "/b": "double_bonds",
-    "/m": "stereo_relative_inchi_enatiomer",
-    "/s": "stereo_absolute",
+    "/b": "stereo_dbond",  # double bond (Z/E) stereochemistry
+    "/t": "stereo_sp3",  # tetrahderal stereochemistry
+    "/m": "stereo_sp3_inverted",
+    "/s": "stereo_type",
     "/i": "isotopic",
 }
-stereo_layers = ["tetrahedral", "double_bonds", "stereo_relative_inchi_enatiomer", "stereo_absolute"]
+stereo_all_layers = ["stereo_dbond", "stereo_sp3", "stereo_sp3_inverted", "stereo_type"]
+stereo_tetrahedral_layers = ["stereo_sp3", "stereo_sp3_inverted", "stereo_type"]
 
 
 def standardize_and_get_inchi(mol: Mol, options: str = "", log_level=None, warnings_as_errors=False) -> str:
@@ -89,9 +90,14 @@ def standardize_and_get_inchi(mol: Mol, options: str = "", log_level=None, warni
     mol = deepcopy(mol)
     mol = assert_sanity(mol)
 
-    # standardize molecule and assign stereo from 3D coordinates
+    # standardise molecule
     mol = remove_isotopic_info(mol)
-    RemoveStereochemistry(mol)
+
+    # assign stereo from 3D coordinates only if 3D coordinates are present
+    has_pose = mol.GetNumConformers() > 0
+    if has_pose:
+        RemoveStereochemistry(mol)
+
     mol = RemoveHs(mol)
     try:
         mol = neutralize_atoms(mol)
@@ -99,7 +105,9 @@ def standardize_and_get_inchi(mol: Mol, options: str = "", log_level=None, warni
         logger.warning("Failed to neutralize molecule. Using uncharger. InChI check might fail.")
         mol = Uncharger().uncharge(mol)
     mol = add_stereo_hydrogens(mol)
-    AssignStereochemistryFrom3D(mol, replaceExistingTags=True)
+
+    if has_pose:
+        AssignStereochemistryFrom3D(mol, replaceExistingTags=True)
 
     with CaptureLogger():
         inchi = MolToInchi(mol, options=options, logLevel=log_level, treatWarningAsError=warnings_as_errors)
@@ -110,11 +118,12 @@ def standardize_and_get_inchi(mol: Mol, options: str = "", log_level=None, warni
 def _compare_inchis(inchi_true: str, inchi_pred: str, layers: list[str] = standard_layers) -> dict[str, bool]:
     results = {}
 
-    # fast when overall InChI is the same
+    # fast return when overall InChI is the same
     if inchi_true == inchi_pred:
         results["inchi_overall"] = True
         for layer in layers:
             results[layer_names[layer]] = True
+            results["stereo_tetrahedral"] = True
             results["stereo"] = True
         return results
 
@@ -129,7 +138,10 @@ def _compare_inchis(inchi_true: str, inchi_pred: str, layers: list[str] = standa
             results[name] = (layer not in layers_true) and (layer not in layers_pred)
         else:
             results[name] = layers_true[layer] == layers_pred[layer]
-    results["stereo"] = all(results[name] for name in stereo_layers if name in results)  # combine stereo layers
+
+    # combine stereo layers (pass if not present)
+    results["stereo_tetrahedral"] = all(results.get(name, True) for name in stereo_tetrahedral_layers)
+    results["stereo"] = all(results.get(name, True) for name in stereo_all_layers)
 
     return results
 

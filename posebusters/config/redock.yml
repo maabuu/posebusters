@@ -31,10 +31,13 @@ modules:
     chosen_binary_test_output:
       - formula
       - connections
-      - stereo
+      - stereo_dbond
+      - stereo_tetrahedral
     rename_outputs:
       formula: "Molecular formula preserved"
       connections: "Molecular bonds preserved"
+      stereo_dbond: "Double bond stereochemistry preserved"
+      stereo_tetrahedral: "sp3 stereochemistry preserved"
       stereo: "Stereochemistry preserved"
   - name: "Geometry"
     function: "distance_geometry"
