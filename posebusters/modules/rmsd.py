@@ -66,20 +66,16 @@ def robust_rmsd(
     mol_probe = deepcopy(mol_probe)
     mol_ref = deepcopy(mol_ref)
 
-    if heavy_only:
-        mol_probe = remove_all_charges_and_hydrogens(mol_probe)
-        mol_ref = remove_all_charges_and_hydrogens(mol_ref)
-
     # if drop_stereo:
     #     RemoveStereochemistry(mol_probe)
     #     RemoveStereochemistry(mol_ref)
-
     # if heavy_only:
-    #     mol_probe = RemoveHs(mol_probe)
-    #     mol_ref = RemoveHs(mol_ref)
-    # else:
-    #     mol_probe = AddHs(mol_probe)
-    #     mol_ref = AddHs(mol_ref)
+    #     mol_probe = remove_all_charges_and_hydrogens(mol_probe)
+    #     mol_ref = remove_all_charges_and_hydrogens(mol_ref)
+
+    if heavy_only:
+        mol_probe = RemoveHs(mol_probe)
+        mol_ref = RemoveHs(mol_ref)
 
     params = dict(symmetrizeConjugatedTerminalGroups=symmetrizeConjugatedTerminalGroups, **params)
 
