@@ -81,8 +81,8 @@ def robust_rmsd(
     #     mol_probe = AddHs(mol_probe)
     #     mol_ref = AddHs(mol_ref)
 
-    mol_ref = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_ref)
-    mol_probe = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_probe)
+    # mol_ref = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_ref)
+    # mol_probe = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_probe)
 
     params = dict(symmetrizeConjugatedTerminalGroups=symmetrizeConjugatedTerminalGroups, **params)
 
