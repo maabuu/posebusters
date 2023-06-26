@@ -186,7 +186,7 @@
                 "--outfmt",
                 "long",
             ]
-        }
+        },
         {
             "name": "bust conditioned on protein -- 1g9v gold",
             "type": "python",
@@ -201,6 +201,27 @@
                 "tests/conftest/1G9V_RQ3/1G9V_RQ3_ligands.sdf",
                 "-p",
                 "tests/conftest/1G9V_RQ3/1G9V_RQ3_protein.pdb",
+                "--top-n",
+                "1",
+                "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust conditioned on protein -- 1gkc",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "~/Datasets/PoseBuster/1GKC_NFH/1GKC_NFH_ligand.sdf",
+                "-l",
+                "~/Datasets/PoseBuster/1GKC_NFH/1GKC_NFH_ligands.sdf",
+                "-p",
+                "~/Datasets/PoseBuster/1GKC_NFH/1GKC_NFH_protein.pdb",
                 "--top-n",
                 "1",
                 "--full-report",

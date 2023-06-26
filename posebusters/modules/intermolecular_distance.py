@@ -89,7 +89,7 @@ def check_intermolecular_distance(
     details["absolute_gap"] = details["distance"] - details["sum_vdw_scaled"]
     details["relative_gap"] = details["absolute_gap"] / details["sum_vdw_scaled"]
     details["relative_overlap"] = -details["relative_gap"]
-    details["clash"] = details["absolute_gap"] < -clash_cutoff
+    details["clash"] = details["relative_gap"] < -clash_cutoff
 
     results = {
         "smallest_distance": smallest_distance,
