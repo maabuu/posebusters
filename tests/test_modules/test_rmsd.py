@@ -17,6 +17,12 @@ def test_check_rmsd(mol_rq3_x00, mol_rq3_x01, mol_rq3_x10):
     assert out["results"]["rmsd"] == pytest.approx(10.0, abs=1e-6)
 
 
+def test_check_rmsd_bug(mol_true_1mmv, mol_pred_1mmv):
+    out = check_rmsd(mol_true_1mmv, mol_pred_1mmv)
+    assert out["results"]["rmsd"] < 10.0
+    assert out["results"]["rmsd_within_threshold"] is False
+
+
 def test_check_rmsd_tautomeric(mol_pred_1g9v, mol_true_1g9v):
     out = check_rmsd(mol_pred_1g9v, mol_true_1g9v)
     assert out["results"]["rmsd"] == pytest.approx(6.97287, abs=1e-4)

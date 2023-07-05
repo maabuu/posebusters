@@ -15,7 +15,7 @@ def main():
     bust()
 
 
-@click.command()
+@click.command(name="bust")
 @click.argument("mol_pred", type=click.Path(exists=True, path_type=Path), required=False)
 @click.option(
     "-l", "--mol_true", type=click.Path(exists=True, path_type=Path), required=False, default=None, help="True ligand."

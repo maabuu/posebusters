@@ -56,7 +56,7 @@ def robust_rmsd(
     mol_ref: Mol,
     conf_id_probe: int = -1,
     conf_id_ref: int = -1,
-    drop_stereo: bool = True,
+    drop_stereo: bool = False,
     heavy_only: bool = True,
     kabsch: bool = False,
     symmetrizeConjugatedTerminalGroups=True,
@@ -66,9 +66,9 @@ def robust_rmsd(
     mol_probe = deepcopy(mol_probe)
     mol_ref = deepcopy(mol_ref)
 
-    # if drop_stereo:
-    #     RemoveStereochemistry(mol_probe)
-    #     RemoveStereochemistry(mol_ref)
+    if drop_stereo:
+        RemoveStereochemistry(mol_probe)
+        RemoveStereochemistry(mol_ref)
     # if heavy_only:
     #     mol_probe = remove_all_charges_and_hydrogens(mol_probe)
     #     mol_ref = remove_all_charges_and_hydrogens(mol_ref)
@@ -80,24 +80,39 @@ def robust_rmsd(
     params = dict(symmetrizeConjugatedTerminalGroups=symmetrizeConjugatedTerminalGroups, **params)
 
     try:
-        return _call_rdkit_rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, params, kabsch)
+        rmsd = _call_rdkit_rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, params, kabsch)
+        if not np.isnan(rmsd):
+            return rmsd
     except RuntimeError as error:
         pass
     except ValueError as error:
         pass
+
+    # try again but remove charges and hydrogens
+    mol_ref_uncharged = remove_all_charges_and_hydrogens(mol_ref)
+    mol_probe_uncharged = remove_all_charges_and_hydrogens(mol_probe)
+    try:
+        rmsd = _call_rdkit_rmsd(mol_probe_uncharged, mol_ref_uncharged, conf_id_probe, conf_id_ref, params, kabsch)
+        if not np.isnan(rmsd):
+            return rmsd
+    except RuntimeError as error:
+        logger.info(f"Could not calculate RMSD due to {error}")
+    except ValueError as error:
+        logger.info(f"Could not calculate RMSD due to {error}")
 
     # try again but on canonical tautomers
-    mol_ref = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_ref)
-    mol_probe = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_probe)
-
+    mol_ref_canonical = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_ref)
+    mol_probe_canonical = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_probe)
     try:
-        return _call_rdkit_rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, params, kabsch)
+        rmsd = _call_rdkit_rmsd(mol_probe_canonical, mol_ref_canonical, conf_id_probe, conf_id_ref, params, kabsch)
+        if not np.isnan(rmsd):
+            return rmsd
     except RuntimeError as error:
         logger.info(f"Could not calculate RMSD due to {error}")
-        return np.nan
     except ValueError as error:
         logger.info(f"Could not calculate RMSD due to {error}")
-        return np.nan
+
+    return np.nan
 
 
 def _call_rdkit_rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_ref: int, params, kabsch: bool = False):

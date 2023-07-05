@@ -105,3 +105,13 @@ def mol_true_1w1p():
 @pytest.fixture
 def mol_one_true_1w1p():
     return MolFromMolFile("tests/conftest/1W1P_GIO/1W1P_GIO_ligand.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_true_1mmv():
+    return MolFromMolFile("tests/conftest/1MMV_3AR/1MMV_3AR_crystal.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_pred_1mmv():
+    return MolFromMolFile("tests/conftest/1MMV_3AR/1MMV_3AR_tankbind.sdf", sanitize=True)
