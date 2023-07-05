@@ -5,16 +5,16 @@ import logging
 from copy import deepcopy
 
 import numpy as np
-from rdkit.Chem import AllChem
+from rdkit.Chem import AllChem, RemoveStereochemistry
 from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdMolAlign import CalcRMS, GetBestRMS
+from rdkit.Chem.rdmolfiles import MolToSmiles
 from rdkit.Chem.rdmolops import AddHs, RemoveHs
-from rdkit.Chem import RemoveStereochemistry
 from rdkit.rdBase import LogToPythonLogger
 
 from ..tools.logging import CaptureLogger
-from ..tools.molecules import remove_all_charges_and_hydrogens
+from ..tools.molecules import remove_all_charges_and_hydrogens, neutralize_atoms
 
 LogToPythonLogger()
 logger = logging.getLogger(__name__)
@@ -105,6 +105,22 @@ def robust_rmsd(
     mol_probe_canonical = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_probe)
     try:
         rmsd = _call_rdkit_rmsd(mol_probe_canonical, mol_ref_canonical, conf_id_probe, conf_id_ref, params, kabsch)
+        if not np.isnan(rmsd):
+            return rmsd
+    except RuntimeError as error:
+        logger.info(f"Could not calculate RMSD due to {error}")
+    except ValueError as error:
+        logger.info(f"Could not calculate RMSD due to {error}")
+
+    # try again but after neutralizing atoms
+    mol_ref_neutral_canonical = rdMolStandardize.TautomerEnumerator().Canonicalize(neutralize_atoms(RemoveHs(mol_ref)))
+    mol_probe_neutral_canonical = rdMolStandardize.TautomerEnumerator().Canonicalize(
+        neutralize_atoms(RemoveHs(mol_probe))
+    )
+    try:
+        rmsd = _call_rdkit_rmsd(
+            mol_probe_neutral_canonical, mol_ref_neutral_canonical, conf_id_probe, conf_id_ref, params, kabsch
+        )
         if not np.isnan(rmsd):
             return rmsd
     except RuntimeError as error:

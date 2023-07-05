@@ -108,10 +108,20 @@ def mol_one_true_1w1p():
 
 
 @pytest.fixture
-def mol_true_1mmv():
+def mol_true_1mmv_3ar():
     return MolFromMolFile("tests/conftest/1MMV_3AR/1MMV_3AR_crystal.sdf", sanitize=True)
 
 
 @pytest.fixture
-def mol_pred_1mmv():
+def mol_pred_1mmv_3ar():
     return MolFromMolFile("tests/conftest/1MMV_3AR/1MMV_3AR_tankbind.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_true_1q1g_mti():
+    return MolFromMolFile("tests/conftest/1Q1G_MTI/1Q1G_MTI_crystal.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_pred_1q1g_mti():
+    return MolFromMolFile("tests/conftest/1Q1G_MTI/1Q1G_MTI_tankbind.sdf", sanitize=True)
