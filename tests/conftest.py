@@ -125,3 +125,13 @@ def mol_true_1q1g_mti():
 @pytest.fixture
 def mol_pred_1q1g_mti():
     return MolFromMolFile("tests/conftest/1Q1G_MTI/1Q1G_MTI_tankbind.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_true_6yr2_t1c():
+    return MolFromMolFile("tests/conftest/6YR2_T1C/6YR2_T1C_crystal.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_pred_6yr2_t1c():
+    return MolFromMolFile("tests/conftest/6YR2_T1C/6YR2_T1C_tankbind.sdf", sanitize=True)

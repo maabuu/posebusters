@@ -19,6 +19,13 @@ from ..tools.molecules import remove_all_charges_and_hydrogens, neutralize_atoms
 LogToPythonLogger()
 logger = logging.getLogger(__name__)
 
+tautomer_enumerator = rdMolStandardize.TautomerEnumerator()
+tautomer_enumerator.SetMaxTautomers(100000)
+tautomer_enumerator.SetMaxTransforms(100000)
+tautomer_enumerator.SetReassignStereo(True)
+tautomer_enumerator.SetRemoveBondStereo(True)
+tautomer_enumerator.SetRemoveSp3Stereo(True)
+
 
 def check_rmsd(mol_pred: Mol, mol_true: Mol, rmsd_threshold: float = 2.0) -> dict[str, dict[str, bool | float]]:
     """Calculate RMSD and related metrics between predicted molecule and closest ground truth molecule.
@@ -69,9 +76,6 @@ def robust_rmsd(
     if drop_stereo:
         RemoveStereochemistry(mol_probe)
         RemoveStereochemistry(mol_ref)
-    # if heavy_only:
-    #     mol_probe = remove_all_charges_and_hydrogens(mol_probe)
-    #     mol_ref = remove_all_charges_and_hydrogens(mol_ref)
 
     if heavy_only:
         mol_probe = RemoveHs(mol_probe)
@@ -96,27 +100,37 @@ def robust_rmsd(
         if not np.isnan(rmsd):
             return rmsd
     except RuntimeError as error:
-        logger.info(f"Could not calculate RMSD due to {error}")
+        pass
     except ValueError as error:
-        logger.info(f"Could not calculate RMSD due to {error}")
+        pass
+
+    # try again but neutralize atoms
+    mol_ref_neutralized = neutralize_atoms(mol_ref)
+    mol_probe_neutralized = neutralize_atoms(mol_probe)
+    try:
+        rmsd = _call_rdkit_rmsd(mol_probe_neutralized, mol_ref_neutralized, conf_id_probe, conf_id_ref, params, kabsch)
+        if not np.isnan(rmsd):
+            return rmsd
+    except RuntimeError as error:
+        pass
+    except ValueError as error:
+        pass
 
     # try again but on canonical tautomers
-    mol_ref_canonical = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_ref)
-    mol_probe_canonical = rdMolStandardize.TautomerEnumerator().Canonicalize(mol_probe)
+    mol_ref_canonical = tautomer_enumerator.Canonicalize(mol_ref)
+    mol_probe_canonical = tautomer_enumerator.Canonicalize(mol_probe)
     try:
         rmsd = _call_rdkit_rmsd(mol_probe_canonical, mol_ref_canonical, conf_id_probe, conf_id_ref, params, kabsch)
         if not np.isnan(rmsd):
             return rmsd
     except RuntimeError as error:
-        logger.info(f"Could not calculate RMSD due to {error}")
+        pass
     except ValueError as error:
-        logger.info(f"Could not calculate RMSD due to {error}")
+        pass
 
     # try again but after neutralizing atoms
-    mol_ref_neutral_canonical = rdMolStandardize.TautomerEnumerator().Canonicalize(neutralize_atoms(RemoveHs(mol_ref)))
-    mol_probe_neutral_canonical = rdMolStandardize.TautomerEnumerator().Canonicalize(
-        neutralize_atoms(RemoveHs(mol_probe))
-    )
+    mol_ref_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_ref))
+    mol_probe_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_probe))
     try:
         rmsd = _call_rdkit_rmsd(
             mol_probe_neutral_canonical, mol_ref_neutral_canonical, conf_id_probe, conf_id_ref, params, kabsch
