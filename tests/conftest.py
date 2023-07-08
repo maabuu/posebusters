@@ -118,6 +118,16 @@ def mol_pred_1mmv_3ar():
 
 
 @pytest.fixture
+def mol_true_1of6_dty():
+    return MolFromMolFile("tests/conftest/1OF6_DTY/1OF6_DTY_crystal.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_pred_1of6_dty():
+    return MolFromMolFile("tests/conftest/1OF6_DTY/1OF6_DTY_vina.sdf", sanitize=True)
+
+
+@pytest.fixture
 def mol_true_1q1g_mti():
     return MolFromMolFile("tests/conftest/1Q1G_MTI/1Q1G_MTI_crystal.sdf", sanitize=True)
 

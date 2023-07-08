@@ -23,6 +23,12 @@ def test_check_rmsd_1mmv_3ar(mol_true_1mmv_3ar, mol_pred_1mmv_3ar):
     assert out["results"]["rmsd_within_threshold"] is False
 
 
+def test_check_rmsd_1of6_dty(mol_true_1of6_dty, mol_pred_1of6_dty):
+    out = check_rmsd(mol_true_1of6_dty, mol_pred_1of6_dty)
+    assert out["results"]["rmsd"] < 2.0
+    assert out["results"]["rmsd_within_threshold"] is True
+
+
 def test_check_rmsd_1q1g_mti(mol_true_1q1g_mti, mol_pred_1q1g_mti):
     out = check_rmsd(mol_true_1q1g_mti, mol_pred_1q1g_mti)
     assert out["results"]["rmsd"] < 50.0

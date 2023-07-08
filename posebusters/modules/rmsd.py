@@ -93,9 +93,9 @@ def robust_rmsd(
         pass
 
     # try again but remove charges and hydrogens
-    mol_ref_uncharged = remove_all_charges_and_hydrogens(mol_ref)
-    mol_probe_uncharged = remove_all_charges_and_hydrogens(mol_probe)
     try:
+        mol_ref_uncharged = remove_all_charges_and_hydrogens(mol_ref)
+        mol_probe_uncharged = remove_all_charges_and_hydrogens(mol_probe)
         rmsd = _call_rdkit_rmsd(mol_probe_uncharged, mol_ref_uncharged, conf_id_probe, conf_id_ref, params, kabsch)
         if not np.isnan(rmsd):
             return rmsd
@@ -105,9 +105,9 @@ def robust_rmsd(
         pass
 
     # try again but neutralize atoms
-    mol_ref_neutralized = neutralize_atoms(mol_ref)
-    mol_probe_neutralized = neutralize_atoms(mol_probe)
     try:
+        mol_ref_neutralized = neutralize_atoms(mol_ref)
+        mol_probe_neutralized = neutralize_atoms(mol_probe)
         rmsd = _call_rdkit_rmsd(mol_probe_neutralized, mol_ref_neutralized, conf_id_probe, conf_id_ref, params, kabsch)
         if not np.isnan(rmsd):
             return rmsd
@@ -117,9 +117,9 @@ def robust_rmsd(
         pass
 
     # try again but on canonical tautomers
-    mol_ref_canonical = tautomer_enumerator.Canonicalize(mol_ref)
-    mol_probe_canonical = tautomer_enumerator.Canonicalize(mol_probe)
     try:
+        mol_ref_canonical = tautomer_enumerator.Canonicalize(mol_ref)
+        mol_probe_canonical = tautomer_enumerator.Canonicalize(mol_probe)
         rmsd = _call_rdkit_rmsd(mol_probe_canonical, mol_ref_canonical, conf_id_probe, conf_id_ref, params, kabsch)
         if not np.isnan(rmsd):
             return rmsd
@@ -129,9 +129,9 @@ def robust_rmsd(
         pass
 
     # try again but after neutralizing atoms
-    mol_ref_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_ref))
-    mol_probe_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_probe))
     try:
+        mol_ref_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_ref))
+        mol_probe_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_probe))
         rmsd = _call_rdkit_rmsd(
             mol_probe_neutral_canonical, mol_ref_neutral_canonical, conf_id_probe, conf_id_ref, params, kabsch
         )
