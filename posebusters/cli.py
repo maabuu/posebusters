@@ -15,7 +15,12 @@ logger = logging.getLogger(__name__)
 
 def main():
     """Run PoseBusters from the command line."""
-    bust()
+
+    # safe entry point
+    try:
+        bust()
+    except Exception as e:
+        click.echo(e)
 
 
 @click.command(name="bust")
