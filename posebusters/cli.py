@@ -5,9 +5,12 @@ from pathlib import Path
 
 import click
 import pandas as pd
+import logging
 
 from .posebusters import PoseBusters
 from .tools.formatting import create_long_output, create_short_output
+
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -46,6 +49,11 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
     if debug:
         click.echo("Debug mode is on.")
 
+    if outfmt == "short":
+        if full_report:
+            logger.warning("Full report is not available in short output format. Ignoring --full-report option.")
+        full_report = False
+
     if table is None and mol_args.get("mol_pred") is None:
         # check that an input was provided
         click.echo("Provide either MOL_PRED or a table using the --table option.\n")
@@ -63,28 +71,29 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
         posebusters = PoseBusters(mode, top_n=top_n, debug=debug)
         posebusters_results = posebusters.bust(**mol_args)
 
-    config = posebusters.config
+    for i, results_dict in enumerate(posebusters_results):
+        results = _dataframe_from_output(results_dict, posebusters.config, full_report)
+        output.write(_format_results(results, outfmt, no_header, i))
+
+
+def _dataframe_from_output(results_dict, config, full_report: bool = False) -> pd.DataFrame:
+    d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}
+    df = pd.DataFrame.from_dict(d, orient="index")
+
     test_columns = [(c["name"], n) for c in config["modules"] for n in c["chosen_binary_test_output"]]
     names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c["rename_outputs"].items()}
     suffix_lookup = {c["name"]: c["rename_suffix"] for c in config["modules"] if "rename_suffix" in c}
 
-    for i, results_dict in enumerate(posebusters_results):
-        results = _dataframe_from_output(results_dict)
+    available_columns = df.columns.tolist()
+    missing_columns = [c for c in test_columns if c not in available_columns]
+    extra_columns = [c for c in available_columns if c not in test_columns]
+    columns = test_columns + extra_columns if full_report else test_columns
 
-        available_columns = results.columns.tolist()
-        missing_columns = [c for c in test_columns if c not in available_columns]
-        extra_columns = [c for c in available_columns if c not in test_columns]
-        columns = test_columns + extra_columns if full_report and outfmt != "short" else test_columns
+    df[missing_columns] = pd.NA
+    df = df[columns]
+    df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]
 
-        results[missing_columns] = pd.NA
-        results = results[columns]
-        results.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in results.columns]
-        output.write(_format_results(results, outfmt, no_header, i))
-
-
-def _dataframe_from_output(results_dict):
-    d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}
-    return pd.DataFrame.from_dict(d, orient="index")
+    return df
 
 
 def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = False, index: int = 0) -> str:
