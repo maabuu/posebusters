@@ -19,10 +19,10 @@ modules:
   - name: "Chemistry"
     function: sanity
     chosen_binary_test_output:
-      - chemically_valid
+      - passes_rdkit_sanity_checks
       - all_atoms_connected
     rename_outputs:
-      chemically_valid: "Predicted molecule chemically valid"
+      passes_rdkit_sanity_checks: "Molecule passes RDKit sanity check"
       all_atoms_connected: "All atoms connected"
   - name: "Geometry"
     function: "distance_geometry"

@@ -29,7 +29,7 @@ def check_chemistry(mol_pred: Mol) -> Mol:
     results = {
         "passes_valence_checks": "AtomValenceException" not in types,
         "passes_kekulization": "AtomKekulizeException" not in types,
-        "chemically_valid": len(errors) == 0,
+        "passes_rdkit_sanity_checks": len(errors) == 0,
         "all_atoms_connected": num_frags <= 1,
     }
     details = pd.DataFrame(dict(messages=messages, atom_indices=atom_indices, types=types))
