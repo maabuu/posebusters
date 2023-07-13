@@ -21,6 +21,7 @@ modules:
       - all_atoms_connected
     rename_outputs:
       chemically_valid: "Predicted molecule chemically valid"
+      all_atoms_connected: "All atoms connected"
   - name: "Geometry"
     function: "distance_geometry"
     parameters:

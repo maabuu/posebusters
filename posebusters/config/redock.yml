@@ -24,6 +24,7 @@ modules:
       - chemically_valid
     rename_outputs:
       chemically_valid: "Predicted molecule chemically valid"
+      all_atoms_connected: "All atoms connected"
   - name: "Chemistry"
     function: identity
     parameters:
