@@ -70,7 +70,7 @@ def robust_rmsd(
 ) -> float:
     """RMSD calculation that handles errors and returns NaN if RMSD cannot be calculated."""
     mol_probe = deepcopy(mol_probe)
-    mol_ref = deepcopy(mol_ref)
+    mol_ref = deepcopy(mol_ref)  # copy mols because rdkit RMSD calculation aligns mols
 
     if drop_stereo:
         RemoveStereochemistry(mol_probe)
@@ -80,74 +80,61 @@ def robust_rmsd(
         mol_probe = RemoveHs(mol_probe)
         mol_ref = RemoveHs(mol_ref)
 
-    params = dict(symmetrizeConjugatedTerminalGroups=symmetrizeConjugatedTerminalGroups, **params)
+    # combine parameters
+    params = dict(symmetrizeConjugatedTerminalGroups=symmetrizeConjugatedTerminalGroups, kabsch=kabsch, **params)
 
-    try:
-        rmsd = _call_rdkit_rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, params, kabsch)
-        if not np.isnan(rmsd):
-            return rmsd
-    except RuntimeError as error:
-        pass
-    except ValueError as error:
-        pass
+    # calculate RMSD
+    rmsd = _call_rdkit_rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, **params)
+    if not np.isnan(rmsd):
+        return rmsd
 
     # try again but remove charges and hydrogens
-    try:
-        mol_ref_uncharged = remove_all_charges_and_hydrogens(mol_ref)
-        mol_probe_uncharged = remove_all_charges_and_hydrogens(mol_probe)
-        rmsd = _call_rdkit_rmsd(mol_probe_uncharged, mol_ref_uncharged, conf_id_probe, conf_id_ref, params, kabsch)
-        if not np.isnan(rmsd):
-            return rmsd
-    except RuntimeError as error:
-        pass
-    except ValueError as error:
-        pass
+    mol_ref_uncharged = remove_all_charges_and_hydrogens(mol_ref)
+    mol_probe_uncharged = remove_all_charges_and_hydrogens(mol_probe)
+    rmsd = _call_rdkit_rmsd(mol_probe_uncharged, mol_ref_uncharged, conf_id_probe, conf_id_ref, **params)
+    if not np.isnan(rmsd):
+        return rmsd
 
     # try again but neutralize atoms
-    try:
-        mol_ref_neutralized = neutralize_atoms(mol_ref)
-        mol_probe_neutralized = neutralize_atoms(mol_probe)
-        rmsd = _call_rdkit_rmsd(mol_probe_neutralized, mol_ref_neutralized, conf_id_probe, conf_id_ref, params, kabsch)
-        if not np.isnan(rmsd):
-            return rmsd
-    except RuntimeError as error:
-        pass
-    except ValueError as error:
-        pass
+    mol_ref_neutralized = neutralize_atoms(mol_ref)
+    mol_probe_neutralized = neutralize_atoms(mol_probe)
+    rmsd = _call_rdkit_rmsd(mol_probe_neutralized, mol_ref_neutralized, conf_id_probe, conf_id_ref, **params)
+    if not np.isnan(rmsd):
+        return rmsd
 
     # try again but on canonical tautomers
-    try:
-        mol_ref_canonical = tautomer_enumerator.Canonicalize(mol_ref)
-        mol_probe_canonical = tautomer_enumerator.Canonicalize(mol_probe)
-        rmsd = _call_rdkit_rmsd(mol_probe_canonical, mol_ref_canonical, conf_id_probe, conf_id_ref, params, kabsch)
-        if not np.isnan(rmsd):
-            return rmsd
-    except RuntimeError as error:
-        pass
-    except ValueError as error:
-        pass
+    mol_ref_canonical = tautomer_enumerator.Canonicalize(mol_ref)
+    mol_probe_canonical = tautomer_enumerator.Canonicalize(mol_probe)
+    rmsd = _call_rdkit_rmsd(mol_probe_canonical, mol_ref_canonical, conf_id_probe, conf_id_ref, **params)
+    if not np.isnan(rmsd):
+        return rmsd
 
     # try again but after neutralizing atoms
-    try:
-        mol_ref_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_ref))
-        mol_probe_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_probe))
-        rmsd = _call_rdkit_rmsd(
-            mol_probe_neutral_canonical, mol_ref_neutral_canonical, conf_id_probe, conf_id_ref, params, kabsch
-        )
-        if not np.isnan(rmsd):
-            return rmsd
-    except RuntimeError as error:
-        logger.info(f"Could not calculate RMSD due to {error}")
-    except ValueError as error:
-        logger.info(f"Could not calculate RMSD due to {error}")
+    mol_ref_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_ref))
+    mol_probe_neutral_canonical = tautomer_enumerator.Canonicalize(neutralize_atoms(mol_probe))
+    rmsd = _call_rdkit_rmsd(
+        mol_probe_neutral_canonical, mol_ref_neutral_canonical, conf_id_probe, conf_id_ref, **params
+    )
+    if not np.isnan(rmsd):
+        return rmsd
 
     return np.nan
 
 
-def _call_rdkit_rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_ref: int, params, kabsch: bool = False):
+def _call_rdkit_rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_ref: int, **params):
+    try:
+        with CaptureLogger() as cl:
+            _rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, **params)
+    except RuntimeError as error:
+        pass
+    except ValueError as error:
+        pass
+
+    return np.nan
+
+
+def _rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_ref: int, kabsch: bool = False, **params):
     if kabsch is True:
-        with CaptureLogger():
-            return GetBestRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
+        return GetBestRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
     else:
-        with CaptureLogger():
-            return CalcRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
+        return CalcRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
