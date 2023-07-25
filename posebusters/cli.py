@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    """Run PoseBusters from the command line."""
-
-    # safe entry point
+    """Safe entry point for PoseBusters from the command line."""
     try:
         bust()
     except Exception as e:

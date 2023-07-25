@@ -5,12 +5,11 @@ import logging
 from copy import deepcopy
 
 import numpy as np
-from rdkit.Chem import AllChem, RemoveStereochemistry
+from rdkit.Chem import RemoveStereochemistry
 from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdMolAlign import CalcRMS, GetBestRMS
-from rdkit.Chem.rdmolfiles import MolToSmiles
-from rdkit.Chem.rdmolops import AddHs, RemoveHs
+from rdkit.Chem.rdmolops import RemoveHs
 from rdkit.rdBase import LogToPythonLogger
 
 from ..tools.logging import CaptureLogger

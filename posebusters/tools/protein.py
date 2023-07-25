@@ -1,3 +1,4 @@
+"""Protein related functions."""
 import logging
 from typing import Iterable
 
