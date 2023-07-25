@@ -164,8 +164,8 @@ modules:
   - name: "Volume overlap with inorganic cofactors"
     function: volume_overlap
     parameters:
-      clash_cutoff: 0.20
-      vdw_scale: 0.8
+      clash_cutoff: 0.075
+      vdw_scale: 0.5
       ignore_hydrogens: True
       ignore_types:
       - protein

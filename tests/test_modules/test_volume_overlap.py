@@ -60,3 +60,16 @@ def test_check_volume_overlap_7cnq_g8x(mol_lig_7cnq_g8x, mol_cond_7cnq_g8x):
     )
     assert out["results"]["volume_overlap"] > 0.0
     assert out["results"]["no_volume_clash"] is True
+
+
+def test_check_volume_overlap_7ztl_bcn(mol_lig_7ztl_bcn, mol_cond_7ztl_bcn):
+    out = check_volume_overlap(
+        mol_lig_7ztl_bcn,
+        mol_cond_7ztl_bcn,
+        clash_cutoff=0.075,
+        vdw_scale=0.5,
+        ignore_hydrogens=True,
+        ignore_types={"protein", "organic_cofactors"},
+    )
+    assert out["results"]["volume_overlap"] > 0.0
+    assert out["results"]["no_volume_clash"] is True

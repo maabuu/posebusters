@@ -143,31 +143,50 @@ def _process_mol(
     """Process a molecule, optionally adding hydrogens and assigning bond orders."""
     if mol is None:
         raise ValueError("Could not load molecule.")
-
     if smiles is not None:
-        template = MolFromSmiles(smiles)
-        mol = AssignBondOrdersFromTemplate(template, mol)
-        if mol is None:
-            raise ValueError("Could not assign bond orders to molecule.")
-
+        mol = _assign_bond_order(mol, smiles)
     if cleanup:
-        mol = Cleanup(mol)
-        if mol is None:
-            raise ValueError("Could not cleanup molecule.")
-
+        mol = _cleanup(mol)
     if sanitize:
-        SanitizeMol(mol)
-        if mol is None:
-            raise ValueError("Could not sanitize molecule.")
-
+        mol = _sanitize(mol)
     if add_hs:
-        mol = AddHs(mol, addCoords=True)
-        if mol is None:
-            raise ValueError("Could not add hydrogens to molecule.")
-
+        mol = _add_hydrogens(mol)
     if assign_stereo:
-        AssignStereochemistryFrom3D(mol)
-        if mol is None:
-            raise ValueError("Could not assign stereo to molecule.")
+        mol = _assign_stereo(mol)
+    return mol
 
+
+def _assign_bond_order(mol: Mol, smiles) -> Mol:
+    template = MolFromSmiles(smiles)
+    mol = AssignBondOrdersFromTemplate(template, mol)
+    if mol is None:
+        raise ValueError("Could not assign bond orders to molecule.")
+    return mol
+
+
+def _cleanup(mol: Mol) -> Mol:
+    mol = Cleanup(mol)
+    if mol is None:
+        raise ValueError("Could not cleanup molecule.")
+    return mol
+
+
+def _sanitize(mol: Mol) -> Mol:
+    mol = SanitizeMol(mol)
+    if mol is None:
+        raise ValueError("Could not sanitize molecule.")
+    return mol
+
+
+def _add_hydrogens(mol: Mol) -> Mol:
+    mol = AddHs(mol, addCoords=True)
+    if mol is None:
+        raise ValueError("Could not add hydrogens to molecule.")
+    return mol
+
+
+def _assign_stereo(mol: Mol) -> Mol:
+    AssignStereochemistryFrom3D(mol)
+    if mol is None:
+        raise ValueError("Could not assign stereo to molecule.")
     return mol

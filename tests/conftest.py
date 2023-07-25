@@ -170,3 +170,13 @@ def mol_lig_7cnq_g8x():
 @pytest.fixture
 def mol_cond_7cnq_g8x():
     return MolFromPDBFile("tests/conftest/7CNQ_G8X/7CNQ_G8X_protein.pdb", sanitize=False, proximityBonding=False)
+
+
+@pytest.fixture
+def mol_lig_7ztl_bcn():
+    return MolFromMolFile("tests/conftest/7ZTL_BCN/7ZTL_BCN_ligand.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_cond_7ztl_bcn():
+    return MolFromPDBFile("tests/conftest/7ZTL_BCN/7ZTL_BCN_protein.pdb", sanitize=False, proximityBonding=False)
