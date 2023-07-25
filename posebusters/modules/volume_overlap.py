@@ -8,7 +8,7 @@ from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdShapeHelpers import ShapeTverskyIndex
 
 from ..tools.molecules import delete_atoms
-from ..tools.protein import get_mask
+from ..tools.protein import get_atom_type_mask
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ def check_volume_overlap(
     assert isinstance(mol_cond, Mol)
 
     # filter by atom types
-    keep_mask = np.array(get_mask(mol_cond, ignore_hydrogens, ignore_types))
+    keep_mask = np.array(get_atom_type_mask(mol_cond, ignore_hydrogens, ignore_types))
     mol_cond = _filter_by_mask(mol_cond, keep_mask)
     if mol_cond.GetNumAtoms() == 0:
         return {"results": {"volume_overlap": np.nan, "no_volume_clash": True}}

@@ -84,7 +84,7 @@ modules:
   - name: "Distance to protein"
     function: "intermolecular_distance"
     parameters:
-      vdw_scale: 0.8
+      radius_scale: 1.0
       clash_cutoff: 0.05
       ignore_hydrogens: True
       ignore_types:
@@ -101,7 +101,7 @@ modules:
   - name: "Distance to organic cofactors"
     function: "intermolecular_distance"
     parameters:
-      vdw_scale: 0.8
+      radius_scale: 1.0
       clash_cutoff: 0.05
       ignore_hydrogens: True
       ignore_types:
@@ -116,7 +116,7 @@ modules:
   - name: "Distance to inorganic cofactors"
     function: "intermolecular_distance"
     parameters:
-      vdw_scale: 0.8
+      radius_scale: 1.0
       clash_cutoff: 0.50
       ignore_hydrogens: True
       ignore_types:

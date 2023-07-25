@@ -145,3 +145,13 @@ def mol_true_6yr2_t1c():
 @pytest.fixture
 def mol_pred_6yr2_t1c():
     return MolFromMolFile("tests/conftest/6YR2_T1C/6YR2_T1C_tankbind.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_lig_7ecr_sin():
+    return MolFromMolFile("tests/conftest/7ECR_SIN/7ECR_SIN_ligand.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_cond_7ecr_sin():
+    return MolFromPDBFile("tests/conftest/7ECR_SIN/7ECR_SIN_protein.pdb", sanitize=False, proximityBonding=False)

@@ -81,7 +81,7 @@ modules:
   - name: "Distance to protein"
     function: "intermolecular_distance"
     parameters:
-      vdw_scale: 0.8
+      radius_scale: 0.8
       clash_cutoff: 0.05
       ignore_hydrogens: True
       ignore_atom_type: HETATM
@@ -95,7 +95,7 @@ modules:
   - name: "Distance to cofactors"
     function: "intermolecular_distance"
     parameters:
-      vdw_scale: 0.8
+      radius_scale: 0.8
       clash_cutoff: 0.05
       ignore_hydrogens: True
       ignore_atom_type: ATOM

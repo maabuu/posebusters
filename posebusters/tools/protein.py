@@ -35,7 +35,7 @@ _inorganic_cofactor_ccd_codes = {
 }
 
 
-def get_mask(mol: Mol, ignore_h: bool, ignore_types: Iterable[str]) -> list[bool]:
+def get_atom_type_mask(mol: Mol, ignore_h: bool, ignore_types: Iterable[str]) -> list[bool]:
     """Get mask for atoms to keep."""
     ignore_types = set(ignore_types)
     if ignore := ignore_types - {"protein", "organic_cofactors", "inorganic_cofactors"}:
