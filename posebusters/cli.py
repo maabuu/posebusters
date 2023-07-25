@@ -23,22 +23,14 @@ def main():
         click.echo(e)
 
 
+_path = click.Path(exists=True, path_type=Path)
+
+
 @click.command(name="bust")
-@click.argument("mol_pred", type=click.Path(exists=True, path_type=Path), required=False)
-@click.option(
-    "-l", "--mol_true", type=click.Path(exists=True, path_type=Path), required=False, default=None, help="True ligand."
-)
-@click.option(
-    "-p",
-    "--mol_cond",
-    type=click.Path(exists=True, path_type=Path),
-    required=False,
-    default=None,
-    help="Protein receptor.",
-)
-@click.option(
-    "-t", "--table", type=click.Path(exists=True, path_type=Path), help="Run multiple inputs listed in a .csv file."
-)
+@click.argument("mol_pred", type=_path, required=False)
+@click.option("-l", "--mol_true", type=_path, required=False, default=None, help="True ligand.")
+@click.option("-p", "--mol_cond", type=_path, required=False, default=None, help="Protein receptor.")
+@click.option("-t", "--table", type=_path, help="Run multiple inputs listed in a .csv file.")
 @click.option("-f", "--outfmt", type=click.Choice(["short", "long", "csv"]), default="short", help="Output format.")
 @click.option(
     "-o", "--out", "output", type=click.File("w"), default="-", help="Output file. Prints to stdout by default."
@@ -46,6 +38,7 @@ def main():
 @click.option("-c", "--config", type=click.File("r"), default=None, help="Configuration file.")
 @click.option("--full-report", type=bool, default=False, is_flag=True, help="Print full report.")
 @click.option("--no-header", type=bool, default=False, is_flag=True, help="Print without header.")
+# @click.option("--print-header", type=bool, default=False, is_flag=True, help="Print header only.")
 @click.option("--top-n", type=int, default=None, help="Run on top N results in MOL_PRED only.")
 @click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
 @click.version_option()
