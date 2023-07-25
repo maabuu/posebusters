@@ -5,11 +5,10 @@ import logging
 from copy import deepcopy
 
 import numpy as np
-from rdkit.Chem import RemoveStereochemistry
 from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdMolAlign import CalcRMS, GetBestRMS
-from rdkit.Chem.rdmolops import RemoveHs
+from rdkit.Chem.rdmolops import RemoveHs, RemoveStereochemistry
 from rdkit.rdBase import LogToPythonLogger
 
 from ..tools.logging import CaptureLogger
@@ -68,7 +67,7 @@ def robust_rmsd(
     symmetrizeConjugatedTerminalGroups=True,
     **params,
 ) -> float:
-    """RMSD calculation that handles errors and returns NaN if RMSD cannot be calculated."""
+    """RMSD calculation for isomers."""
     mol_probe = deepcopy(mol_probe)
     mol_ref = deepcopy(mol_ref)  # copy mols because rdkit RMSD calculation aligns mols
 
@@ -124,7 +123,7 @@ def robust_rmsd(
 def _call_rdkit_rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_ref: int, **params):
     try:
         with CaptureLogger():
-            _rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, **params)
+            return _rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, **params)
     except RuntimeError:
         pass
     except ValueError:
