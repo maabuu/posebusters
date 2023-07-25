@@ -123,11 +123,11 @@ def robust_rmsd(
 
 def _call_rdkit_rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_ref: int, **params):
     try:
-        with CaptureLogger() as cl:
+        with CaptureLogger():
             _rmsd(mol_probe, mol_ref, conf_id_probe, conf_id_ref, **params)
-    except RuntimeError as error:
+    except RuntimeError:
         pass
-    except ValueError as error:
+    except ValueError:
         pass
 
     return np.nan

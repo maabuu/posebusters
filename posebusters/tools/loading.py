@@ -140,7 +140,7 @@ def _process_mol(
     add_hs=False,
     assign_stereo=True,
 ) -> Mol:
-    """Load a molecule from a file, optionally adding hydrogens and assigning bond orders."""
+    """Process a molecule, optionally adding hydrogens and assigning bond orders."""
     if mol is None:
         raise ValueError("Could not load molecule.")
 
