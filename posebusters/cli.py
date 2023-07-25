@@ -1,11 +1,11 @@
 """Command line interface for PoseBusters."""
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 import click
 import pandas as pd
-import logging
 
 from .posebusters import PoseBusters
 from .tools.formatting import create_long_output, create_short_output

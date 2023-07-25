@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 import pytest
-from rdkit.Chem.rdmolfiles import MolFromMol2File, MolFromMolFile, MolFromPDBFile, SDMolSupplier
+from rdkit.Chem.rdmolfiles import (
+    MolFromMol2File,
+    MolFromMolFile,
+    MolFromPDBFile,
+    SDMolSupplier,
+)
 
 
 @pytest.fixture
@@ -155,3 +160,13 @@ def mol_lig_7ecr_sin():
 @pytest.fixture
 def mol_cond_7ecr_sin():
     return MolFromPDBFile("tests/conftest/7ECR_SIN/7ECR_SIN_protein.pdb", sanitize=False, proximityBonding=False)
+
+
+@pytest.fixture
+def mol_lig_7cnq_g8x():
+    return MolFromMolFile("tests/conftest/7CNQ_G8X/7CNQ_G8X_ligand.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_cond_7cnq_g8x():
+    return MolFromPDBFile("tests/conftest/7CNQ_G8X/7CNQ_G8X_protein.pdb", sanitize=False, proximityBonding=False)

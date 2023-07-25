@@ -47,3 +47,16 @@ def test_check_volume_overlap_without_hydrogens(mol_rq3_x00, mol_rq3_x01, mol_rq
     out = check_volume_overlap(mol_rq3_x00, mol_rq3_x10, ignore_hydrogens=True, search_distance=20.0)
     assert out["results"]["volume_overlap"] == 0.0
     assert out["results"]["no_volume_clash"] is True
+
+
+def test_check_volume_overlap_7cnq_g8x(mol_lig_7cnq_g8x, mol_cond_7cnq_g8x):
+    out = check_volume_overlap(
+        mol_lig_7cnq_g8x,
+        mol_cond_7cnq_g8x,
+        clash_cutoff=0.075,
+        vdw_scale=0.8,
+        ignore_hydrogens=True,
+        ignore_types={"inorganic_cofactors", "organic_cofactors"},
+    )
+    assert out["results"]["volume_overlap"] > 0.0
+    assert out["results"]["no_volume_clash"] is True

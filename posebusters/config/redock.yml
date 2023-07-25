@@ -84,8 +84,9 @@ modules:
   - name: "Distance to protein"
     function: "intermolecular_distance"
     parameters:
+      radius_type: vdw
       radius_scale: 1.0
-      clash_cutoff: 0.05
+      clash_cutoff: 0.75
       ignore_hydrogens: True
       ignore_types:
       - organic_cofactors
@@ -101,8 +102,9 @@ modules:
   - name: "Distance to organic cofactors"
     function: "intermolecular_distance"
     parameters:
+      radius_type: vdw
       radius_scale: 1.0
-      clash_cutoff: 0.05
+      clash_cutoff: 0.75
       ignore_hydrogens: True
       ignore_types:
       - protein
@@ -116,8 +118,9 @@ modules:
   - name: "Distance to inorganic cofactors"
     function: "intermolecular_distance"
     parameters:
+      radius_type: covalent
       radius_scale: 1.0
-      clash_cutoff: 0.50
+      clash_cutoff: 0.75
       ignore_hydrogens: True
       ignore_types:
       - protein
@@ -161,7 +164,7 @@ modules:
   - name: "Volume overlap with inorganic cofactors"
     function: volume_overlap
     parameters:
-      clash_cutoff: 0.10
+      clash_cutoff: 0.20
       vdw_scale: 0.8
       ignore_hydrogens: True
       ignore_types:

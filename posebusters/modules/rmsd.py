@@ -14,7 +14,7 @@ from rdkit.Chem.rdmolops import AddHs, RemoveHs
 from rdkit.rdBase import LogToPythonLogger
 
 from ..tools.logging import CaptureLogger
-from ..tools.molecules import remove_all_charges_and_hydrogens, neutralize_atoms
+from ..tools.molecules import neutralize_atoms, remove_all_charges_and_hydrogens
 
 LogToPythonLogger()
 logger = logging.getLogger(__name__)
