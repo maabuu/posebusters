@@ -23,7 +23,7 @@ def check_intermolecular_distance(
     max_distance: float = 5.0,
     search_distance: float = 6.0,
 ) -> dict[str, Any]:
-    """Calculate pairwise intermolecular distances between ligand and protein atoms.
+    """Check that predicted molecule is not too close and not too far away from conditioning molecule.
 
     Args:
         mol_pred: Predicted molecule (docked ligand) with one conformer.
@@ -71,9 +71,6 @@ def check_intermolecular_distance(
 
     distances_all = _pairwise_distance(coords_ligand, coords_protein)
 
-    # minimum distance
-    smallest_distance = distances_all.min() if distances_all.size else np.inf
-
     # select atoms that are close to ligand to check for clash
     mask_protein = distances_all.min(axis=0) <= search_distance
     distances = distances_all[:, mask_protein]
@@ -81,9 +78,15 @@ def check_intermolecular_distance(
     atoms_protein = atoms_protein_all[mask_protein]
 
     radius_sum = radius_ligand[:, None] + radius_protein[None, :]
-    violation_ligand, violation_protein = np.where(distances - radius_sum < 0)
+    relative_distance = distances / radius_sum
+    violations = relative_distance < 1 / radius_scale
 
-    # collect details around those possible violations
+    if distances.size > 0:
+        violations[np.unravel_index(distances.argmin(), distances.shape)] = True  # add smallest distances as info
+        violations[np.unravel_index(relative_distance.argmin(), relative_distance.shape)] = True
+    violation_ligand, violation_protein = np.where(violations)
+
+    # collect details around those violations in a dataframe
     details = pd.DataFrame()
     details["ligand_atom_id"] = violation_ligand
     details["protein_atom_id"] = violation_protein
@@ -93,19 +96,13 @@ def check_intermolecular_distance(
     details["protein_vdw"] = [radius_protein[i] for i in violation_protein]
     details["sum_radii"] = details["ligand_vdw"] + details["protein_vdw"]
     details["distance"] = distances[violation_ligand, violation_protein]
-
-    # identify clashes after scaling vdw and applying cutoff
     details["sum_radii_scaled"] = details["sum_radii"] * radius_scale
     details["relative_distance"] = details["distance"] / details["sum_radii_scaled"]
-    # details["absolute_gap"] = details["distance"] - details["sum_radii_scaled"]
-    # details["relative_gap"] = details["absolute_gap"] / details["sum_radii_scaled"]
-    # details["relative_overlap"] = -details["relative_gap"]
-    # details["clash"] = details["relative_gap"] < -clash_cutoff
     details["clash"] = details["relative_distance"] < clash_cutoff
 
     results = {
-        "smallest_distance": smallest_distance,
-        "not_too_far_away": max_distance >= smallest_distance,
+        "smallest_distance": details["distance"].min(),
+        "not_too_far_away": details["distance"].min() <= max_distance,
         "num_pairwise_clashes": details["clash"].sum(),
         "no_clashes": not details["clash"].any(),
     }
@@ -117,5 +114,5 @@ def check_intermolecular_distance(
     return {"results": results, "details": details}
 
 
-def _pairwise_distance(x, y):
+def _pairwise_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return np.linalg.norm(x[:, None, :] - y[None, :, :], axis=-1)
