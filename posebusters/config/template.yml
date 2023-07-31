@@ -67,9 +67,9 @@ modules:
     chosen_binary_test_output:
       - flatness_passes
     rename_outputs:
-      num_systems_checked: "Number aromatic rings checked"
-      max_distance: "Aromatic ring maximum distance from plane"
-      num_systems_passed: "Number aromatic rings pass"
+      num_systems_checked: number_aromatic_rings_checked
+      num_systems_passed: number_aromatic_rings_pass
+      max_distance: aromatic_ring_maximum_distance_from_plane
       flatness_passes: "Aromatic ring flatness passes"
   - name: "Double bond flatness"
     function: "flatness"
@@ -80,9 +80,9 @@ modules:
     chosen_binary_test_output:
       - flatness_passes
     rename_outputs:
-      num_systems_checked: "Number double bonds checked"
-      max_distance: "Double bond maximum distance from plane"
-      num_systems_passed: "Number double bonds pass"
+      num_systems_checked: number_double_bonds_checked
+      num_systems_passed: number_double_bonds_pass
+      max_distance: double_bond_maximum_distance_from_plane
       flatness_passes: "Double bond flatness passes"
   - name: "Energy ratio"
     function: energy_ratio
