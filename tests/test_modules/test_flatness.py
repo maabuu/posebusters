@@ -6,7 +6,7 @@ rings = {
     "aromatic_5_membered_rings_sp2": "[ar5^2]1[ar5^2][ar5^2][ar5^2][ar5^2]1",
     "aromatic_6_membered_rings_sp2": "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1",
 }
-bonds = {"trigonal_planar_double_bonds": "[#6;X3;^2](*)(*)=[#6;X3;^2](*)(*)"}
+bonds = {"trigonal_planar_double_bonds": "[C;X3;^2](*)(*)=[C;X3;^2](*)(*)"}
 
 
 def test_check_flatness(mol_pm2, mol_cgb):
