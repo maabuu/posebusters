@@ -1,12 +1,14 @@
 """Module to check flatness of ligand substructures."""
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any, Iterable
 
 import numpy as np
 from numpy import ndarray as Array
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdmolfiles import MolFromSmarts
+from rdkit.Chem.rdmolops import SanitizeMol
 
 _flat = {
     "aromatic_5_membered_rings_sp2": "[ar5^2]1[ar5^2][ar5^2][ar5^2][ar5^2]1",
@@ -18,26 +20,31 @@ _flat = {
 def check_flatness(
     mol_pred: Mol, threshold_flatness: float = 0.1, flat_systems: dict[str, str] = _flat
 ) -> dict[str, Any]:
-    """Check whether substructures of molecule are as flat as chemistry predicts.
+    """Check whether substructures of molecule are flat.
 
     Args:
-        mol_pred: Predicted molecule (docked ligand) with exactly one conformer.
-        threshold_flatness: _description_. Defaults to 0.1.
-        flat_systems: _description_. Defaults to None.
+        mol_pred: Molecule with exactly one conformer.
+        threshold_flatness: Maximum distance from shared plane used as cutoff. Defaults to 0.1.
+        flat_systems: Patterns of flat systems provided as SMARTS. Defaults to 5 and 6 membered
+            aromatic rings and carbon sigma bonds.
 
     Returns:
         PoseBusters results dictionary.
     """
+    mol = deepcopy(mol_pred)
+    # if mol cannot be sanitized, then rdkit may not find substructures
+    SanitizeMol(mol)
+
     planar_groups = []
     types = []
     for flat_system, smarts in flat_systems.items():
         match = MolFromSmarts(smarts)
-        atom_groups = list(mol_pred.GetSubstructMatches(match))
+        atom_groups = list(mol.GetSubstructMatches(match))
         planar_groups += atom_groups
         types += [flat_system] * len(atom_groups)
 
     # calculate distances to plane and check threshold
-    coords = [_get_coords(mol_pred, group) for group in planar_groups]
+    coords = [_get_coords(mol, group) for group in planar_groups]
     max_distances = [float(_get_distances_to_plane(X).max()) for X in coords]
     flatness_passes = [bool(d <= threshold_flatness) for d in max_distances]
 
@@ -50,8 +57,8 @@ def check_flatness(
 
     results = {
         "num_systems_checked": len(planar_groups),
-        "max_distance": max(max_distances) if max_distances else np.nan,
         "num_systems_passed": sum(flatness_passes),
+        "max_distance": max(max_distances) if max_distances else np.nan,
         "flatness_passes": all(flatness_passes) if len(flatness_passes) > 0 else True,
     }
 

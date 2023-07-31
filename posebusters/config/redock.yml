@@ -70,7 +70,7 @@ modules:
     chosen_binary_test_output:
       - flatness_passes
     rename_outputs:
-      num_syst ems_checked: "Number aromatic rings checked"
+      num_systems_checked: "Number aromatic rings checked"
       max_distance: "Aromatic ring maximum distance from plane"
       num_systems_passed: "Number aromatic rings pass"
       flatness_passes: "Aromatic ring flatness passes"
@@ -83,7 +83,7 @@ modules:
     chosen_binary_test_output:
       - flatness_passes
     rename_outputs:
-      num_syst ems_checked: "Number double bonds checked"
+      num_systems_checked: "Number double bonds checked"
       max_distance: "Double bond maximum distance from plane"
       num_systems_passed: "Number double bonds pass"
       flatness_passes: "Double bond flatness passes"

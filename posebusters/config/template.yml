@@ -57,18 +57,33 @@ modules:
       bond_lengths_within_bounds: "Bond lengths within bounds"
       bond_angles_within_bounds: "Bond angles within bounds"
       no_internal_clash: "No internal clashes"
-  - name: "Flatness"
+  - name: "Ring flatness"
     function: "flatness"
     parameters:
       flat_systems: # list atoms which together should lie on plane as SMARTS matches
         aromatic_5_membered_rings_sp2: "[ar5^2]1[ar5^2][ar5^2][ar5^2][ar5^2]1"
         aromatic_6_membered_rings_sp2: "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1"
-        # - trigonal_planar_double_bonds: "[#6;X3;D2,D3;^2]=[#6;X3;D2,D3;^2]"
       threshold_flatness: 0.1 # max distance in A to closest shared plane
     chosen_binary_test_output:
       - flatness_passes
     rename_outputs:
-      flatness_passes: "Flatness passes"
+      num_systems_checked: "Number aromatic rings checked"
+      max_distance: "Aromatic ring maximum distance from plane"
+      num_systems_passed: "Number aromatic rings pass"
+      flatness_passes: "Aromatic ring flatness passes"
+  - name: "Double bond flatness"
+    function: "flatness"
+    parameters:
+      flat_systems: # list atoms which together should lie on plane as SMARTS matches
+        trigonal_planar_double_bonds: "[#6;X3;D2,D3;^2]=[#6;X3;D2,D3;^2]"
+      threshold_flatness: 0.1 # max distance in A to closest shared plane
+    chosen_binary_test_output:
+      - flatness_passes
+    rename_outputs:
+      num_systems_checked: "Number double bonds checked"
+      max_distance: "Double bond maximum distance from plane"
+      num_systems_passed: "Number double bonds pass"
+      flatness_passes: "Double bond flatness passes"
   - name: "Energy ratio"
     function: energy_ratio
     parameters:
