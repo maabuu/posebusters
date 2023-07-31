@@ -6,7 +6,7 @@ rings = {
     "aromatic_5_membered_rings_sp2": "[ar5^2]1[ar5^2][ar5^2][ar5^2][ar5^2]1",
     "aromatic_6_membered_rings_sp2": "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1",
 }
-bonds = {"trigonal_planar_double_bonds": "[#6;X3;D2,D3;^2]=[#6;X3;D2,D3;^2]"}
+bonds = {"trigonal_planar_double_bonds": "[#6;X3;D2,D3;^2](*)(*)=[#6;X3;D2,D3;^2](*)(*)"}
 
 
 def test_check_flatness(mol_pm2, mol_cgb):
@@ -21,7 +21,7 @@ def test_check_flatness(mol_pm2, mol_cgb):
 
 def test_check_flatness_6yr2_t1c(mol_pred_6yr2_t1c, mol_true_6yr2_t1c):
     # pass
-    out = check_flatness(mol_true_6yr2_t1c)
+    out = check_flatness(mol_true_6yr2_t1c, threshold_flatness=0.5)
     assert out["results"]["flatness_passes"] is True
 
     # fail
@@ -33,8 +33,8 @@ def test_check_flatness_6yr2_t1c(mol_pred_6yr2_t1c, mol_true_6yr2_t1c):
     assert out["results"]["flatness_passes"] is False
 
     # pass bonds
-    out = check_flatness(mol_pred_6yr2_t1c, flat_systems=bonds)
-    assert out["results"]["flatness_passes"] is True
+    out = check_flatness(mol_pred_6yr2_t1c, flat_systems=bonds, threshold_flatness=0.5)
+    assert out["results"]["flatness_passes"] is False
 
 
 def test_check_flatness_7ecr_sin(mol_lig_7ecr_sin):
