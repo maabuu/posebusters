@@ -60,7 +60,7 @@ modules:
     function: "flatness"
     parameters:
       flat_systems: # list atoms which together should lie on plane as SMARTS matches
-        trigonal_planar_double_bonds: "[#6;X3;D2,D3;^2](*)(*)=[#6;X3;D2,D3;^2](*)(*)"
+        trigonal_planar_double_bonds: "[#6;X3;^2](*)(*)=[#6;X3;^2](*)(*)"
       threshold_flatness: 0.5 # max distance in A to closest shared plane
     chosen_binary_test_output:
       - flatness_passes

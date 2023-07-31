@@ -13,7 +13,7 @@ from rdkit.Chem.rdmolops import SanitizeMol
 _flat = {
     "aromatic_5_membered_rings_sp2": "[ar5^2]1[ar5^2][ar5^2][ar5^2][ar5^2]1",
     "aromatic_6_membered_rings_sp2": "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1",
-    "trigonal_planar_double_bonds": "[#6;X3;D2,D3;^2](*)(*)=[#6;X3;D2,D3;^2](*)(*)",
+    "trigonal_planar_double_bonds": "[#6;X3;^2](*)(*)=[#6;X3;^2](*)(*)",
 }
 
 
