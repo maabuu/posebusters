@@ -1,12 +1,4 @@
-
 # Setup test modules
-# needs:
-#   name
-#   function
-#   parameters (optional)
-#   selected_outputs (optional)
-#   rename_outputs (optional)
-
 modules:
   - name: "Loading"
     function: loading
@@ -22,6 +14,7 @@ modules:
     function: sanity
     chosen_binary_test_output:
       - passes_rdkit_sanity_checks
+      - all_atoms_connected
     rename_outputs:
       passes_rdkit_sanity_checks: "Molecule passes RDKit sanity check"
       all_atoms_connected: "All atoms connected"
@@ -38,7 +31,7 @@ modules:
       formula: "Molecular formula preserved"
       connections: "Molecular bonds preserved"
       stereo_dbond: "Double bond stereochemistry preserved"
-      stereo_tetrahedral: "sp3 stereochemistry preserved"
+      stereo_tetrahedral: "Tetrahedral chiral center stereochemistry preserved"
       stereo: "Stereochemistry preserved"
   - name: "Geometry"
     function: "distance_geometry"
@@ -106,6 +99,7 @@ modules:
       ignore_types:
       - organic_cofactors
       - inorganic_cofactors
+      - waters
       max_distance: 5.0
     chosen_binary_test_output:
       - not_too_far_away
@@ -124,6 +118,7 @@ modules:
       ignore_types:
       - protein
       - inorganic_cofactors
+      - waters
       max_distance: 5.0
     chosen_binary_test_output:
       - no_clashes
@@ -140,12 +135,30 @@ modules:
       ignore_types:
       - protein
       - organic_cofactors
+      - waters
       max_distance: 5.0
     chosen_binary_test_output:
       - no_clashes
     rename_outputs:
       no_clashes: "No clashes with inorganic cofactors"
     rename_suffix: "_inorganic_cofactors"
+  - name: "Distance to waters"
+    function: "intermolecular_distance"
+    parameters:
+      radius_type: vdw
+      radius_scale: 1.0
+      clash_cutoff: 0.75
+      ignore_hydrogens: True
+      ignore_types:
+      - protein
+      - organic_cofactors
+      - inorganic_cofactors
+      max_distance: 5.0
+    chosen_binary_test_output:
+      - no_clashes
+    rename_outputs:
+      no_clashes: "No clashes with waters"
+    rename_suffix: "_waters"
   - name: "Volume overlap with protein"
     function: volume_overlap
     parameters:
@@ -155,6 +168,7 @@ modules:
       ignore_types:
       - organic_cofactors
       - inorganic_cofactors
+      - waters
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
@@ -170,6 +184,7 @@ modules:
       ignore_types:
       - protein
       - inorganic_cofactors
+      - waters
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
@@ -185,12 +200,29 @@ modules:
       ignore_types:
       - protein
       - organic_cofactors
+      - waters
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
       volume_overlap: "Volume overlap with inorganic cofactors"
       no_volume_clash: "No volume clash with inorganic cofactors"
     rename_suffix: "_inorganic_cofactors"
+  - name: "Volume overlap with waters"
+    function: volume_overlap
+    parameters:
+      clash_cutoff: 0.075
+      vdw_scale: 0.5
+      ignore_hydrogens: True
+      ignore_types:
+      - protein
+      - organic_cofactors
+      - waters
+    chosen_binary_test_output:
+      - no_volume_clash
+    rename_outputs:
+      volume_overlap: "Volume overlap with waters"
+      no_volume_clash: "No volume clash with waters"
+    rename_suffix: "_waters"
   - name: "RMSD"
     function: rmsd
     parameters:

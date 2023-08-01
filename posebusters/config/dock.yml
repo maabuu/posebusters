@@ -1,12 +1,4 @@
-
 # Setup test modules
-# needs:
-#   name
-#   function
-#   parameters (optional)
-#   selected_outputs (optional)
-#   rename_outputs (optional)
-
 modules:
   - name: "Loading"
     function: loading
@@ -32,9 +24,9 @@ modules:
         scaleVDW: True # scale down lower bounds for atoms less than 5 bonds apart
         doTriangleSmoothing: True
         useMacrocycle14config: False
-      threshold_bad_bond_length: 0.2 # widens DG bound by this factor
-      threshold_bad_angle: 0.2 # widens DG bound by this factor
-      threshold_clash: 0.2 # widens DG bound by this factor
+      threshold_bad_bond_length: 0.25 # widens DG bound by this factor
+      threshold_bad_angle: 0.25 # widens DG bound by this factor
+      threshold_clash: 0.3 # widens DG bound by this factor
       ignore_hydrogens: True # ignore hydrogens
     chosen_binary_test_output:
       - bond_lengths_within_bounds
@@ -74,38 +66,42 @@ modules:
   - name: "Energy ratio"
     function: energy_ratio
     parameters:
-      threshold_energy_ratio: 7.0
+      threshold_energy_ratio: 100.0
       ensemble_number_conformations: 50
     chosen_binary_test_output:
       - energy_ratio_passes
     rename_outputs:
-      energy_ratio_passes: "Energy ratio passes"
+      energy_ratio_passes: "Energy ratio within threshold"
   - name: "Distance to protein"
     function: "intermolecular_distance"
     parameters:
-      radius_scale: 0.8
-      clash_cutoff: 0.05
+      radius_type: vdw
+      radius_scale: 1.0
+      clash_cutoff: 0.75
       ignore_hydrogens: True
       ignore_types:
       - organic_cofactors
       - inorganic_cofactors
+      - waters
       max_distance: 5.0
     chosen_binary_test_output:
       - not_too_far_away
       - no_clashes
     rename_outputs:
-      not_too_far_away: "Not too far away"
+      not_too_far_away: "Ligand close to protein"
       no_clashes: "No clashes with protein"
     rename_suffix: "_protein"
   - name: "Distance to organic cofactors"
     function: "intermolecular_distance"
     parameters:
-      radius_scale: 0.8
-      clash_cutoff: 0.05
+      radius_type: vdw
+      radius_scale: 1.0
+      clash_cutoff: 0.75
       ignore_hydrogens: True
       ignore_types:
       - protein
       - inorganic_cofactors
+      - waters
       max_distance: 5.0
     chosen_binary_test_output:
       - no_clashes
@@ -115,27 +111,47 @@ modules:
   - name: "Distance to inorganic cofactors"
     function: "intermolecular_distance"
     parameters:
-      radius_scale: 0.8
-      clash_cutoff: 0.05
+      radius_type: covalent
+      radius_scale: 1.0
+      clash_cutoff: 0.75
       ignore_hydrogens: True
       ignore_types:
       - protein
       - organic_cofactors
+      - waters
       max_distance: 5.0
     chosen_binary_test_output:
       - no_clashes
     rename_outputs:
       no_clashes: "No clashes with inorganic cofactors"
     rename_suffix: "_inorganic_cofactors"
+  - name: "Distance to waters"
+    function: "intermolecular_distance"
+    parameters:
+      radius_type: vdw
+      radius_scale: 1.0
+      clash_cutoff: 0.75
+      ignore_hydrogens: True
+      ignore_types:
+      - protein
+      - organic_cofactors
+      - inorganic_cofactors
+      max_distance: 5.0
+    chosen_binary_test_output:
+      - no_clashes
+    rename_outputs:
+      no_clashes: "No clashes with waters"
+    rename_suffix: "_waters"
   - name: "Volume overlap with protein"
     function: volume_overlap
     parameters:
-      clash_cutoff: 0.05
+      clash_cutoff: 0.075
       vdw_scale: 0.8
       ignore_hydrogens: True
       ignore_types:
       - organic_cofactors
       - inorganic_cofactors
+      - waters
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
@@ -145,12 +161,13 @@ modules:
   - name: "Volume overlap with organic cofactors"
     function: volume_overlap
     parameters:
-      clash_cutoff: 0.05
+      clash_cutoff: 0.075
       vdw_scale: 0.8
       ignore_hydrogens: True
       ignore_types:
       - protein
       - inorganic_cofactors
+      - waters
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
@@ -160,18 +177,35 @@ modules:
   - name: "Volume overlap with inorganic cofactors"
     function: volume_overlap
     parameters:
-      clash_cutoff: 0.05
-      vdw_scale: 0.8
+      clash_cutoff: 0.075
+      vdw_scale: 0.5
       ignore_hydrogens: True
       ignore_types:
       - protein
       - organic_cofactors
+      - waters
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
       volume_overlap: "Volume overlap with inorganic cofactors"
       no_volume_clash: "No volume clash with inorganic cofactors"
     rename_suffix: "_inorganic_cofactors"
+  - name: "Volume overlap with waters"
+    function: volume_overlap
+    parameters:
+      clash_cutoff: 0.075
+      vdw_scale: 0.5
+      ignore_hydrogens: True
+      ignore_types:
+      - protein
+      - organic_cofactors
+      - waters
+    chosen_binary_test_output:
+      - no_volume_clash
+    rename_outputs:
+      volume_overlap: "Volume overlap with waters"
+      no_volume_clash: "No volume clash with waters"
+    rename_suffix: "_waters"
 
 # Options for loading molecule files with RDKit
 loading:

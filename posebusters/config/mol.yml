@@ -1,12 +1,4 @@
-
 # Setup test modules
-# needs:
-#   name
-#   function
-#   parameters (optional)
-#   selected_outputs (optional)
-#   rename_outputs (optional)
-
 modules:
   - name: "Loading"
     function: loading
@@ -30,9 +22,9 @@ modules:
         scaleVDW: True # scale down lower bounds for atoms less than 5 bonds apart
         doTriangleSmoothing: True
         useMacrocycle14config: False
-      threshold_bad_bond_length: 0.2 # widens DG bound by this factor
-      threshold_bad_angle: 0.2 # widens DG bound by this factor
-      threshold_clash: 0.2 # widens DG bound by this factor
+      threshold_bad_bond_length: 0.25 # widens DG bound by this factor
+      threshold_bad_angle: 0.25 # widens DG bound by this factor
+      threshold_clash: 0.3 # widens DG bound by this factor
       ignore_hydrogens: True # ignore hydrogens
     chosen_binary_test_output:
       - bond_lengths_within_bounds
@@ -72,12 +64,12 @@ modules:
   - name: "Energy ratio"
     function: energy_ratio
     parameters:
-      threshold_energy_ratio: 7.0
+      threshold_energy_ratio: 100.0
       ensemble_number_conformations: 50
     chosen_binary_test_output:
       - energy_ratio_passes
     rename_outputs:
-      energy_ratio_passes: "Energy ratio passes"
+      energy_ratio_passes: "Energy ratio within threshold"
 
 # Options for loading molecule files with RDKit
 loading:
