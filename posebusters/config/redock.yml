@@ -106,7 +106,7 @@ modules:
       - no_clashes
     rename_outputs:
       not_too_far_away: "Ligand close to protein"
-      no_clashes: "No clashes with protein"
+      no_clashes: "No minimum distance clash with protein"
     rename_suffix: "_protein"
   - name: "Distance to organic cofactors"
     function: "intermolecular_distance"
@@ -123,7 +123,7 @@ modules:
     chosen_binary_test_output:
       - no_clashes
     rename_outputs:
-      no_clashes: "No clashes with organic cofactors"
+      no_clashes: "No minimum distance clash with organic cofactors"
     rename_suffix: "_organic_cofactors"
   - name: "Distance to inorganic cofactors"
     function: "intermolecular_distance"
@@ -140,7 +140,7 @@ modules:
     chosen_binary_test_output:
       - no_clashes
     rename_outputs:
-      no_clashes: "No clashes with inorganic cofactors"
+      no_clashes: "No minimum distance clash with inorganic cofactors"
     rename_suffix: "_inorganic_cofactors"
   - name: "Distance to waters"
     function: "intermolecular_distance"
@@ -157,7 +157,7 @@ modules:
     chosen_binary_test_output:
       - no_clashes
     rename_outputs:
-      no_clashes: "No clashes with waters"
+      no_clashes: "No minimum distance clash with waters"
     rename_suffix: "_waters"
   - name: "Volume overlap with protein"
     function: volume_overlap
