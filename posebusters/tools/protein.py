@@ -44,8 +44,9 @@ _water_ccd_codes = {
 def get_atom_type_mask(mol: Mol, ignore_h: bool, ignore_types: Iterable[str]) -> list[bool]:
     """Get mask for atoms to keep."""
     ignore_types = set(ignore_types)
-    if ignore := ignore_types - {"protein", "organic_cofactors", "inorganic_cofactors", "waters"}:
-        raise ValueError(f"Ignore types {ignore} not supported.")
+    unsupported = ignore_types - {"protein", "organic_cofactors", "inorganic_cofactors", "waters"}
+    if unsupported:
+        raise ValueError(f"Ignore types {unsupported} not supported.")
 
     if mol.GetAtomWithIdx(0).GetPDBResidueInfo() is None:
         logger.warning("No PDB information found. Assuming organic molecule.")
