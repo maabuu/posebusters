@@ -95,8 +95,8 @@ modules:
       radius_type: vdw
       radius_scale: 1.0
       clash_cutoff: 0.75
-      ignore_hydrogens: True
       ignore_types:
+      - hydrogens
       - organic_cofactors
       - inorganic_cofactors
       - waters
@@ -114,8 +114,8 @@ modules:
       radius_type: vdw
       radius_scale: 1.0
       clash_cutoff: 0.75
-      ignore_hydrogens: True
       ignore_types:
+      - hydrogens
       - protein
       - inorganic_cofactors
       - waters
@@ -131,8 +131,8 @@ modules:
       radius_type: covalent
       radius_scale: 1.0
       clash_cutoff: 0.75
-      ignore_hydrogens: True
       ignore_types:
+      - hydrogens
       - protein
       - organic_cofactors
       - waters
@@ -148,8 +148,8 @@ modules:
       radius_type: vdw
       radius_scale: 1.0
       clash_cutoff: 0.75
-      ignore_hydrogens: True
       ignore_types:
+      - hydrogens
       - protein
       - organic_cofactors
       - inorganic_cofactors
@@ -164,8 +164,8 @@ modules:
     parameters:
       clash_cutoff: 0.075
       vdw_scale: 0.8
-      ignore_hydrogens: True
       ignore_types:
+      - hydrogens
       - organic_cofactors
       - inorganic_cofactors
       - waters
@@ -180,8 +180,8 @@ modules:
     parameters:
       clash_cutoff: 0.075
       vdw_scale: 0.8
-      ignore_hydrogens: True
       ignore_types:
+      - hydrogens
       - protein
       - inorganic_cofactors
       - waters
@@ -196,8 +196,8 @@ modules:
     parameters:
       clash_cutoff: 0.075
       vdw_scale: 0.5
-      ignore_hydrogens: True
       ignore_types:
+      - hydrogens
       - protein
       - organic_cofactors
       - waters
@@ -212,8 +212,8 @@ modules:
     parameters:
       clash_cutoff: 0.075
       vdw_scale: 0.5
-      ignore_hydrogens: True
       ignore_types:
+      - hydrogens
       - protein
       - organic_cofactors
       - waters

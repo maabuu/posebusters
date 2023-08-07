@@ -19,7 +19,7 @@ def check_volume_overlap(
     clash_cutoff: float = 0.05,
     vdw_scale: float = 0.8,
     ignore_hydrogens: bool = True,
-    ignore_types: set[str] = set(),
+    ignore_types: set[str] = {"hydrogens"},
     search_distance: float = 6.0,
 ) -> dict[str, dict]:
     """Check volume overlap between ligand and protein.
@@ -30,7 +30,6 @@ def check_volume_overlap(
         clash_cutoff: Threshold for how much volume overlap is allowed. This is the maximum share of volume of
             `mol_pred` allowed to overlap with `mol_cond`. Defaults to 0.05.
         vdw_scale: Scaling factor for the van der Waals radii which define the volume around each atom. Defaults to 0.8.
-        ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
         ignore_types: Which types of atoms to ignore. Possible values are "protein", "organic_cofactors",
             "inorganic_cofactors". Defaults to none (empty set).
 
@@ -41,7 +40,7 @@ def check_volume_overlap(
     assert isinstance(mol_cond, Mol)
 
     # filter by atom types
-    keep_mask = np.array(get_atom_type_mask(mol_cond, ignore_hydrogens, ignore_types))
+    keep_mask = np.array(get_atom_type_mask(mol_cond, ignore_types))
     mol_cond = _filter_by_mask(mol_cond, keep_mask)
     if mol_cond.GetNumAtoms() == 0:
         return {"results": {"volume_overlap": np.nan, "no_volume_clash": True}}

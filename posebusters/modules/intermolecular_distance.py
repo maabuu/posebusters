@@ -18,8 +18,7 @@ def check_intermolecular_distance(
     radius_type: str = "vdw",
     radius_scale: float = 1.0,
     clash_cutoff: float = 0.75,
-    ignore_hydrogens: bool = True,
-    ignore_types: set[str] = set(),
+    ignore_types: set[str] = {"hydrogens"},
     max_distance: float = 5.0,
     search_distance: float = 6.0,
 ) -> dict[str, Any]:
@@ -33,9 +32,8 @@ def check_intermolecular_distance(
         radius_scale: Scaling factor for the atomic radii. Defaults to 0.8.
         clash_cutoff: Threshold for how much the atoms may overlap before a clash is reported. Defaults
             to 0.05.
-        ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
         ignore_types: Which types of atoms to ignore. Possible values to include are "protein", "organic_cofactors",
-            "inorganic_cofactors". Defaults to None (empty set).
+            "inorganic_cofactors". Defaults to {"hydrogens"}.
         max_distance: Maximum distance (in Angstrom) predicted and conditioning molecule may be apart to be considered
             as valid. Defaults to 5.0.
 
@@ -48,14 +46,8 @@ def check_intermolecular_distance(
     atoms_ligand = np.array([a.GetSymbol() for a in mol_pred.GetAtoms()])
     atoms_protein_all = np.array([a.GetSymbol() for a in mol_cond.GetAtoms()])
 
-    # select atoms in predicted molecules
-    if ignore_hydrogens:
-        heavy_atoms_mask_ligand = np.asarray(atoms_ligand != "H")
-        coords_ligand = coords_ligand[heavy_atoms_mask_ligand, :]
-        atoms_ligand = atoms_ligand[heavy_atoms_mask_ligand]
-
     # select atoms in conditioning molecule
-    mask = get_atom_type_mask(mol_cond, ignore_hydrogens, ignore_types)
+    mask = get_atom_type_mask(mol_cond, ignore_types)
     coords_protein = coords_protein[mask, :]
     atoms_protein_all = atoms_protein_all[mask]
 
