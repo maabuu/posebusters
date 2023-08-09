@@ -30,6 +30,25 @@ bound_matrix_params = {
     "useMacrocycle14config": False,
 }
 
+_empty_results = {
+    "results": {
+        "number_bonds": np.nan,
+        "shortest_bond_relative_length": np.nan,
+        "longest_bond_relative_length": np.nan,
+        "number_short_outlier_bonds": np.nan,
+        "number_long_outlier_bonds": np.nan,
+        "bond_lengths_within_bounds": np.nan,
+        "number_angles": np.nan,
+        "most_extreme_relative_angle": np.nan,
+        "number_outlier_angles": np.nan,
+        "bond_angles_within_bounds": np.nan,
+        "number_noncov_pairs": np.nan,
+        "shortest_noncovalent_relative_distance": np.nan,
+        "number_clashes": np.nan,
+        "no_internal_clash": np.nan,
+    }
+}
+
 
 def check_geometry(
     mol_pred: Mol,
@@ -59,11 +78,15 @@ def check_geometry(
     assert mol.GetNumConformers() == 1, "Molecule must have exactly one conformer."
 
     # sanitize to ensure DG works or manually process molecule
-    if sanitize:
-        SanitizeMol(mol)
-    else:
-        # also removes stereochemistry information which we check elsewhere
-        mol = remove_all_charges_and_hydrogens(mol)
+    try:
+        if sanitize:
+            flags = SanitizeMol(mol)
+            assert flags == 0, f"Sanitization failed with flags {flags}"
+        else:
+            # also removes stereochemistry information which we check elsewhere
+            mol = remove_all_charges_and_hydrogens(mol)
+    except:
+        return _empty_results
 
     # get bonds and angles
     bond_set = sorted(_get_bond_atom_indices(mol))  # tuples
@@ -71,7 +94,7 @@ def check_geometry(
     angle_set = {(a[0], a[2]): a for a in angles}  # {tuples : triples}
 
     if len(bond_set) == 0:
-        raise ValueError("Molecule has no bonds.")
+        logger.warning("Molecule has no bonds.")
 
     # distance geometry bounds, lower triangle min distances, upper triangle max distances
     bounds = GetMoleculeBoundsMatrix(mol, **bound_matrix_params)
@@ -100,7 +123,7 @@ def check_geometry(
     df_12["distance"] = conf_distances[lower_triangle_idcs]
 
     if ignore_hydrogens:
-        df_12 = df_12[~df_12["has_hydrogen"]]
+        df_12 = df_12.loc[~df_12["has_hydrogen"], :]
 
     # calculate violations
     df_bonds = _bond_check(df_12)  # makes copy
@@ -154,7 +177,7 @@ def check_geometry(
 
 def _bond_check(df: pd.DataFrame) -> pd.DataFrame:
     # covalent bond length
-    df = df[df["is_bond"]].copy()
+    df = df.loc[df["is_bond"], :].copy()
 
     # bonds can be too short or too long
     df[col_pe] = df.apply(lambda x: bpe(*x[["distance", col_lb, col_ub]]), axis=1)

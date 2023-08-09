@@ -15,6 +15,14 @@ _flat = {
     "aromatic_6_membered_rings_sp2": "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1",
     "trigonal_planar_double_bonds": "[C;X3;^2](*)(*)=[C;X3;^2](*)(*)",
 }
+_empty_results = {
+    "results": {
+        "num_systems_checked": np.nan,
+        "num_systems_passed": np.nan,
+        "max_distance": np.nan,
+        "flatness_passes": np.nan,
+    }
+}
 
 
 def check_flatness(
@@ -33,7 +41,10 @@ def check_flatness(
     """
     mol = deepcopy(mol_pred)
     # if mol cannot be sanitized, then rdkit may not find substructures
-    SanitizeMol(mol)
+    try:
+        SanitizeMol(mol)
+    except:
+        return _empty_results
 
     planar_groups = []
     types = []

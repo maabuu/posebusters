@@ -20,6 +20,15 @@ from ..tools.logging import CaptureLogger
 
 logger = logging.getLogger(__name__)
 
+_empty_results = {
+    "results": {
+        "ensemble_avg_energy": np.nan,
+        "mol_pred_energy": np.nan,
+        "energy_ratio": np.nan,
+        "energy_ratio_passes": np.nan,
+    }
+}
+
 
 def check_energy_ratio(
     mol_pred: Mol,
@@ -38,9 +47,11 @@ def check_energy_ratio(
         PoseBusters results dictionary.
     """
     mol_pred = deepcopy(mol_pred)
-    SanitizeMol(mol_pred)
-    AddHs(mol_pred, addCoords=True)
-    # TODO: optimize only hydrogens
+    try:
+        SanitizeMol(mol_pred)
+        AddHs(mol_pred, addCoords=True)
+    except:
+        return _empty_results
 
     with CaptureLogger():
         inchi = MolToInchi(mol_pred)
