@@ -64,7 +64,7 @@ class PoseBusters:
         self.results: dict[tuple[str, str], list[tuple[str, str, Any]]] = defaultdict(list)
 
     def bust(
-        self, mol_pred: Mol | Path, mol_true: Mol | Path | None, mol_cond: Mol | Path | None
+        self, mol_pred: tuple[Mol | Path], mol_true: Mol | Path | None, mol_cond: Mol | Path | None
     ) -> Generator[dict, None, None]:
         """Run all tests on one molecule.
 
@@ -76,7 +76,8 @@ class PoseBusters:
         Returns:
             PoseBusters object.
         """
-        self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond]], columns=["mol_pred", "mol_true", "mol_cond"])
+        columns = ["mol_pred", "mol_true", "mol_cond"]
+        self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred], columns=columns)
         return self._run()
 
     def bust_table(self, mol_table: pd.DataFrame) -> Generator[dict, None, None]:

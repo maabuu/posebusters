@@ -25,9 +25,9 @@ _path = click.Path(exists=True, path_type=Path)
 
 
 @click.command(name="bust")
-@click.argument("mol_pred", type=_path, required=False)
-@click.option("-l", "--mol_true", type=_path, required=False, default=None, help="True ligand.")
-@click.option("-p", "--mol_cond", type=_path, required=False, default=None, help="Protein receptor.")
+@click.argument("mol_pred", type=_path, required=False, default=None, nargs=-1)
+@click.option("-l", "--mol_true", type=_path, required=False, default=None, help="True molecule, e.g. crystal ligand.")
+@click.option("-p", "--mol_cond", type=_path, required=False, default=None, help="Conditioning molecule, e.g. protein.")
 @click.option("-t", "--table", type=_path, help="Run multiple inputs listed in a .csv file.")
 @click.option("-f", "--outfmt", type=click.Choice(["short", "long", "csv"]), default="short", help="Output format.")
 @click.option(
@@ -110,7 +110,7 @@ def _select_mode(columns: list[str]) -> str:
         mode = "redock"
     elif "mol_pred" in columns and ("protein" in columns) or ("mol_cond" in columns):
         mode = "dock"
-    elif any(column in columns for column in ("mol_pred", "ligand", "molecules", "molecule")):
+    elif any(column in columns for column in ("mol_pred", "molecule", "molecules", "molecule")):
         mode = "mol"
     else:
         raise NotImplementedError(f"No supported columns found in csv. Columns found are {columns}")
