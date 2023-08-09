@@ -23,6 +23,8 @@ mol_pred_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_ligand.sdf"
 mol_true_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_ligands.sdf"
 mol_cond_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_no_ligand_no_solvent.pdb"
 
+mol_single_h = "tests/conftest/single_hydrogen.sdf"
+
 
 def test_bust_redocks_1ia1() -> None:
     result = runner.invoke(
@@ -48,8 +50,13 @@ def test_bust_mols() -> None:
     assert result.exit_code == 0
 
 
-def test_bust_table() -> None:
-    result = runner.invoke(bust, ["-t", mols_table])
+def test_bust_mols() -> None:
+    result = runner.invoke(bust, [mol_pred_1ia1])
+    assert result.exit_code == 0
+
+
+def test_bust_single_hydrogen() -> None:
+    result = runner.invoke(bust, [mol_single_h])
     assert result.exit_code == 0
 
 
