@@ -6,8 +6,8 @@ modules:
       - mol_pred_loaded
       - mol_cond_loaded
     rename_outputs:
-      mol_pred_loaded: "Docked ligand successfully loaded"
-      mol_cond_loaded: "Crystal protein successfully loaded"
+      mol_pred_loaded: "Input molecule successfully loaded"
+      mol_cond_loaded: "Conditioning molecule successfully loaded"
   - name: "Chemistry"
     function: sanity
     chosen_binary_test_output:
