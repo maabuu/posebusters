@@ -45,6 +45,7 @@ modules:
       threshold_bad_angle: 0.25 # widens DG bound by this factor
       threshold_clash: 0.3 # widens DG bound by this factor
       ignore_hydrogens: True # ignore hydrogens
+      sanitize: True # sanitize molecule before running DG module (recommended)
     chosen_binary_test_output:
       - bond_lengths_within_bounds
       - bond_angles_within_bounds

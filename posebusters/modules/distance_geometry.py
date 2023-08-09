@@ -38,7 +38,7 @@ def check_geometry(
     threshold_bad_angle: float = 0.2,
     bound_matrix_params: dict[str, Any] = bound_matrix_params,
     ignore_hydrogens: bool = True,
-    sanitize: bool = False,
+    sanitize: bool = True,
 ) -> dict[str, Any]:
     """Use RDKit distance geometry bounds to check the geometry of a molecule.
 
@@ -50,6 +50,7 @@ def check_geometry(
         threshold_bad_angle: _description_. Defaults to 0.2.
         bound_matrix_params: _description_. Defaults to bound_matrix_params.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
+        sanitize: Sanitize molecule before running DG module (recommended). Defaults to True.
 
     Returns:
         PoseBusters results dictionary.
