@@ -2,7 +2,7 @@
 # <img src="docs/source/_static/logo_banner.png" alt="drawing" height="75"/>
 
 PoseBusters: Command line tool and Python package for checking the chemical
-and physical sensibility of docked or generated molecules.
+and physical sensibility of docked or generated molecule poses.
 
 
 ## Installation
@@ -19,20 +19,21 @@ conda install posebusters -c conda-forge -->
 ### Command line
 
 ```bash
-# check re-docked ligand (new ligand into protein).
-bust redock ligand_pred.sdf mol_true.sdf mol_cond.pdb
+# Check docked ligand (new ligand for a given protein).
+bust ligand_pred.sdf -p mol_cond.pdb
 
-# check docked ligand (where crystal protein-ligand structure is known).
-bust dock ligand_pred.sdf protein.pdb
+# Check re-docked ligand (where crystal protein-ligand structure is known).
+bust ligand_pred.sdf -l mol_true.sdf -p protein.pdb
 
-# check generated molecule (only check ligand).
-bust mol molecule_pred.sdf
+# Check generated molecule pose. Also supports wildcard.
+bust molecule_pred.sdf
+bust *_pred.sdf
 
-# check multiple of the three above using a .csv input:
-bust table file_table.csv
+# Check any of the three by providing a csv with files to check together
+bust -t file_table.csv
 ```
 
-### Python API
+<!-- ### Python API
 
 ```python
 from dockbusters import DockBuster
@@ -45,7 +46,7 @@ DockBuster().bust_dock(ligand_pred_file, protein_crystal_file)
 
 # check molecule
 DockBuster().bust_mol(ligand_pred_file, protein_crystal_file)
-```
+``` -->
 
 ## Thanks
 
