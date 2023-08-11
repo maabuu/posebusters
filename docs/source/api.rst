@@ -1,7 +1,7 @@
 .. Top level package
 
 ====================================
-User API
+Python API
 ====================================
 
 PoseBusters class

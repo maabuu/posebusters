@@ -3,7 +3,7 @@
 .. _ref_cli:
 
 ====================================
-Command line tool
+Command line interface
 ====================================
 
 PoseBusters provides the command ``bust`` for checking generated molecules
