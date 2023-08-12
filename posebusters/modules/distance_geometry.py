@@ -12,7 +12,6 @@ from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdDistGeom import GetMoleculeBoundsMatrix
 from rdkit.Chem.rdmolops import SanitizeMol
 
-from ..tools.molecules import remove_all_charges_and_hydrogens
 from ..tools.stats import bape, bpe, pe
 
 logger = getLogger(__name__)
@@ -30,22 +29,40 @@ bound_matrix_params = {
     "useMacrocycle14config": False,
 }
 
+col_n_bonds = "number_bonds"
+col_shortest_bond = "shortest_bond_relative_length"
+col_longest_bond = "longest_bond_relative_length"
+col_n_short_bonds = "number_short_outlier_bonds"
+col_n_long_bonds = "number_long_outlier_bonds"
+col_n_good_bonds = "number_valid_bonds"
+col_bonds_result = "bond_lengths_within_bounds"
+col_n_angles = "number_angles"
+col_extremest_angle = "most_extreme_relative_angle"
+col_n_bad_angles = "number_outlier_angles"
+col_n_good_angles = "number_valid_angles"
+col_angles_result = "bond_angles_within_bounds"
+col_n_noncov = "number_noncov_pairs"
+col_closest_noncov = "shortest_noncovalent_relative_distance"
+col_n_clashes = "number_clashes"
+col_n_good_noncov = "number_valid_noncov_pairs"
+col_clash_result = "no_internal_clash"
+
 _empty_results = {
     "results": {
-        "number_bonds": np.nan,
-        "shortest_bond_relative_length": np.nan,
-        "longest_bond_relative_length": np.nan,
-        "number_short_outlier_bonds": np.nan,
-        "number_long_outlier_bonds": np.nan,
-        "bond_lengths_within_bounds": np.nan,
-        "number_angles": np.nan,
-        "most_extreme_relative_angle": np.nan,
-        "number_outlier_angles": np.nan,
-        "bond_angles_within_bounds": np.nan,
-        "number_noncov_pairs": np.nan,
-        "shortest_noncovalent_relative_distance": np.nan,
-        "number_clashes": np.nan,
-        "no_internal_clash": np.nan,
+        col_n_bonds: np.nan,
+        col_shortest_bond: np.nan,
+        col_longest_bond: np.nan,
+        col_n_short_bonds: np.nan,
+        col_n_long_bonds: np.nan,
+        col_bonds_result: np.nan,
+        col_n_angles: np.nan,
+        col_extremest_angle: np.nan,
+        col_n_bad_angles: np.nan,
+        col_angles_result: np.nan,
+        col_n_noncov: np.nan,
+        col_closest_noncov: np.nan,
+        col_n_clashes: np.nan,
+        col_clash_result: np.nan,
     }
 }
 
@@ -77,16 +94,22 @@ def check_geometry(
     mol = deepcopy(mol_pred)
     assert mol.GetNumConformers() == 1, "Molecule must have exactly one conformer."
 
+    results = _empty_results.copy()
+
+    if mol.GetNumAtoms() == 1:
+        logger.warning(f"Molecule has only {mol.GetNumAtoms()} atoms.")
+        results[col_angles_result] = True
+        results[col_bonds_result] = True
+        results[col_clash_result] = True
+        return results
+
     # sanitize to ensure DG works or manually process molecule
     try:
         if sanitize:
             flags = SanitizeMol(mol)
             assert flags == 0, f"Sanitization failed with flags {flags}"
-        else:
-            # also removes stereochemistry information which we check elsewhere
-            mol = remove_all_charges_and_hydrogens(mol)
     except:
-        return _empty_results
+        return results
 
     # get bonds and angles
     bond_set = sorted(_get_bond_atom_indices(mol))  # tuples
@@ -126,87 +149,62 @@ def check_geometry(
         df_12 = df_12.loc[~df_12["has_hydrogen"], :]
 
     # calculate violations
-    df_bonds = _bond_check(df_12)  # makes copy
-    df_clash = _clash_check(df_12)  # makes copy
-    df_angles = _angle_check(df_12)  # makes copy
+    df_bonds = _bond_check(df_12)
+    df_clash = _clash_check(df_12)
+    df_angles = _angle_check(df_12)
 
     # bond statistics
-    number_bonds = len(df_bonds)
-    number_short_outlier_bonds = sum(df_bonds[col_pe] < -threshold_bad_bond_length)
-    number_long_outlier_bonds = sum(df_bonds[col_pe] > threshold_bad_bond_length)
-    number_valid_bonds = number_bonds - number_short_outlier_bonds - number_long_outlier_bonds
-
-    shortest_bond_relative_length = (df_bonds["distance"] / df_bonds["lower_bound"]).min()
-    longest_bond_relative_length = (df_bonds["distance"] / df_bonds["upper_bound"]).max()
+    results[col_n_bonds] = len(df_bonds)
+    results[col_n_short_bonds] = sum(df_bonds[col_pe] < -threshold_bad_bond_length)
+    results[col_n_long_bonds] = sum(df_bonds[col_pe] > threshold_bad_bond_length)
+    results[col_n_good_bonds] = results[col_n_bonds] - results[col_n_short_bonds] - results[col_n_long_bonds]
+    results[col_bonds_result] = results[col_n_good_bonds] == results[col_n_bonds]
+    results[col_shortest_bond] = (df_bonds["distance"] / df_bonds["lower_bound"]).min()
+    results[col_longest_bond] = (df_bonds["distance"] / df_bonds["upper_bound"]).max()
 
     # angle statistics
-    number_angles = len(df_angles)
-    number_outlier_angles = sum(df_angles[col_bape] > threshold_bad_angle)
-    number_valid_angles = number_angles - number_outlier_angles
-
+    results[col_n_angles] = len(df_angles)
+    results[col_n_bad_angles] = sum(df_angles[col_bape] > threshold_bad_angle)
+    results[col_n_good_angles] = results[col_n_angles] - results[col_n_bad_angles]
+    results[col_angles_result] = results[col_n_good_angles] == results[col_n_angles]
     lb_extreme_angle = 2 - (df_angles["distance"] / df_angles["lower_bound"]).min()
     ub_extreme_angle = (df_angles["distance"] / df_angles["upper_bound"]).max()
-    most_extreme_angle = max(lb_extreme_angle, ub_extreme_angle)
+    results[col_extremest_angle] = max(lb_extreme_angle, ub_extreme_angle)
 
     # steric clash statistics
-    number_noncov_pairs = len(df_clash)
-    number_clashes = sum(df_clash[col_bpe] < -threshold_clash)
-    number_valid_noncov_pairs = number_noncov_pairs - number_clashes
-
-    shortest_noncovalent_distance = (df_clash["distance"] / df_clash["lower_bound"]).min()
-
-    results = {
-        "number_bonds": number_bonds,
-        "shortest_bond_relative_length": shortest_bond_relative_length,
-        "longest_bond_relative_length": longest_bond_relative_length,
-        "number_short_outlier_bonds": number_short_outlier_bonds,
-        "number_long_outlier_bonds": number_long_outlier_bonds,
-        "bond_lengths_within_bounds": number_valid_bonds == number_bonds,
-        "number_angles": number_angles,
-        "most_extreme_relative_angle": most_extreme_angle,
-        "number_outlier_angles": number_outlier_angles,
-        "bond_angles_within_bounds": number_valid_angles == number_angles,
-        "number_noncov_pairs": number_noncov_pairs,
-        "shortest_noncovalent_relative_distance": shortest_noncovalent_distance,
-        "number_clashes": number_clashes,
-        "no_internal_clash": number_valid_noncov_pairs == number_noncov_pairs,
-    }
+    results[col_n_noncov] = len(df_clash)
+    results[col_n_clashes] = sum(df_clash[col_bpe] < -threshold_clash)
+    results[col_n_good_noncov] = results[col_n_noncov] - results[col_n_clashes]
+    results[col_clash_result] = results[col_n_good_noncov] == results[col_n_noncov]
+    results[col_closest_noncov] = (df_clash["distance"] / df_clash["lower_bound"]).min()
 
     return {"results": results, "details": {"bonds": df_bonds, "clash": df_clash, "angles": df_angles}}
 
 
 def _bond_check(df: pd.DataFrame) -> pd.DataFrame:
-    # covalent bond length
-    df = df.loc[df["is_bond"], :].copy()
-
     # bonds can be too short or too long
+    df = df[df["is_bond"]].copy()
     df[col_pe] = df.apply(lambda x: bpe(*x[["distance", col_lb, col_ub]]), axis=1)
-
     return df
 
 
 def _angle_check(df: pd.DataFrame) -> pd.DataFrame:
-    # noncovalent bonds (1,2-distances informed by van der Waals radii)
-    df = df[(~df["is_bond"]) & (df["is_angle"])].copy()
-
     # angles have no direction (we do not know if larger or bigger beyond bounds)
+    df = df[(~df["is_bond"]) & (df["is_angle"])].copy()
     df[col_bape] = df.apply(lambda x: bape(*x[["distance", col_lb, col_ub]]), axis=1)
-
     return df
 
 
 def _clash_check(df: pd.DataFrame) -> pd.DataFrame:
-    # noncovalent bonds (1,2-distances informed by van der Waals radii)
+    # clash is only when lower bound is violated
     df = df[(~df["is_bond"]) & (~df["is_angle"])].copy()
 
-    # clash is only when lower bound is violated
     def _lb_pe(value, lower_bound):
         if value >= lower_bound:
             return 0.0
         return pe(value, lower_bound)
 
     df[col_bpe] = df.apply(lambda x: _lb_pe(*x[["distance", col_lb]]), axis=1)
-
     return df
 
 
@@ -246,39 +244,6 @@ def _two_bonds_to_angle(bond1: tuple[int, int], bond2: tuple[int, int]) -> None 
 
 def _sort_bond(bond: tuple[int, int]) -> tuple[int, int]:
     return (min(bond), max(bond))
-
-
-def _get_torsions_atom_indices(mol: Mol) -> list[tuple[int, int, int, int]]:
-    matches = mol.GetSubstructMatches(RotatableBondSmarts, uniquify=1)
-    torsion_list = []
-    for idx2, idx3 in matches:
-        bond = mol.GetBondBetweenAtoms(idx2, idx3)
-        atom2 = mol.GetAtomWithIdx(idx2)
-        atom3 = mol.GetAtomWithIdx(idx3)
-        # if (((atom2.GetHybridization() != HybridizationType.SP2)
-        #     and (atom2.GetHybridization() != HybridizationType.SP3))
-        #     or ((atom3.GetHybridization() != HybridizationType.SP2)
-        #     and (atom3.GetHybridization() != HybridizationType.SP3))):
-        #     continue
-        torsion = None
-        for b1 in atom2.GetBonds():
-            if b1.GetIdx() == bond.GetIdx():
-                continue
-            idx1 = b1.GetOtherAtomIdx(idx2)
-            for b2 in atom3.GetBonds():
-                if (b2.GetIdx() == bond.GetIdx()) or (b2.GetIdx() == b1.GetIdx()):
-                    continue
-                idx4 = b2.GetOtherAtomIdx(idx3)
-                # skip 3-membered rings
-                if idx4 == idx1:
-                    continue
-                torsion = (idx1, idx2, idx3, idx4)
-                break
-            if torsion is not None:
-                break
-        if torsion is not None:
-            torsion_list.append(torsion)
-    return torsion_list
 
 
 def _pairwise_distance(x):
