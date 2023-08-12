@@ -50,7 +50,7 @@ def check_energy_ratio(
     try:
         SanitizeMol(mol_pred)
         AddHs(mol_pred, addCoords=True)
-    except:
+    except Exception:
         return _empty_results
 
     with CaptureLogger():

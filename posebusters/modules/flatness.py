@@ -43,7 +43,7 @@ def check_flatness(
     # if mol cannot be sanitized, then rdkit may not find substructures
     try:
         SanitizeMol(mol)
-    except:
+    except Exception:
         return _empty_results
 
     planar_groups = []
