@@ -15,7 +15,7 @@ conda install posebusters -c conda-forge -->
 
 ## Usage
 
-### Command line
+<!-- ### Command line usage -->
 
 ```bash
 # Check docked ligand (new ligand for a given protein).
@@ -38,14 +38,18 @@ bust -t file_table.csv
 from dockbusters import DockBuster
 
 # check re-docked ligand
-DockBuster().bust_redock(ligand_pred_file, ligand_crystal_file, protein_crystal_file)
+DockBuster().bust(ligand_pred_file, ligand_crystal_file, protein_crystal_file)
 
 # check docked ligand
-DockBuster().bust_dock(ligand_pred_file, protein_crystal_file)
+DockBuster().bust(ligand_pred_file, protein_crystal_file)
 
 # check molecule
-DockBuster().bust_mol(ligand_pred_file, protein_crystal_file)
+DockBuster().bust(ligand_pred_file, protein_crystal_file)
 ``` -->
+
+## Documentation
+
+Documentation is available at [https://posebusters.readthedocs.io](https://posebusters.readthedocs.io).
 
 ## Thanks
 

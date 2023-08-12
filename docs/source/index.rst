@@ -1,6 +1,6 @@
 
 ============================================================================================================
-PoseBusters: chemical and physical sensibility checks for generated molecule poses.
+PoseBusters: sensibility checks for generated molecule poses.
 ============================================================================================================
 
 PoseBusters is a command line tool and Python library to check the output of molecular conformation generators, docking programs, or other programs that generate molecules in 3D.
@@ -115,6 +115,10 @@ PoseBusters can be installed from PyPI.
 Use the ``bust`` command to check molecules, docked ligands or generated molecules conditioned on a protein.
 
 .. command-output:: bust redocked_ligand.sdf -l crystal_ligand.sdf -p protein.pdb --outfmt short
+  :cwd: inputs
+  :ellipsis: 12
+
+.. command-output:: bust redocked_ligand.sdf -l crystal_ligand.sdf -p protein.pdb --outfmt long
   :cwd: inputs
   :ellipsis: 12
 
