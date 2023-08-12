@@ -50,11 +50,6 @@ def test_bust_mols() -> None:
     assert result.exit_code == 0
 
 
-def test_bust_mols() -> None:
-    result = runner.invoke(bust, [mol_pred_1ia1])
-    assert result.exit_code == 0
-
-
 def test_bust_single_hydrogen() -> None:
     result = runner.invoke(bust, [mol_single_h])
     assert result.exit_code == 0
