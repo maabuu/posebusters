@@ -26,8 +26,8 @@ jobs:
         pip install flit
 
     - name: Build and publish
-      # env:
-      #   FLIT_USERNAME: __token__
+      env:
+        FLIT_USERNAME: maabuu
       #   FLIT_PASSWORD: ${{ secrets.PYPI_TOKEN }}
       #   FLIT_INDEX_URL: https://test.pypi.org/legacy/
       run: |
