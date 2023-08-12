@@ -7,9 +7,8 @@ on:
 
 jobs:
   publish:
-
     runs-on: ubuntu-latest
-
+    environment: release
     steps:
 
     - name: Checkout source
@@ -27,9 +26,9 @@ jobs:
         pip install flit
 
     - name: Build and publish
-      env:
-        FLIT_USERNAME: __token__
-        FLIT_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        FLIT_INDEX_URL: https://test.pypi.org/legacy/
+      # env:
+      #   FLIT_USERNAME: __token__
+      #   FLIT_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      #   FLIT_INDEX_URL: https://test.pypi.org/legacy/
       run: |
         flit publish
