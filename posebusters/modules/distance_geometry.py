@@ -7,7 +7,6 @@ from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
-from rdkit.Chem.Lipinski import RotatableBondSmarts
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdDistGeom import GetMoleculeBoundsMatrix
 from rdkit.Chem.rdmolops import SanitizeMol
@@ -48,22 +47,20 @@ col_n_good_noncov = "number_valid_noncov_pairs"
 col_clash_result = "no_internal_clash"
 
 _empty_results = {
-    "results": {
-        col_n_bonds: np.nan,
-        col_shortest_bond: np.nan,
-        col_longest_bond: np.nan,
-        col_n_short_bonds: np.nan,
-        col_n_long_bonds: np.nan,
-        col_bonds_result: np.nan,
-        col_n_angles: np.nan,
-        col_extremest_angle: np.nan,
-        col_n_bad_angles: np.nan,
-        col_angles_result: np.nan,
-        col_n_noncov: np.nan,
-        col_closest_noncov: np.nan,
-        col_n_clashes: np.nan,
-        col_clash_result: np.nan,
-    }
+    col_n_bonds: np.nan,
+    col_shortest_bond: np.nan,
+    col_longest_bond: np.nan,
+    col_n_short_bonds: np.nan,
+    col_n_long_bonds: np.nan,
+    col_bonds_result: np.nan,
+    col_n_angles: np.nan,
+    col_extremest_angle: np.nan,
+    col_n_bad_angles: np.nan,
+    col_angles_result: np.nan,
+    col_n_noncov: np.nan,
+    col_closest_noncov: np.nan,
+    col_n_clashes: np.nan,
+    col_clash_result: np.nan,
 }
 
 
@@ -101,15 +98,15 @@ def check_geometry(
         results[col_angles_result] = True
         results[col_bonds_result] = True
         results[col_clash_result] = True
-        return results
+        return {"results": results}
 
     # sanitize to ensure DG works or manually process molecule
     try:
         if sanitize:
             flags = SanitizeMol(mol)
             assert flags == 0, f"Sanitization failed with flags {flags}"
-    except:
-        return results
+    except Exception:
+        return {"results": results}
 
     # get bonds and angles
     bond_set = sorted(_get_bond_atom_indices(mol))  # tuples
