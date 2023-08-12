@@ -69,9 +69,12 @@ class PoseBusters:
         """Run all tests on one molecule.
 
         Args:
-            mol_pred: _description_
-            mol_true: _description_
-            mol_cond: _description_
+            mol_pred: Generated molecule, e.g. docked ligand, with one or more poses.
+            mol_true: True molecule, e.g. crytal ligand, with one or more poses.
+            mol_cond: Conditioning molecule, e.g. protein.
+
+        Notes:
+            - Molecules can be provided as rdkit molecule objects or file paths.
 
         Returns:
             PoseBusters object.
@@ -84,7 +87,7 @@ class PoseBusters:
         """Run all tests on multiple molecules provided in pandas dataframe as paths or rdkit molecule objects.
 
         Args:
-            mol_table: _description_
+            mol_table: Pandas dataframe with columns "mol_pred", "mol_true", "mol_cond" containing paths to molecules.
 
         Returns:
             PoseBusters object.

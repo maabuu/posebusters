@@ -32,7 +32,7 @@ def check_intermolecular_distance(
         radius_scale: Scaling factor for the atomic radii. Defaults to 0.8.
         clash_cutoff: Threshold for how much the atoms may overlap before a clash is reported. Defaults
             to 0.05.
-        ignore_types: Which types of atoms to ignore. Possible values to include are "protein", "organic_cofactors",
+        ignore_types: Which types of atoms to ignore. Possible values to include are "hydrogens", "protein", "organic_cofactors",
             "inorganic_cofactors". Defaults to {"hydrogens"}.
         max_distance: Maximum distance (in Angstrom) predicted and conditioning molecule may be apart to be considered
             as valid. Defaults to 5.0.
