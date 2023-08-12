@@ -23,11 +23,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install flit
     # https://docs.pypi.org/trusted-publishers/using-a-publisher/
-    - name: create API token
-      id: token
+    - name: mint API token
+      id: mint-token
       run: |
-        resp=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-          "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=pypi")
+        resp=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN $ACTIONS_ID_TOKEN_REQUEST_URL&audience=pypi")
         oidc_token=$(jq '.value' <<< "${resp}")
         resp=$(curl -X POST https://pypi.org/_/oidc/github/mint-token -d "{\"token\": \"${oidc_token}\"}")
         api_token=$(jq '.token' <<< "${resp}")
@@ -36,6 +35,6 @@ jobs:
     - name: Build and publish
       env:
         FLIT_USERNAME: __token__
-        FLIT_PASSWORD: ${{ steps.token.outputs.api-token }}
+        FLIT_PASSWORD: ${{ steps.mint-token.outputs.api-token }}
       run: |
         flit publish
