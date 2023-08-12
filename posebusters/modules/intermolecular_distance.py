@@ -101,7 +101,7 @@ def check_intermolecular_distance(
 
     i = np.argmin(details["relative_distance"]) if len(details) > 0 else None
     most_extreme = {"most_extreme_" + c: details.loc[i][str(c)] if i is not None else pd.NA for c in details.columns}
-    results = results | most_extreme
+    results = {**results, **most_extreme}
 
     return {"results": results, "details": details}
 
