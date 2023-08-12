@@ -79,7 +79,7 @@ def check_geometry(
         mol_pred: Predicted molecule (docked ligand) with exactly one conformer.
         threshold_bad_bond_length: Bond length threshold in relative percentage. 0.2 means that bonds may be up to 20%
             longer than DG bounds. Defaults to 0.2.
-        threshold_clash: Threshold for how much overlap consitutes a clash. 0.2 means that the two atoms may be up to
+        threshold_clash: Threshold for how much overlap constitutes a clash. 0.2 means that the two atoms may be up to
             80% of the lower bound apart. Defaults to 0.2.
         threshold_bad_angle: Bond angle threshold in relative percentage. 0.2 means that bonds may be up to 20%
             longer than DG bounds. Defaults to 0.2.
