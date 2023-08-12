@@ -1,4 +1,4 @@
-"""PoseBusters: Checking the chemical and physical sensibility of docked or generated molecules."""
+"""PoseBusters: Sensibility checks for generated molecule poses."""
 
 from posebusters.modules.distance_geometry import check_geometry
 from posebusters.modules.energy_ratio import check_energy_ratio
