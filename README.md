@@ -17,15 +17,17 @@ conda install posebusters -c conda-forge -->
 <!-- ### Command line usage -->
 
 ```bash
-# Check docked ligand (new ligand for a given protein).
+
+# Check generated molecule pose.
+bust molecule_pred.sdf
+bust molecule_a.sdf molecule_b.sdf
+bust molecule_*.sdf
+
+# Check new ligand generated for a given protein.
 bust ligand_pred.sdf -p mol_cond.pdb
 
-# Check re-docked ligand (where crystal protein-ligand structure is known).
+# Check re-docked ligand (a pose that should recover the ligand in a given protein-ligand crystal complex).
 bust ligand_pred.sdf -l mol_true.sdf -p protein.pdb
-
-# Check generated molecule pose. Also supports wildcard.
-bust molecule_pred.sdf
-bust *_pred.sdf
 
 # Check any of the three by providing a csv with files to check together
 bust -t file_table.csv
