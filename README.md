@@ -1,7 +1,6 @@
 ![posebusters_banner](https://github.com/maabuu/posebusters/blob/b5f4c2caed1499c2b73f5297a08e60ec7d263c61/docs/source/_static/logo_banner.png?raw=true "PoseBusters")
 
-PoseBusters: Command line tool and Python package for checking the chemical
-and physical sensibility of docked or generated molecule poses.
+PoseBusters: Sensibility checks for generated molecule poses.
 
 
 ## Installation
