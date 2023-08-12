@@ -51,9 +51,9 @@ test = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/maabuu/posebusters/tree/main#readme"
-Source = "https://github.com/maabuu/posebusters"
-Tracker = "https://github.com/maabuu/posebusters/issues"
+Documentation = "https://posebusters.readthedocs.io/en/latest/"
+Source = "https://github.com/maabuu/posebusters/"
+Tracker = "https://github.com/maabuu/posebusters/issues/"
 
 [project.scripts]
 bust = "posebusters.cli:bust"
