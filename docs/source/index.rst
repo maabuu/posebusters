@@ -1,6 +1,6 @@
 
 ============================================================================================================
-PoseBusters: sensibility checks for generated molecule poses.
+PoseBusters: Sensibility checks for generated molecule poses.
 ============================================================================================================
 
 PoseBusters is a command line tool and Python library to check the output of molecular conformation generators, docking programs, or other programs that generate molecules in 3D.

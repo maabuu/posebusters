@@ -9,10 +9,6 @@ Command line interface
 PoseBusters provides the command ``bust`` for checking generated molecules
 and optionally taking a conditioning protein or ligands into account.
 
-You can run ``bust`` with no arguments to get more info.
-
-.. command-output:: bust
-
 Use ``bust`` to check a series of molecules within one ``.sdf`` file.
 
 .. command-output:: bust generated_molecules.sdf --outfmt long
@@ -75,6 +71,14 @@ The ``--out`` option can be used to save the output to a file::
   bust generated_molecules.sdf --outfmt csv --out results.csv
 
 
+Help
+====================================
+
+Run ``--help`` options prints information about the command line options.
+
+.. command-output:: bust --help
+
+.. command-output:: bust --version
 
 
 Configuration settings

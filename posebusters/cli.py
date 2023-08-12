@@ -25,7 +25,7 @@ _path = click.Path(exists=True, path_type=Path)
 
 
 @click.command(name="bust")
-@click.argument("mol_pred", type=_path, required=False, default=None, nargs=-1)
+@click.argument("mol_pred", type=_path, required=True, default=None, nargs=-1)
 @click.option("-l", "--mol_true", type=_path, required=False, default=None, help="True molecule, e.g. crystal ligand.")
 @click.option("-p", "--mol_cond", type=_path, required=False, default=None, help="Conditioning molecule, e.g. protein.")
 @click.option("-t", "--table", type=_path, help="Run multiple inputs listed in a .csv file.")
@@ -41,7 +41,7 @@ _path = click.Path(exists=True, path_type=Path)
 @click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
 @click.version_option()
 def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **mol_args):
-    """PoseBusters: check generated 3D molecules with or without conditioning."""
+    """PoseBusters: Sensibility checks for generated molecule poses."""
     if debug:
         click.echo("Debug mode is on.")
 
