@@ -56,4 +56,3 @@ This program uses software written by other people. Notably:
 
 - RDKit [https://github.com/rdkit/rdkit](https://github.com/rdkit/rdkit)
 - Pandas [https://github.com/pandas-dev/pandas](https://github.com/pandas-dev/pandas)
-
