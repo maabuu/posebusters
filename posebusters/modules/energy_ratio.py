@@ -59,12 +59,12 @@ def check_energy_ratio(
     try:
         conf_energy = get_conf_energy(mol_pred)
     except Exception as e:
-        logger.warning(f"UFF failed to calculate conformation energy for {inchi}: {e}")
+        logger.warning(f"Failed to calculate conformation energy for {inchi}: {e}")
         conf_energy = np.nan
     try:
         avg_energy = float(get_average_energy(inchi, ensemble_number_conformations))
     except Exception as e:
-        logger.warning(f"UFF failed to calculate average ensemble energy for {inchi}: {e}")
+        logger.warning(f"Failed to calculate ensemble conformation energy for {inchi}: {e}")
         avg_energy = np.nan
 
     pred_factor = conf_energy / avg_energy
@@ -107,6 +107,7 @@ def new_conformation(mol: Mol, n_confs: int = 1, num_threads: int = 0, energy_mi
     # etkdg
     with CaptureLogger():
         cids_etkdg = EmbedMultipleConfs(mol_etkdg, n_confs, etkdg)
+        assert len(cids_etkdg) == n_confs, "Failed to generate conformations."
 
     # energy minimization
     if energy_minimization:
