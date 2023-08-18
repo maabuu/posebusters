@@ -130,6 +130,20 @@ For more usage examples, bulk processing, and the Python API see the documentati
 and the `Python library <python_library.ipynb>`_.
 
 
+Docking case study
+====================================
+
+.. code-block:: bibtex
+
+   @online{buttenschoen2023posebusters,
+      title = {{{PoseBusters}}: {{AI-based}} Docking Methods Fail to Generate Physically Valid Poses or Generalise to Novel Sequences},
+      shorttitle = {{{PoseBusters}}},
+      author = {Buttenschoen, Martin and Morris, Garrett M. and Deane, Charlotte M.},
+      date = {2023-08-10},
+      eprint = {2308.05777},
+      eprinttype = {arxiv}
+   }
+
 Sample checks
 ====================================
 
@@ -158,6 +172,8 @@ For more information on the checks, see :ref:`checks`.
 +---------------------------------------------+----------------------------------------+
 | Volume overlap                              |                                        |
 +---------------------------------------------+----------------------------------------+
+| Bad:                                        | Good:                                  |
+|                                             |                                        |
 | |volume_overlap_fail|                       | |volume_overlap_true|                  |
 |                                             |                                        |
 | Ligand and receptor clash                   |                                        |

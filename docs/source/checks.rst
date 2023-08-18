@@ -4,6 +4,21 @@
 Checks
 ====================================
 
+For more detailed information about the tests and for a case study using PoseBusters to compare docking methods, refer to our preprint:
+
+   @online{buttenschoen2023posebusters,
+   title = {{{PoseBusters}}: {{AI-based}} Docking Methods Fail to Generate Physically Valid Poses or Generalise to Novel Sequences},
+   shorttitle = {{{PoseBusters}}},
+   author = {Buttenschoen, Martin and Morris, Garrett M. and Deane, Charlotte M.},
+   date = {2023-08-10},
+   eprint = {2308.05777},
+   eprinttype = {arxiv}
+   }
+
+
+Example failure modes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. |tetrahedral_stereo_fail| image:: images/tankbind_astex_1hww.png
    :height: 500 px
    :width: 650 px
