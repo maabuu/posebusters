@@ -4,18 +4,6 @@
 Checks
 ====================================
 
-For more detailed information about the tests and for a case study using PoseBusters to compare docking methods, refer to our preprint:
-
-   @online{buttenschoen2023posebusters,
-   title = {{{PoseBusters}}: {{AI-based}} Docking Methods Fail to Generate Physically Valid Poses or Generalise to Novel Sequences},
-   shorttitle = {{{PoseBusters}}},
-   author = {Buttenschoen, Martin and Morris, Garrett M. and Deane, Charlotte M.},
-   date = {2023-08-10},
-   eprint = {2308.05777},
-   eprinttype = {arxiv}
-   }
-
-
 Example failure modes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -188,3 +176,21 @@ with in a receptor's binding pocket without any steric clash.
 |                                             |                                        |
 | Ligand and receptor clash                   |                                        |
 +---------------------------------------------+----------------------------------------+
+
+More details on tests and docking case study
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _preprint: https://arxiv.org/abs/2308.05777
+
+For more detailed information about the tests and for a case study using PoseBusters to compare docking methods, refer to our `preprint`_:
+
+.. code-block:: bibtex
+
+   @online{buttenschoen2023posebusters,
+   title = {{{PoseBusters}}: {{AI-based}} Docking Methods Fail to Generate Physically Valid Poses or Generalise to Novel Sequences},
+   shorttitle = {{{PoseBusters}}},
+   author = {Buttenschoen, Martin and Morris, Garrett M. and Deane, Charlotte M.},
+   date = {2023-08-10},
+   eprint = {2308.05777},
+   eprinttype = {arxiv}
+   }

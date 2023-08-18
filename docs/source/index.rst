@@ -133,6 +133,10 @@ and the `Python library <python_library.ipynb>`_.
 Docking case study
 ====================================
 
+.. _preprint: https://arxiv.org/abs/2308.05777
+
+For more detailed information about the tests and for a case study using PoseBusters to compare docking methods, refer to our `preprint`_:
+
 .. code-block:: bibtex
 
    @online{buttenschoen2023posebusters,
