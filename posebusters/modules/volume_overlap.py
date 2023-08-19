@@ -18,7 +18,6 @@ def check_volume_overlap(
     mol_cond: Mol,
     clash_cutoff: float = 0.05,
     vdw_scale: float = 0.8,
-    ignore_hydrogens: bool = True,
     ignore_types: set[str] = {"hydrogens"},
     search_distance: float = 6.0,
 ) -> dict[str, dict]:
@@ -30,8 +29,8 @@ def check_volume_overlap(
         clash_cutoff: Threshold for how much volume overlap is allowed. This is the maximum share of volume of
             `mol_pred` allowed to overlap with `mol_cond`. Defaults to 0.05.
         vdw_scale: Scaling factor for the van der Waals radii which define the volume around each atom. Defaults to 0.8.
-        ignore_types: Which types of atoms to ignore. Possible values are "protein", "organic_cofactors",
-            "inorganic_cofactors". Defaults to none (empty set).
+        ignore_types: Which types of atoms in mol_cond to ignore. Possible values to include are "hydrogens", "protein",
+            "organic_cofactors", "inorganic_cofactors", "waters". Defaults to {"hydrogens"}.
 
     Returns:
         PoseBusters results dictionary.
@@ -52,6 +51,7 @@ def check_volume_overlap(
     if mol_cond.GetNumAtoms() == 0:
         return {"results": {"volume_overlap": np.nan, "no_volume_clash": True}}
 
+    ignore_hydrogens = "hydrogens" in ignore_types
     overlap = ShapeTverskyIndex(mol_pred, mol_cond, alpha=1, beta=0, vdwScale=vdw_scale, ignoreHs=ignore_hydrogens)
 
     results = {
