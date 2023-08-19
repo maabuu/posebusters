@@ -14,6 +14,7 @@ from rdkit.Chem.rdForceFieldHelpers import (
     UFFGetMoleculeForceField,
     UFFOptimizeMoleculeConfs,
 )
+from rdkit.Chem.rdmolfiles import MolToSmiles
 from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D, SanitizeMol
 
 from ..tools.logging import CaptureLogger
@@ -53,8 +54,13 @@ def check_energy_ratio(
     except Exception:
         return _empty_results
 
-    with CaptureLogger():
+    with CaptureLogger() as log:
         inchi = MolToInchi(mol_pred)
+    if len(inchi) == 0:
+        try:
+            logger.warning(f"Failed to generate InChI for {MolToSmiles(mol_pred)}: {log['ERROR']}")
+        except Exception:
+            logger.warning(f"Failed to generate InChI: {log['ERROR']}")
 
     try:
         conf_energy = get_conf_energy(mol_pred)
