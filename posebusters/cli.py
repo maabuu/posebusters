@@ -1,12 +1,16 @@
 """Command line interface for PoseBusters."""
 from __future__ import annotations
 
+import argparse
 import logging
+import sys
 from pathlib import Path
+from typing import Iterable
 
-import click
 import pandas as pd
+from rdkit.Chem.rdchem import Mol
 
+from . import __version__
 from .posebusters import PoseBusters
 from .tools.formatting import create_long_output, create_short_output
 
@@ -15,46 +19,29 @@ logger = logging.getLogger(__name__)
 
 def main():
     """Safe entry point for PoseBusters from the command line."""
+    parser = _parse_args(sys.argv[1:])
     try:
-        bust()
+        bust(**vars(parser))
     except Exception as e:
-        click.echo(e)
+        logger.error(e)
 
 
-_path = click.Path(exists=True, path_type=Path)
-
-
-@click.command(name="bust")
-@click.argument("mol_pred", type=_path, required=True, default=None, nargs=-1)
-@click.option("-l", "--mol_true", type=_path, required=False, default=None, help="True molecule, e.g. crystal ligand.")
-@click.option("-p", "--mol_cond", type=_path, required=False, default=None, help="Conditioning molecule, e.g. protein.")
-@click.option("-t", "--table", type=_path, help="Run multiple inputs listed in a .csv file.")
-@click.option("-f", "--outfmt", type=click.Choice(["short", "long", "csv"]), default="short", help="Output format.")
-@click.option(
-    "-o", "--out", "output", type=click.File("w"), default="-", help="Output file. Prints to stdout by default."
-)
-@click.option("-c", "--config", type=click.File("r"), default=None, help="Configuration file.")
-@click.option("--full-report", type=bool, default=False, is_flag=True, help="Print full report.")
-@click.option("--no-header", type=bool, default=False, is_flag=True, help="Print without header.")
-# @click.option("--print-header", type=bool, default=False, is_flag=True, help="Print header only.")
-@click.option("--top-n", type=int, default=None, help="Run on top N results in MOL_PRED only.")
-@click.option("--debug", type=bool, default=False, is_flag=True, help="Enable debug output.")
-@click.version_option()
-def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **mol_args):
+def bust(
+    mols_pred: list[Mol | Path] = [],
+    mol_true: Mol | Path | None = None,
+    mol_cond: Mol | Path | None = None,
+    table=None,
+    outfmt="short",
+    output=sys.stdout,
+    config=None,
+    debug=False,
+    no_header=False,
+    full_report=False,
+    top_n=-1,
+):
     """PoseBusters: Plausibility checks for generated molecule poses."""
-    if debug:
-        click.echo("Debug mode is on.")
-
-    if outfmt == "short":
-        if full_report:
-            logger.warning("Full report is not available in short output format. Ignoring --full-report option.")
-        full_report = False
-
-    if table is None and mol_args.get("mol_pred") is None:
-        # check that an input was provided
-        click.echo("Provide either MOL_PRED or a table using the --table option.\n")
-        click.echo(bust.get_help(click.Context(bust)))
-        return None
+    if table is None and len(mols_pred) == 0:
+        raise ValueError("Provide either MOLS_PRED or TABLE.")
     elif table is not None:
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
@@ -62,14 +49,47 @@ def bust(table, outfmt, output, config, debug, no_header, full_report, top_n, **
         posebusters = PoseBusters(mode, top_n=top_n, debug=debug)
         posebusters_results = posebusters.bust_table(file_paths)
     else:
-        # run on file inputs
-        mode = _select_mode([m for m, v in mol_args.items() if v is not None]) if config is None else config
+        # run on single input
+        d = {k for k, v in dict(mol_pred=mols_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
+        mode = _select_mode(d) if config is None else config
         posebusters = PoseBusters(mode, top_n=top_n, debug=debug)
-        posebusters_results = posebusters.bust(**mol_args)
+        posebusters_results = posebusters.bust(mols_pred, mol_true, mol_cond)
 
     for i, results_dict in enumerate(posebusters_results):
         results = _dataframe_from_output(results_dict, posebusters.config, full_report)
         output.write(_format_results(results, outfmt, no_header, i))
+
+
+def _parse_args(args):
+    parser = argparse.ArgumentParser()
+
+    # input
+    parser.add_argument("mol_pred", default=[], type=argparse.FileType("r"), nargs="*", help="Predicted molecule(s).")
+    parser.add_argument("-l", "--mol_true", type=argparse.FileType("r"), help="True molecule, e.g. crystal ligand.")
+    parser.add_argument("-p", "--mol_cond", type=argparse.FileType("r"), help="Conditioning molecule, e.g. protein.")
+    parser.add_argument("-t", "--table", type=argparse.FileType("r"), help="Run multiple inputs listed in a .csv file.")
+
+    # output options
+    parser.add_argument("-f", "--outfmt", choices=["short", "long", "csv"], default="short", help="Output format.")
+    parser.add_argument("-o", "--output", type=argparse.FileType("w"), default=sys.stdout, help="Output file.")
+
+    # config
+    parser.add_argument("-c", "--config", type=argparse.FileType("r"), default=None, help="Configuration file.")
+    parser.add_argument("--full-report", action="store_true", help="Print full report.")
+    parser.add_argument("--no-header", action="store_true", help="Print without header.")
+    parser.add_argument("--top-n", type=int, default=None, help="Run on top N results in MOL_PRED only.")
+
+    # other
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    parser.add_argument("--debug", action="store_true", help="Enable debug output.")
+
+    namespace = parser.parse_args(args)
+
+    # check that either mol_pred or table was provided
+    if namespace.table is None and len(namespace.mol_pred) == 0:
+        parser.error("Provide either MOL_PRED or TABLE.\n")
+
+    return namespace
 
 
 def _dataframe_from_output(results_dict, config, full_report: bool = False) -> pd.DataFrame:
@@ -104,13 +124,13 @@ def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = F
         raise ValueError(f"Unknown output format {outfmt}")
 
 
-def _select_mode(columns: list[str]) -> str:
+def _select_mode(columns: Iterable[str]) -> str:
     # decide on mode to run for provided input table
     if "mol_pred" in columns and "mol_true" in columns and "mol_cond" in columns:
         mode = "redock"
     elif "mol_pred" in columns and ("protein" in columns) or ("mol_cond" in columns):
         mode = "dock"
-    elif any(column in columns for column in ("mol_pred", "molecule", "molecules", "molecule")):
+    elif any(column in columns for column in ("mol_pred", "mols_pred", "molecule", "molecules", "molecule")):
         mode = "mol"
     else:
         raise NotImplementedError(f"No supported columns found in csv. Columns found are {columns}")

@@ -6,7 +6,7 @@ import logging
 from collections import defaultdict
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Generator
+from typing import Any, Callable, Generator, Iterable
 
 import pandas as pd
 from rdkit.Chem.rdchem import Mol
@@ -64,7 +64,7 @@ class PoseBusters:
         self.results: dict[tuple[str, str], list[tuple[str, str, Any]]] = defaultdict(list)
 
     def bust(
-        self, mol_pred: tuple[Mol | Path], mol_true: Mol | Path | None, mol_cond: Mol | Path | None
+        self, mol_pred: Iterable[Mol | Path], mol_true: Mol | Path | None = None, mol_cond: Mol | Path | None = None
     ) -> Generator[dict, None, None]:
         """Run all tests on one molecule.
 

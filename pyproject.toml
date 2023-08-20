@@ -26,7 +26,6 @@ classifiers = [
 requires-python = "~=3.7"
 dynamic = ["version", "description"]
 dependencies = [
-    'click',
     'rdkit >= 2020.09',
     'pandas',
     'numpy',
@@ -56,10 +55,7 @@ Source = "https://github.com/maabuu/posebusters/"
 Tracker = "https://github.com/maabuu/posebusters/issues/"
 
 [project.scripts]
-bust = "posebusters.cli:bust"
-
-#[project.entry-points.posebusters]
-#bust = "posebusters.cli:bust"
+bust = "posebusters.cli:main"
 
 [tool.flit.module]
 name = "posebusters"
