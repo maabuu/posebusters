@@ -63,12 +63,12 @@ def _parse_args(args):
     parser = argparse.ArgumentParser()
 
     # input
-    parser.add_argument("mol_pred", default=[], type=argparse.FileType("r"), nargs="*", help="Predicted molecule(s).")
+    help = "Predicted molecule(s)."
+    parser.add_argument("mol_pred", dest="mols_pred", default=[], type=argparse.FileType("r"), nargs="*", help=help)
     parser.add_argument("-l", dest="mol_true", type=argparse.FileType("r"), help="True molecule, e.g. crystal ligand.")
     parser.add_argument("-p", dest="mol_cond", type=argparse.FileType("r"), help="Conditioning molecule, e.g. protein.")
-    parser.add_argument(
-        "-t", dest="table", type=argparse.FileType("r"), help="Run multiple inputs listed in a .csv file."
-    )
+    help = "Run multiple inputs listed in a .csv file."
+    parser.add_argument("-t", dest="table", type=argparse.FileType("r"), help=help)
 
     # output options
     parser.add_argument("--outfmt", choices=["short", "long", "csv"], default="short", help="Output format.")
