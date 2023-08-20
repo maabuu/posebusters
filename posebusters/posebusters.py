@@ -43,7 +43,7 @@ molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 class PoseBusters:
     """Class to run all tests on a set of molecules."""
 
-    def __init__(self, config: str | dict = "redock", debug: bool = False, top_n: int | None = None):
+    def __init__(self, config: str | dict = "redock", top_n: int | None = None):
         """Initialize PoseBusters object."""
         self.module_func: list  # dict[str, Callable]
         self.module_args: list  # dict[str, set[str]]
@@ -58,7 +58,6 @@ class PoseBusters:
             logger.error(f"Configuration {config} not valid. Provide either 'dock', 'redock', 'mol' or a dictionary.")
         assert len(set(self.config.get("tests", {}).keys()) - set(module_dict.keys())) == 0
 
-        self.config["debug"] = self.config.get("debug", debug)
         self.config["top_n"] = self.config.get("top_n", top_n)
 
         self.results: dict[tuple[str, str], list[tuple[str, str, Any]]] = defaultdict(list)

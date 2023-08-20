@@ -34,7 +34,6 @@ def bust(
     outfmt="short",
     output=sys.stdout,
     config=None,
-    debug=False,
     no_header=False,
     full_report=False,
     top_n=-1,
@@ -46,13 +45,13 @@ def bust(
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
         mode = _select_mode(file_paths.columns.tolist()) if config is None else config
-        posebusters = PoseBusters(mode, top_n=top_n, debug=debug)
+        posebusters = PoseBusters(mode, top_n=top_n)
         posebusters_results = posebusters.bust_table(file_paths)
     else:
         # run on single input
         d = {k for k, v in dict(mol_pred=mols_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
         mode = _select_mode(d) if config is None else config
-        posebusters = PoseBusters(mode, top_n=top_n, debug=debug)
+        posebusters = PoseBusters(mode, top_n=top_n)
         posebusters_results = posebusters.bust(mols_pred, mol_true, mol_cond)
 
     for i, results_dict in enumerate(posebusters_results):
