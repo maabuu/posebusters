@@ -64,23 +64,26 @@ def _parse_args(args):
 
     # input
     parser.add_argument("mol_pred", default=[], type=argparse.FileType("r"), nargs="*", help="Predicted molecule(s).")
-    parser.add_argument("-l", "--mol_true", type=argparse.FileType("r"), help="True molecule, e.g. crystal ligand.")
-    parser.add_argument("-p", "--mol_cond", type=argparse.FileType("r"), help="Conditioning molecule, e.g. protein.")
-    parser.add_argument("-t", "--table", type=argparse.FileType("r"), help="Run multiple inputs listed in a .csv file.")
+    parser.add_argument("-l", dest="mol_true", type=argparse.FileType("r"), help="True molecule, e.g. crystal ligand.")
+    parser.add_argument("-p", dest="mol_cond", type=argparse.FileType("r"), help="Conditioning molecule, e.g. protein.")
+    parser.add_argument(
+        "-t", dest="table", type=argparse.FileType("r"), help="Run multiple inputs listed in a .csv file."
+    )
 
     # output options
-    parser.add_argument("-f", "--outfmt", choices=["short", "long", "csv"], default="short", help="Output format.")
-    parser.add_argument("-o", "--output", type=argparse.FileType("w"), default=sys.stdout, help="Output file.")
+    parser.add_argument("--outfmt", choices=["short", "long", "csv"], default="short", help="Output format.")
+    parser.add_argument("--output", type=argparse.FileType("w"), default=sys.stdout, help="Output file.")
 
     # config
-    parser.add_argument("-c", "--config", type=argparse.FileType("r"), default=None, help="Configuration file.")
-    parser.add_argument("--full-report", action="store_true", help="Print full report.")
-    parser.add_argument("--no-header", action="store_true", help="Print without header.")
+    parser.add_argument("--config", type=argparse.FileType("r"), default=None, help="Configuration file.")
+    parser.add_argument("--full-report", action="store_true", help="Print details for each test.")
+    parser.add_argument("--no-header", action="store_true", help="Print output without header.")
     parser.add_argument("--top-n", type=int, default=None, help="Run on top N results in MOL_PRED only.")
 
     # other
-    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-    parser.add_argument("--debug", action="store_true", help="Enable debug output.")
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {__version__}", help="Print version and exit."
+    )
 
     namespace = parser.parse_args(args)
 
