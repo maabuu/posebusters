@@ -27,7 +27,7 @@ def main():
 
 
 def bust(
-    mols_pred: list[Mol | Path] = [],
+    mol_pred: list[Mol | Path] = [],
     mol_true: Mol | Path | None = None,
     mol_cond: Mol | Path | None = None,
     table=None,
@@ -39,7 +39,7 @@ def bust(
     top_n=-1,
 ):
     """PoseBusters: Plausibility checks for generated molecule poses."""
-    if table is None and len(mols_pred) == 0:
+    if table is None and len(mol_pred) == 0:
         raise ValueError("Provide either MOLS_PRED or TABLE.")
     elif table is not None:
         # run on table
@@ -49,10 +49,10 @@ def bust(
         posebusters_results = posebusters.bust_table(file_paths)
     else:
         # run on single input
-        d = {k for k, v in dict(mol_pred=mols_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
+        d = {k for k, v in dict(mol_pred=mol_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
         mode = _select_mode(d) if config is None else config
         posebusters = PoseBusters(mode, top_n=top_n)
-        posebusters_results = posebusters.bust(mols_pred, mol_true, mol_cond)
+        posebusters_results = posebusters.bust(mol_pred, mol_true, mol_cond)
 
     for i, results_dict in enumerate(posebusters_results):
         results = _dataframe_from_output(results_dict, posebusters.config, full_report)
@@ -71,24 +71,20 @@ def _parse_args(args):
 
     # input
     help = "molecule(s) to check"
-    in_group.add_argument("mol_pred", default=[], type=argparse.FileType("r"), nargs="*", help=help)
-    in_group.add_argument("-l", dest="mol_true", type=argparse.FileType("r"), help="true molecule, e.g. crystal ligand")
-    in_group.add_argument(
-        "-p", dest="mol_cond", type=argparse.FileType("r"), help="conditioning molecule, e.g. protein"
-    )
+    in_group.add_argument("mol_pred", default=[], type=_path, nargs="*", help=help)
+    in_group.add_argument("-l", dest="mol_true", type=_path, help="true molecule, e.g. crystal ligand")
+    in_group.add_argument("-p", dest="mol_cond", type=_path, help="conditioning molecule, e.g. protein")
     help = "run multiple inputs listed in a .csv file"
-    in_group.add_argument("-t", dest="table", type=argparse.FileType("r"), help=help)
+    in_group.add_argument("-t", dest="table", type=_path, help=help)
 
     # output options
     out_group.add_argument("--outfmt", choices=["short", "long", "csv"], default="short", help="output format")
-    out_group.add_argument(
-        "--output", type=argparse.FileType("w"), default=sys.stdout, help="output file (default: stdout)"
-    )
+    out_group.add_argument("--output", type=_path, default=sys.stdout, help="output file (default: stdout)")
     out_group.add_argument("--full-report", action="store_true", help="print details for each test")
     out_group.add_argument("--no-header", action="store_true", help="print output without header")
 
     # config
-    cfg_group.add_argument("--config", type=argparse.FileType("r"), default=None, help="configuration file")
+    cfg_group.add_argument("--config", type=_path, default=None, help="configuration file")
     cfg_group.add_argument(
         "--top-n", type=int, default=None, help="run on TOP_N results in MOL_PRED only (default: all)"
     )
@@ -101,7 +97,8 @@ def _parse_args(args):
 
     # check that either mol_pred or table was provided
     if namespace.table is None and len(namespace.mol_pred) == 0:
-        parser.error("Provide either MOL_PRED or TABLE as input.\n")
+        parser.print_help()
+        parser.exit(status=1, message="\nProvide either MOL_PRED or TABLE as input.\n")
 
     return namespace
 
@@ -149,3 +146,10 @@ def _select_mode(columns: Iterable[str]) -> str:
     else:
         raise NotImplementedError(f"No supported columns found in csv. Columns found are {columns}")
     return mode
+
+
+def _path(path_str: str):
+    path = Path(path_str)
+    if not path.exists():
+        raise argparse.ArgumentTypeError(f"File {path} not found!")
+    return path
