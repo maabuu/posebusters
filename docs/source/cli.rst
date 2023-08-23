@@ -74,7 +74,7 @@ The ``--out`` option can be used to save the output to a file::
 Help
 ====================================
 
-Run ``--help`` options prints information about the command line options.
+Running with the ``--help`` option prints information about the command line options.
 
 .. command-output:: bust --help
 

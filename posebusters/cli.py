@@ -27,16 +27,16 @@ def main():
 
 
 def bust(
-    mol_pred: list[Mol | Path] = [],
-    mol_true: Mol | Path | None = None,
-    mol_cond: Mol | Path | None = None,
+    mol_pred: list[Path | Mol] = [],
+    mol_true: Path | Mol | None = None,
+    mol_cond: Path | Mol | None = None,
     table=None,
     outfmt="short",
     output=sys.stdout,
     config=None,
     no_header=False,
     full_report=False,
-    top_n=-1,
+    top_n: int | None = None,
 ):
     """PoseBusters: Plausibility checks for generated molecule poses."""
     if table is None and len(mol_pred) == 0:
@@ -79,7 +79,8 @@ def _parse_args(args):
 
     # output options
     out_group.add_argument("--outfmt", choices=["short", "long", "csv"], default="short", help="output format")
-    out_group.add_argument("--output", type=_path, default=sys.stdout, help="output file (default: stdout)")
+    out_group.add_argument("--output", type=Path, default=sys.stdout, help="output file (default: stdout)")
+    # out_group.add_argument("--snake_case", action="store_false", help="use snake case for output columns")
     out_group.add_argument("--full-report", action="store_true", help="print details for each test")
     out_group.add_argument("--no-header", action="store_true", help="print output without header")
 
@@ -128,6 +129,8 @@ def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = F
         return create_long_output(df)
     elif outfmt == "csv":
         header = (not no_header) and (index == 0)
+        df.index.names = ["file", "molecule"]
+        df.columns = [c.lower().replace(" ", "_") for c in df.columns]
         return df.to_csv(index=True, header=header)
     elif outfmt == "short":
         return create_short_output(df)

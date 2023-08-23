@@ -3,13 +3,13 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name =  "posebusters"
+name = "posebusters"
 authors = [
-    {name = "Martin Buttenschoen", email = "martin.buttenschoen@stats.ox.ac.uk"},
+    { name = "Martin Buttenschoen", email = "martin.buttenschoen@stats.ox.ac.uk" },
 ]
-keywords =["posebusters", "docking", "tests", "metric"]
+keywords = ["posebusters", "docking", "tests", "metric"]
 readme = "README.md"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
@@ -25,29 +25,19 @@ classifiers = [
 ]
 requires-python = "~=3.7"
 dynamic = ["version", "description"]
-dependencies = [
-    'rdkit >= 2020.09',
-    'pandas',
-    'numpy',
-    'pyyaml',
-]
+dependencies = ['rdkit >= 2020.09', 'pandas', 'numpy', 'pyyaml']
 
 [project.optional-dependencies]
-dev = [
-    "isort",
-    "black",
-]
+dev = ["isort", "black"]
 docs = [
     "ipython",
     "nbsphinx",
     "sphinx_rtd_theme",
+    "sphinx-hoverxref",
     "sphinx",
+    "sphinxcontrib-programoutput",
 ]
-test = [
-    "pre-commit",
-    "pytest",
-    "pytest-cov",
-]
+test = ["pre-commit", "pytest", "pytest-cov"]
 
 [project.urls]
 Documentation = "https://posebusters.readthedocs.io/en/latest/"

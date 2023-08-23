@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from posebusters.cli import _parse_args, bust
 
 mols_table = "tests/conftest/sample_bust_docks_table.csv"
@@ -10,24 +12,24 @@ mol_cond_1ia1 = "tests/conftest/1IA1_TQ3/1IA1_TQ3_no_ligand_no_solvent.pdb"
 
 def test_parse_args() -> None:
     args = _parse_args([mol_pred_1ia1, "-l", mol_true_1ia1, "-p", mol_cond_1ia1, "--full-report", "--outfmt", "csv"])
-    assert args.mol_pred[0].name == mol_pred_1ia1
-    assert args.mol_true.name == mol_true_1ia1
-    assert args.mol_cond.name == mol_cond_1ia1
+    assert str(args.mol_pred[0]) == mol_pred_1ia1
+    assert str(args.mol_true) == mol_true_1ia1
+    assert str(args.mol_cond) == mol_cond_1ia1
     assert args.full_report
     assert args.outfmt == "csv"
 
     args = _parse_args([mol_pred_1ia1, "--outfmt", "long"])
-    assert args.mol_pred[0].name == mol_pred_1ia1
+    assert str(args.mol_pred[0]) == mol_pred_1ia1
     assert not args.full_report
     assert args.outfmt == "long"
 
 
 def test_bust_mols() -> None:
-    bust([mol_pred_1ia1], mol_true_1ia1, mol_cond_1ia1, full_report=True)
+    bust([Path(mol_pred_1ia1)], Path(mol_true_1ia1), Path(mol_cond_1ia1))
 
 
 def test_bust_table() -> None:
-    bust(table=mols_table, full_report=True)
+    bust(table=mols_table)
 
 
 def test_bust_none() -> None:
