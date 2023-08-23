@@ -60,36 +60,48 @@ def bust(
 
 
 def _parse_args(args):
-    parser = argparse.ArgumentParser()
+    desc = "PoseBusters: Plausibility checks for generated molecule poses."
+    parser = argparse.ArgumentParser(description=desc, add_help=False)
+
+    # Create two argument groups
+    in_group = parser.add_argument_group(title="Input")
+    out_group = parser.add_argument_group(title="Output")
+    cfg_group = parser.add_argument_group(title="Configuration")
+    inf_group = parser.add_argument_group(title="Information")
 
     # input
-    help = "Predicted molecule(s)."
-    parser.add_argument("mol_pred", default=[], type=argparse.FileType("r"), nargs="*", help=help)
-    parser.add_argument("-l", dest="mol_true", type=argparse.FileType("r"), help="True molecule, e.g. crystal ligand.")
-    parser.add_argument("-p", dest="mol_cond", type=argparse.FileType("r"), help="Conditioning molecule, e.g. protein.")
-    help = "Run multiple inputs listed in a .csv file."
-    parser.add_argument("-t", dest="table", type=argparse.FileType("r"), help=help)
+    help = "molecule(s) to check"
+    in_group.add_argument("mol_pred", default=[], type=argparse.FileType("r"), nargs="*", help=help)
+    in_group.add_argument("-l", dest="mol_true", type=argparse.FileType("r"), help="true molecule, e.g. crystal ligand")
+    in_group.add_argument(
+        "-p", dest="mol_cond", type=argparse.FileType("r"), help="conditioning molecule, e.g. protein"
+    )
+    help = "run multiple inputs listed in a .csv file"
+    in_group.add_argument("-t", dest="table", type=argparse.FileType("r"), help=help)
 
     # output options
-    parser.add_argument("--outfmt", choices=["short", "long", "csv"], default="short", help="Output format.")
-    parser.add_argument("--output", type=argparse.FileType("w"), default=sys.stdout, help="Output file.")
+    out_group.add_argument("--outfmt", choices=["short", "long", "csv"], default="short", help="output format")
+    out_group.add_argument(
+        "--output", type=argparse.FileType("w"), default=sys.stdout, help="output file (default: stdout)"
+    )
+    out_group.add_argument("--full-report", action="store_true", help="print details for each test")
+    out_group.add_argument("--no-header", action="store_true", help="print output without header")
 
     # config
-    parser.add_argument("--config", type=argparse.FileType("r"), default=None, help="Configuration file.")
-    parser.add_argument("--full-report", action="store_true", help="Print details for each test.")
-    parser.add_argument("--no-header", action="store_true", help="Print output without header.")
-    parser.add_argument("--top-n", type=int, default=None, help="Run on top N results in MOL_PRED only.")
+    cfg_group.add_argument("--config", type=argparse.FileType("r"), default=None, help="configuration file")
+    cfg_group.add_argument(
+        "--top-n", type=int, default=None, help="run on TOP_N results in MOL_PRED only (default: all)"
+    )
 
     # other
-    parser.add_argument(
-        "--version", action="version", version=f"%(prog)s {__version__}", help="Print version and exit."
-    )
+    inf_group.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
+    inf_group.add_argument("-h", "--help", action="help", help="show this help message and exit")
 
     namespace = parser.parse_args(args)
 
     # check that either mol_pred or table was provided
     if namespace.table is None and len(namespace.mol_pred) == 0:
-        parser.error("Provide either MOL_PRED or TABLE.\n")
+        parser.error("Provide either MOL_PRED or TABLE as input.\n")
 
     return namespace
 
