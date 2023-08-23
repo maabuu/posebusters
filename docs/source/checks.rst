@@ -178,7 +178,7 @@ with in a receptor's binding pocket without any steric clash.
 +---------------------------------------------+----------------------------------------+
 
 More details on tests and docking case study
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _preprint: https://arxiv.org/abs/2308.05777
 

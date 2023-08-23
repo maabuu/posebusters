@@ -81,18 +81,18 @@ Running with the ``--help`` option prints information about the command line opt
 .. command-output:: bust --version
 
 
-Configuration settings
-====================================
+.. Configuration settings
+.. ====================================
 
-PoseBusters will look for configuration parameters in a yaml file ``posebusters.yml``
-in standard locations:
+.. PoseBusters will look for configuration parameters in a yaml file ``posebusters.yml``
+.. in standard locations:
 
-1. ``/etc/posebusters.cfg`` or ``c:\posebusters\posebusters.cfg`` (system-wide),
-2. ``~/.config/posebusters.cfg`` (``$XDG_CONFIG_HOME``) and ``~/.posebusters.cfg`` (``$HOME``)
-   for global (user-wide) settings, and
-3. ``posebusters.cfg`` inside the working directory.
-4. File location provided by the ``--config`` command line option.
+.. 1. ``/etc/posebusters.cfg`` or ``c:\posebusters\posebusters.cfg`` (system-wide),
+.. 2. ``~/.config/posebusters.cfg`` (``$XDG_CONFIG_HOME``) and ``~/.posebusters.cfg`` (``$HOME``)
+..    for global (user-wide) settings, and
+.. 3. ``posebusters.cfg`` inside the working directory.
+.. 4. File location provided by the ``--config`` command line option.
 
-Settings from these files are merged in the listed order of preference:
-user-defined values have higher priority than system-wide defaults
-and project-wide settings will override all others, when defined.
+.. Settings from these files are merged in the listed order of preference:
+.. user-defined values have higher priority than system-wide defaults
+.. and project-wide settings will override all others, when defined.
