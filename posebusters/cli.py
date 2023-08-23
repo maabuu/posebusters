@@ -101,6 +101,10 @@ def _parse_args(args):
         parser.print_help()
         parser.exit(status=1, message="\nProvide either MOL_PRED or TABLE as input.\n")
 
+    # full report only works with long and csv output
+    if namespace.full_report and namespace.outfmt == "short":
+        logger.warning("Option --full-report ignored. Please use --outfmt long or csv for --full-report.")
+        namespace.full_report = False
     return namespace
 
 
