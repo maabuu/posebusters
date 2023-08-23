@@ -12,14 +12,14 @@ mol_cond_1ia1 = "tests/conftest/1IA1_TQ3/1IA1_TQ3_no_ligand_no_solvent.pdb"
 
 def test_parse_args() -> None:
     args = _parse_args([mol_pred_1ia1, "-l", mol_true_1ia1, "-p", mol_cond_1ia1, "--full-report", "--outfmt", "csv"])
-    assert str(args.mol_pred[0]) == mol_pred_1ia1
-    assert str(args.mol_true) == mol_true_1ia1
-    assert str(args.mol_cond) == mol_cond_1ia1
+    assert args.mol_pred[0] == Path(mol_pred_1ia1)
+    assert args.mol_true == Path(mol_true_1ia1)
+    assert args.mol_cond == Path(mol_cond_1ia1)
     assert args.full_report
     assert args.outfmt == "csv"
 
     args = _parse_args([mol_pred_1ia1, "--outfmt", "long"])
-    assert str(args.mol_pred[0]) == mol_pred_1ia1
+    assert args.mol_pred[0] == Path(mol_pred_1ia1)
     assert not args.full_report
     assert args.outfmt == "long"
 
