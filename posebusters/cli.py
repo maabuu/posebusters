@@ -5,10 +5,11 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable
 
 import pandas as pd
 from rdkit.Chem.rdchem import Mol
+from yaml import safe_load
 
 from . import __version__
 from .posebusters import PoseBusters
@@ -30,12 +31,12 @@ def bust(
     mol_pred: list[Path | Mol] = [],
     mol_true: Path | Mol | None = None,
     mol_cond: Path | Mol | None = None,
-    table=None,
-    outfmt="short",
+    table: Path | None = None,
+    outfmt: str = "short",
     output=sys.stdout,
-    config=None,
-    no_header=False,
-    full_report=False,
+    config: Path | None = None,
+    no_header: bool = False,
+    full_report: bool = False,
     top_n: int | None = None,
 ):
     """PoseBusters: Plausibility checks for generated molecule poses."""
@@ -44,13 +45,13 @@ def bust(
     elif table is not None:
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
-        mode = _select_mode(file_paths.columns.tolist()) if config is None else config
+        mode = _select_mode(config, file_paths.columns.tolist())
         posebusters = PoseBusters(mode, top_n=top_n)
         posebusters_results = posebusters.bust_table(file_paths)
     else:
         # run on single input
         d = {k for k, v in dict(mol_pred=mol_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
-        mode = _select_mode(d) if config is None else config
+        mode = _select_mode(config, d)
         posebusters = PoseBusters(mode, top_n=top_n)
         posebusters_results = posebusters.bust(mol_pred, mol_true, mol_cond)
 
@@ -142,8 +143,18 @@ def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = F
         raise ValueError(f"Unknown output format {outfmt}")
 
 
-def _select_mode(columns: Iterable[str]) -> str:
-    # decide on mode to run for provided input table
+def _select_mode(config, columns: Iterable[str]) -> str | dict[str, Any]:
+    # decide on mode to run
+
+    # load config if provided
+    if type(config) == Path:
+        return dict(safe_load(open(config)))
+
+    # forward string if config provide
+    if type(config) == str:
+        return str(config)
+
+    # select mode based on inputs
     if "mol_pred" in columns and "mol_true" in columns and "mol_cond" in columns:
         mode = "redock"
     elif "mol_pred" in columns and ("protein" in columns) or ("mol_cond" in columns):
@@ -152,6 +163,7 @@ def _select_mode(columns: Iterable[str]) -> str:
         mode = "mol"
     else:
         raise NotImplementedError(f"No supported columns found in csv. Columns found are {columns}")
+
     return mode
 
 

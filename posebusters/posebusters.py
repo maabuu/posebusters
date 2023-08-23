@@ -43,7 +43,7 @@ molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 class PoseBusters:
     """Class to run all tests on a set of molecules."""
 
-    def __init__(self, config: str | dict = "redock", top_n: int | None = None):
+    def __init__(self, config: str | dict[str, Any] = "redock", top_n: int | None = None):
         """Initialize PoseBusters object."""
         self.module_func: list  # dict[str, Callable]
         self.module_args: list  # dict[str, set[str]]

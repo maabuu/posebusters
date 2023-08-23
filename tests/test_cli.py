@@ -29,7 +29,7 @@ def test_bust_mols() -> None:
 
 
 def test_bust_table() -> None:
-    bust(table=mols_table)
+    bust(table=Path(mols_table))
 
 
 def test_bust_none() -> None:
