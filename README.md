@@ -54,7 +54,8 @@ DockBuster().bust(ligand_pred_file, protein_crystal_file)
 
 Documentation is available at [https://posebusters.readthedocs.io](https://posebusters.readthedocs.io).
 
-For more information about the tests and for a case study using PoseBusters to compare docking methods, refer to our preprint: 
+For more information about the tests and for a case study using PoseBusters to compare docking methods, refer to our [preprint](https://arxiv.org/abs/2308.05777):
+
 ```
 @online{buttenschoen2023posebusters,
   title = {{{PoseBusters}}: {{AI-based}} Docking Methods Fail to Generate Physically Valid Poses or Generalise to Novel Sequences},
@@ -68,7 +69,7 @@ For more information about the tests and for a case study using PoseBusters to c
 
 ## Feedback & Contact
 
-We welcome all feedback. For code issues, please open an issue. For other inquiries contact us by email. 
+We welcome all feedback. For code issues, please open an issue. For other inquiries contact us by email.
 
 ## Thanks
 

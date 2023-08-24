@@ -32,8 +32,8 @@ def check_intermolecular_distance(
         radius_scale: Scaling factor for the atomic radii. Defaults to 0.8.
         clash_cutoff: Threshold for how much the atoms may overlap before a clash is reported. Defaults
             to 0.05.
-        ignore_types: Which types of atoms to ignore. Possible values to include are "hydrogens", "protein",
-            "organic_cofactors", "inorganic_cofactors". Defaults to {"hydrogens"}.
+        ignore_types: Which types of atoms to ignore in mol_cond. Possible values to include are "hydrogens", "protein",
+            "organic_cofactors", "inorganic_cofactors", "waters". Defaults to {"hydrogens"}.
         max_distance: Maximum distance (in Angstrom) predicted and conditioning molecule may be apart to be considered
             as valid. Defaults to 5.0.
 
@@ -46,10 +46,14 @@ def check_intermolecular_distance(
     atoms_ligand = np.array([a.GetSymbol() for a in mol_pred.GetAtoms()])
     atoms_protein_all = np.array([a.GetSymbol() for a in mol_cond.GetAtoms()])
 
-    # select atoms in conditioning molecule
-    mask = get_atom_type_mask(mol_cond, ignore_types)
-    coords_protein = coords_protein[mask, :]
-    atoms_protein_all = atoms_protein_all[mask]
+    mask = [a.GetSymbol() != "H" for a in mol_pred.GetAtoms()]
+    coords_ligand = coords_ligand[mask, :]
+    atoms_ligand = atoms_ligand[mask]
+
+    if ignore_types:
+        mask = get_atom_type_mask(mol_cond, ignore_types)
+        coords_protein = coords_protein[mask, :]
+        atoms_protein_all = atoms_protein_all[mask]
 
     # get radii
     if radius_type == "vdw":

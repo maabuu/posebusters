@@ -3,6 +3,12 @@
 import pandas as pd
 
 
+def _value_map(x):
+    if type(x) == bool:
+        return ".   " if x else "Fail"
+    return x
+
+
 def create_long_output(df: pd.DataFrame) -> str:
     """Create a detailed output string for the long PoseBusters reporting format.
 
@@ -13,6 +19,7 @@ def create_long_output(df: pd.DataFrame) -> str:
         String with detailed report.
     """
     df = df.T
+    df[df.columns[-1]] = df[df.columns[-1]].map(_value_map, na_action="ignore")
     cols = df.columns
     output = ""
     segments = []
