@@ -9,7 +9,7 @@ PoseBusters class
 
 The PoseBusters class collects the molecules to test, runs the *modules*, and reports the test results.
 
-.. autoclass:: posebusters.posebusters.PoseBusters
+.. autoclass:: posebusters.PoseBusters
     :members:
     :undoc-members:
 

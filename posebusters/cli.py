@@ -12,7 +12,7 @@ from rdkit.Chem.rdchem import Mol
 from yaml import safe_load
 
 from . import __version__
-from .posebusters import PoseBusters
+from .posebusters import PoseBusters, _dataframe_from_output
 from .tools.formatting import create_long_output, create_short_output
 
 logger = logging.getLogger(__name__)
@@ -47,13 +47,16 @@ def bust(
         file_paths = pd.read_csv(table, index_col=None)
         mode = _select_mode(config, file_paths.columns.tolist())
         posebusters = PoseBusters(mode, top_n=top_n)
-        posebusters_results = posebusters.bust_table(file_paths)
+        posebusters.file_paths = file_paths
+        posebusters_results = posebusters._run()
     else:
         # run on single input
         d = {k for k, v in dict(mol_pred=mol_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
         mode = _select_mode(config, d)
         posebusters = PoseBusters(mode, top_n=top_n)
-        posebusters_results = posebusters.bust(mol_pred, mol_true, mol_cond)
+        cols = ["mol_pred", "mol_true", "mol_cond"]
+        posebusters.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred], columns=cols)
+        posebusters_results = posebusters._run()
 
     for i, results_dict in enumerate(posebusters_results):
         results = _dataframe_from_output(results_dict, posebusters.config, full_report)
@@ -107,26 +110,6 @@ def _parse_args(args):
         logger.warning("Option --full-report ignored. Please use --outfmt long or csv for --full-report.")
         namespace.full_report = False
     return namespace
-
-
-def _dataframe_from_output(results_dict, config, full_report: bool = False) -> pd.DataFrame:
-    d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}
-    df = pd.DataFrame.from_dict(d, orient="index")
-
-    test_columns = [(c["name"], n) for c in config["modules"] for n in c["chosen_binary_test_output"]]
-    names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c["rename_outputs"].items()}
-    suffix_lookup = {c["name"]: c["rename_suffix"] for c in config["modules"] if "rename_suffix" in c}
-
-    available_columns = df.columns.tolist()
-    missing_columns = [c for c in test_columns if c not in available_columns]
-    extra_columns = [c for c in available_columns if c not in test_columns]
-    columns = test_columns + extra_columns if full_report else test_columns
-
-    df[missing_columns] = pd.NA
-    df = df[columns]
-    df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]
-
-    return df
 
 
 def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = False, index: int = 0) -> str:

@@ -196,3 +196,4 @@ Contents
    Checks <checks>
    Command line tool <cli>
    User API <api>
+   User API examples <api_notebook>

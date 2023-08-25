@@ -63,36 +63,50 @@ class PoseBusters:
         self.results: dict[tuple[str, str], list[tuple[str, str, Any]]] = defaultdict(list)
 
     def bust(
-        self, mol_pred: Iterable[Mol | Path], mol_true: Mol | Path | None = None, mol_cond: Mol | Path | None = None
-    ) -> Generator[dict, None, None]:
+        self,
+        mol_pred: Iterable[Mol | Path],
+        mol_true: Mol | Path | None = None,
+        mol_cond: Mol | Path | None = None,
+        full_report: bool = False,
+    ) -> pd.DataFrame:
         """Run all tests on one molecule.
 
         Args:
             mol_pred: Generated molecule, e.g. docked ligand, with one or more poses.
             mol_true: True molecule, e.g. crystal ligand, with one or more poses.
             mol_cond: Conditioning molecule, e.g. protein.
+            full_report: Whether to include all columns in the output or only the boolean ones specified in the config.
 
         Notes:
             - Molecules can be provided as rdkit molecule objects or file paths.
 
         Returns:
-            PoseBusters object.
+            Pandas dataframe with results.
         """
         columns = ["mol_pred", "mol_true", "mol_cond"]
         self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred], columns=columns)
-        return self._run()
+        results_gen = self._run()
+        df = pd.concat([_dataframe_from_output(d, self.config, full_report=full_report) for d in results_gen])
+        df.index.names = ["file", "molecule"]
+        df.columns = [c.lower().replace(" ", "_") for c in df.columns]
+        return df
 
-    def bust_table(self, mol_table: pd.DataFrame) -> Generator[dict, None, None]:
+    def bust_table(self, mol_table: pd.DataFrame, full_report: bool = False) -> pd.DataFrame:
         """Run all tests on multiple molecules provided in pandas dataframe as paths or rdkit molecule objects.
 
         Args:
             mol_table: Pandas dataframe with columns "mol_pred", "mol_true", "mol_cond" containing paths to molecules.
+            full_report: Whether to include all columns in the output or only the boolean ones specified in the config.
 
         Returns:
-            PoseBusters object.
+            Pandas dataframe with results.
         """
         self.file_paths = mol_table
-        return self._run()
+        results_gen = self._run()
+        df = pd.concat([_dataframe_from_output(d, self.config, full_report=full_report) for d in results_gen])
+        df.index.names = ["file", "molecule"]
+        df.columns = [c.lower().replace(" ", "_") for c in df.columns]
+        return df
 
     def _run(self) -> Generator[dict, None, None]:
         """Run all tests on molecules provided in file paths.
@@ -163,3 +177,23 @@ class PoseBusters:
             return f"mol_at_pos_{i}"
         else:
             return mol.GetProp("_Name")
+
+
+def _dataframe_from_output(results_dict, config, full_report: bool = False) -> pd.DataFrame:
+    d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}
+    df = pd.DataFrame.from_dict(d, orient="index")
+
+    test_columns = [(c["name"], n) for c in config["modules"] for n in c["chosen_binary_test_output"]]
+    names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c["rename_outputs"].items()}
+    suffix_lookup = {c["name"]: c["rename_suffix"] for c in config["modules"] if "rename_suffix" in c}
+
+    available_columns = df.columns.tolist()
+    missing_columns = [c for c in test_columns if c not in available_columns]
+    extra_columns = [c for c in available_columns if c not in test_columns]
+    columns = test_columns + extra_columns if full_report else test_columns
+
+    df[missing_columns] = pd.NA
+    df = df[columns]
+    df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]
+
+    return df
