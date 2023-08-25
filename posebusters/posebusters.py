@@ -69,7 +69,7 @@ class PoseBusters:
 
         Args:
             mol_pred: Generated molecule, e.g. docked ligand, with one or more poses.
-            mol_true: True molecule, e.g. crytal ligand, with one or more poses.
+            mol_true: True molecule, e.g. crystal ligand, with one or more poses.
             mol_cond: Conditioning molecule, e.g. protein.
 
         Notes:
@@ -98,7 +98,7 @@ class PoseBusters:
         """Run all tests on molecules provided in file paths.
 
         Yields:
-            Generator of pandas dataframes with results.
+            Generator of result dictionaries.
         """
         self._initialize_modules()
 
