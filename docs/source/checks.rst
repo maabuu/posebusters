@@ -177,12 +177,12 @@ with in a receptor's binding pocket without any steric clash.
 | Ligand and receptor clash                   |                                        |
 +---------------------------------------------+----------------------------------------+
 
-More details on tests and docking case study
+More details on tests and docking method comparison
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _preprint: https://arxiv.org/abs/2308.05777
 
-For more detailed information about the tests and for a case study using PoseBusters to compare docking methods, refer to our `preprint`_:
+For more detailed information about the tests and for a study using PoseBusters to compare docking methods, refer to our `preprint`_:
 
 .. code-block:: bibtex
 

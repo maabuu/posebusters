@@ -49,13 +49,13 @@ def test_bust_mols_hydrogen() -> None:
 
 def test_bust_mols_consistency() -> None:
     posebusters = PoseBusters("mol")
-    result_2 = list(list(posebusters.bust([mol_conf_2]))[0].values())[0]
+    result_2 = posebusters.bust([mol_conf_2])
 
     posebusters = PoseBusters("mol")
-    result_3 = list(list(posebusters.bust([mol_conf_3]))[0].values())[0]
+    result_3 = posebusters.bust([mol_conf_2])
 
     # check numbers are approximately equal
-    for v1, v2 in zip(result_2, result_3):
+    for v1, v2 in zip(result_2.values, result_3.values):
         if v1[2] == v2[2] or math.isnan(v1[2]):
             continue
         assert abs(v1[2] - v2[2]) < 1e-6, f"{v1[0], v1[1]}: {v1[2]} != {v2[2]}"

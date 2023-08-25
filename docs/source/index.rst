@@ -130,12 +130,12 @@ For more usage examples, bulk processing, and the Python API see the documentati
 and the `Python library <python_library.ipynb>`_.
 
 
-Docking case study
+Docking methods comparison
 ====================================
 
 .. _preprint: https://arxiv.org/abs/2308.05777
 
-For more detailed information about the tests and for a case study using PoseBusters to compare docking methods, refer to our `preprint`_:
+For more detailed information about the tests and for a study using PoseBusters to compare docking methods, refer to our `preprint`_:
 
 .. code-block:: bibtex
 
@@ -196,3 +196,4 @@ Contents
    Checks <checks>
    Command line tool <cli>
    User API <api>
+   User API examples <api_notebook>
