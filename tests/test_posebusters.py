@@ -24,30 +24,43 @@ mol_single_h = "tests/conftest/single_hydrogen.sdf"
 
 def test_bust_redocks_1ia1() -> None:
     posebusters = PoseBusters("redock")
-    list(posebusters.bust([mol_pred_1ia1], mol_true_1ia1, mol_cond_1ia1))
+    df = posebusters.bust([mol_pred_1ia1], mol_true_1ia1, mol_cond_1ia1)
+    assert df.all(axis=1).values[0]
 
 
 def test_bust_redocks_1w1p() -> None:
     posebusters = PoseBusters("redock")
-    list(posebusters.bust([mol_pred_1w1p], mol_true_1w1p, mol_cond_1w1p))
+    df = posebusters.bust([mol_pred_1w1p], mol_true_1w1p, mol_cond_1w1p)
+    assert df.all(axis=1).values[0]
 
 
 def test_bust_docks() -> None:
     posebusters = PoseBusters("dock")
-    list(posebusters.bust([mol_pred_1ia1], mol_cond=mol_cond_1w1p))
+    df = posebusters.bust([mol_pred_1ia1], mol_cond=mol_cond_1ia1)
+    assert df.all(axis=1).values[0]
 
 
 def test_bust_mols() -> None:
     posebusters = PoseBusters("mol")
-    list(posebusters.bust([mol_pred_1ia1]))
+
+    # pass one not in list
+    df = posebusters.bust(mol_pred_1ia1)
+    assert df.all(axis=1).values[0]
+
+    # pass list
+    df = posebusters.bust([mol_pred_1ia1])
+    assert df.all(axis=1).values[0]
 
 
 def test_bust_mols_hydrogen() -> None:
     posebusters = PoseBusters("mol")
-    list(posebusters.bust([mol_single_h]))
+    df = posebusters.bust([mol_single_h])
+    assert df.sum(axis=1).values[0] >= 8  # energy ratio test fails
 
 
 def test_bust_mols_consistency() -> None:
+    # check that running the same molecule twice gives the same result
+
     posebusters = PoseBusters("mol")
     result_2 = posebusters.bust([mol_conf_2])
 

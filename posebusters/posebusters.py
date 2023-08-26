@@ -64,15 +64,15 @@ class PoseBusters:
 
     def bust(
         self,
-        mol_pred: Iterable[Mol | Path],
+        mol_pred: Iterable[Mol | Path] | Mol | Path,
         mol_true: Mol | Path | None = None,
         mol_cond: Mol | Path | None = None,
         full_report: bool = False,
     ) -> pd.DataFrame:
-        """Run all tests on one molecule.
+        """Run tests on one or more molecules.
 
         Args:
-            mol_pred: Generated molecule, e.g. docked ligand, with one or more poses.
+            mol_pred: Generated molecule(s), e.g. de-novo generated molecule or docked ligand, with one or more poses.
             mol_true: True molecule, e.g. crystal ligand, with one or more poses.
             mol_cond: Conditioning molecule, e.g. protein.
             full_report: Whether to include all columns in the output or only the boolean ones specified in the config.
@@ -83,16 +83,21 @@ class PoseBusters:
         Returns:
             Pandas dataframe with results.
         """
+        mol_pred = [mol_pred] if isinstance(mol_pred, (Mol, Path, str)) else mol_pred
+
         columns = ["mol_pred", "mol_true", "mol_cond"]
         self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred], columns=columns)
+
         results_gen = self._run()
+
         df = pd.concat([_dataframe_from_output(d, self.config, full_report=full_report) for d in results_gen])
         df.index.names = ["file", "molecule"]
         df.columns = [c.lower().replace(" ", "_") for c in df.columns]
+
         return df
 
     def bust_table(self, mol_table: pd.DataFrame, full_report: bool = False) -> pd.DataFrame:
-        """Run all tests on multiple molecules provided in pandas dataframe as paths or rdkit molecule objects.
+        """Run tests on molecules provided in pandas dataframe as paths or rdkit molecule objects.
 
         Args:
             mol_table: Pandas dataframe with columns "mol_pred", "mol_true", "mol_cond" containing paths to molecules.
@@ -102,10 +107,13 @@ class PoseBusters:
             Pandas dataframe with results.
         """
         self.file_paths = mol_table
+
         results_gen = self._run()
+
         df = pd.concat([_dataframe_from_output(d, self.config, full_report=full_report) for d in results_gen])
         df.index.names = ["file", "molecule"]
         df.columns = [c.lower().replace(" ", "_") for c in df.columns]
+
         return df
 
     def _run(self) -> Generator[dict, None, None]:
