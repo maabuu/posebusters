@@ -1,5 +1,7 @@
 import math
 
+from rdkit.Chem.rdmolfiles import MolFromSmiles
+
 from posebusters import PoseBusters
 
 mols_table = "tests/conftest/sample_bust_docks_table.csv"
@@ -49,6 +51,17 @@ def test_bust_mols() -> None:
 
     # pass list
     df = posebusters.bust([mol_pred_1ia1])
+    assert df.all(axis=1).values[0]
+
+
+def test_bust_mol_rdkit() -> None:
+    posebusters = PoseBusters(config="mol")
+    mol = MolFromSmiles("C")
+
+    df = posebusters.bust(mol)
+    assert df.all(axis=1).values[0]
+
+    df = posebusters.bust([mol])
     assert df.all(axis=1).values[0]
 
 
