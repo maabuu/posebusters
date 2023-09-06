@@ -76,7 +76,7 @@ def check_geometry(
     """Use RDKit distance geometry bounds to check the geometry of a molecule.
 
     Args:
-        mol_pred: Predicted molecule (docked ligand) with exactly one conformer.
+        mol_pred: Predicted molecule (docked ligand). Only the first conformer will be checked.
         threshold_bad_bond_length: Bond length threshold in relative percentage. 0.2 means that bonds may be up to 20%
             longer than DG bounds. Defaults to 0.2.
         threshold_clash: Threshold for how much overlap constitutes a clash. 0.2 means that the two atoms may be up to
@@ -91,9 +91,11 @@ def check_geometry(
         PoseBusters results dictionary.
     """
     mol = deepcopy(mol_pred)
-    assert mol.GetNumConformers() == 1, "Molecule must have exactly one conformer."
-
     results = _empty_results.copy()
+
+    if mol.GetNumConformers() == 0:
+        logger.warning("Molecule does not have a conformer.")
+        return {"results": results}
 
     if mol.GetNumAtoms() == 1:
         logger.warning(f"Molecule has only {mol.GetNumAtoms()} atoms.")
