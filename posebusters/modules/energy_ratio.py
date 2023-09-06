@@ -49,11 +49,8 @@ def check_energy_ratio(
     """
     mol_pred = deepcopy(mol_pred)
 
-    if mol_pred.GetNumConformers() == 0:
-        logger.warning("Molecule does not have a conformer.")
-        return _empty_results
-
     try:
+        assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
         SanitizeMol(mol_pred)
         AddHs(mol_pred, addCoords=True)
     except Exception:
