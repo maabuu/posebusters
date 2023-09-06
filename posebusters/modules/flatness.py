@@ -42,6 +42,7 @@ def check_flatness(
     mol = deepcopy(mol_pred)
     # if mol cannot be sanitized, then rdkit may not find substructures
     try:
+        assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
         SanitizeMol(mol)
     except Exception:
         return _empty_results
