@@ -181,7 +181,7 @@ class PoseBusters:
     def _get_name(mol: Mol, i: int) -> str:
         if mol is None:
             return f"invalid_mol_at_pos_{i}"
-        elif mol.GetProp("_Name") == "":
+        elif not mol.HasProp("_Name") or mol.GetProp("_Name") == "":
             return f"mol_at_pos_{i}"
         else:
             return mol.GetProp("_Name")
