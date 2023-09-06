@@ -48,7 +48,9 @@ def check_energy_ratio(
         PoseBusters results dictionary.
     """
     mol_pred = deepcopy(mol_pred)
+
     try:
+        assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
         SanitizeMol(mol_pred)
         AddHs(mol_pred, addCoords=True)
     except Exception:
