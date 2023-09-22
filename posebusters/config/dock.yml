@@ -80,10 +80,10 @@ modules:
       radius_scale: 1.0
       clash_cutoff: 0.75
       ignore_types:
-      - hydrogens
-      - organic_cofactors
-      - inorganic_cofactors
-      - waters
+        - hydrogens
+        - organic_cofactors
+        - inorganic_cofactors
+        - waters
       max_distance: 5.0
     chosen_binary_test_output:
       - not_too_far_away
@@ -99,10 +99,10 @@ modules:
       radius_scale: 1.0
       clash_cutoff: 0.75
       ignore_types:
-      - hydrogens
-      - protein
-      - inorganic_cofactors
-      - waters
+        - hydrogens
+        - protein
+        - inorganic_cofactors
+        - waters
       max_distance: 5.0
     chosen_binary_test_output:
       - no_clashes
@@ -116,10 +116,10 @@ modules:
       radius_scale: 1.0
       clash_cutoff: 0.75
       ignore_types:
-      - hydrogens
-      - protein
-      - organic_cofactors
-      - waters
+        - hydrogens
+        - protein
+        - organic_cofactors
+        - waters
       max_distance: 5.0
     chosen_binary_test_output:
       - no_clashes
@@ -133,10 +133,10 @@ modules:
       radius_scale: 1.0
       clash_cutoff: 0.75
       ignore_types:
-      - hydrogens
-      - protein
-      - organic_cofactors
-      - inorganic_cofactors
+        - hydrogens
+        - protein
+        - organic_cofactors
+        - inorganic_cofactors
       max_distance: 5.0
     chosen_binary_test_output:
       - no_clashes
@@ -149,10 +149,10 @@ modules:
       clash_cutoff: 0.075
       vdw_scale: 0.8
       ignore_types:
-      - hydrogens
-      - organic_cofactors
-      - inorganic_cofactors
-      - waters
+        - hydrogens
+        - organic_cofactors
+        - inorganic_cofactors
+        - waters
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
@@ -165,10 +165,10 @@ modules:
       clash_cutoff: 0.075
       vdw_scale: 0.8
       ignore_types:
-      - hydrogens
-      - protein
-      - inorganic_cofactors
-      - waters
+        - hydrogens
+        - protein
+        - inorganic_cofactors
+        - waters
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
@@ -181,10 +181,10 @@ modules:
       clash_cutoff: 0.075
       vdw_scale: 0.5
       ignore_types:
-      - hydrogens
-      - protein
-      - organic_cofactors
-      - waters
+        - hydrogens
+        - protein
+        - organic_cofactors
+        - waters
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
@@ -197,10 +197,10 @@ modules:
       clash_cutoff: 0.075
       vdw_scale: 0.5
       ignore_types:
-      - hydrogens
-      - protein
-      - organic_cofactors
-      - waters
+        - hydrogens
+        - protein
+        - organic_cofactors
+        - inorganic_cofactors
     chosen_binary_test_output:
       - no_volume_clash
     rename_outputs:
