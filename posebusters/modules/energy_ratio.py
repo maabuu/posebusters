@@ -44,7 +44,7 @@ def check_energy_ratio(
         threshold_energy_ratio: Limit above which the energy ratio is deemed to high. Defaults to 7.0.
         ensemble_number_conformations: Number of conformations to generate for the ensemble over which to
             average. Defaults to 100.
-        inchi_strict: Whether to treat warnings in the InChI generation as errors. Defaults to True.
+        inchi_strict: Whether to treat warnings in the InChI generation as errors. Defaults to False.
 
     Returns:
         PoseBusters results dictionary.
