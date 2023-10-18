@@ -7,17 +7,17 @@ from functools import lru_cache
 
 import numpy as np
 from rdkit import ForceField  # noqa: F401
-from rdkit.Chem.inchi import MolFromInchi, MolToInchi
+from rdkit.Chem.inchi import InchiReadWriteError, MolFromInchi, MolToInchi
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdDistGeom import EmbedMultipleConfs, ETKDGv3
 from rdkit.Chem.rdForceFieldHelpers import (
     UFFGetMoleculeForceField,
     UFFOptimizeMoleculeConfs,
 )
-from rdkit.Chem.rdmolfiles import MolToSmiles
-from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D, SanitizeMol
+from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D
 
 from ..tools.logging import CaptureLogger
+from ..tools.molecules import assert_sanity
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +35,7 @@ def check_energy_ratio(
     mol_pred: Mol,
     threshold_energy_ratio: float = 7.0,
     ensemble_number_conformations: int = 100,
+    inchi_strict: bool = False,
 ):
     """Check whether the energy of the docked ligand is within user defined range.
 
@@ -43,6 +44,7 @@ def check_energy_ratio(
         threshold_energy_ratio: Limit above which the energy ratio is deemed to high. Defaults to 7.0.
         ensemble_number_conformations: Number of conformations to generate for the ensemble over which to
             average. Defaults to 100.
+        inchi_strict: Whether to treat warnings in the InChI generation as errors. Defaults to False.
 
     Returns:
         PoseBusters results dictionary.
@@ -51,24 +53,27 @@ def check_energy_ratio(
 
     try:
         assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
-        SanitizeMol(mol_pred)
+        mol_pred = assert_sanity(mol_pred)
         AddHs(mol_pred, addCoords=True)
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to prepare molecule: {e}")
         return _empty_results
 
-    with CaptureLogger() as log:
-        inchi = MolToInchi(mol_pred)
-    if len(inchi) == 0:
-        try:
-            logger.warning(f"Failed to generate InChI for {MolToSmiles(mol_pred)}: {log['ERROR']}")
-        except Exception:
-            logger.warning(f"Failed to generate InChI: {log['ERROR']}")
+    try:
+        inchi = get_inchi(mol_pred, inchi_strict=inchi_strict)
+    except InchiReadWriteError as e:
+        logger.warning(f"Molecule does not sanitize: {e.args[1]}")
+        return _empty_results
+    except Exception as e:
+        logger.warning(f"Molecule does not sanitize: {e}")
+        return _empty_results
 
     try:
         conf_energy = get_conf_energy(mol_pred)
     except Exception as e:
         logger.warning(f"Failed to calculate conformation energy for {inchi}: {e}")
         conf_energy = np.nan
+
     try:
         avg_energy = float(get_average_energy(inchi, ensemble_number_conformations))
     except Exception as e:
@@ -85,6 +90,16 @@ def check_energy_ratio(
         "energy_ratio_passes": ratio_passes,
     }
     return {"results": results}
+
+
+def get_inchi(mol: Mol, inchi_strict: bool = False) -> str:
+    """Prepare and check InChI of a molecule."""
+    with CaptureLogger() as log:
+        inchi = MolToInchi(mol, treatWarningAsError=inchi_strict)
+        # check inchi because inchi generation does not raise an error if the inchi is invalid
+        if MolFromInchi(inchi, sanitize=True) is None:
+            raise Exception(log["ERROR"].split("ERROR: ")[-1])
+    return inchi
 
 
 @lru_cache(maxsize=None)
