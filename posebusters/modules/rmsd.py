@@ -48,31 +48,31 @@ def check_rmsd(
     assert mol_pred.GetNumConformers() == 1, "Docked ligand should only have one conformer."
 
     rmsds = [robust_rmsd(mol_true, mol_pred, conf_id_probe=i, heavy_only=heavy_only) for i in range(num_conf)]
-    kabsch_rmsd = [
+    kabsch_rmsds = [
         robust_rmsd(mol_true, mol_pred, conf_id_probe=i, kabsch=True, heavy_only=heavy_only) for i in range(num_conf)
     ]
-    centroid_distances = [
-        calculate_centroid_distance(mol_true, mol_pred, conf_id_probe=i, heavy_only=heavy_only) for i in range(num_conf)
+    intercentroids = [
+        intercentroid(mol_true, mol_pred, conf_id_probe=i, heavy_only=heavy_only) for i in range(num_conf)
     ]
 
     if choose_by == "rmsd":
         i = np.argmin(np.nan_to_num(rmsds, nan=np.inf))
     elif choose_by == "kabsch_rmsd":
-        i = np.argmin(np.nan_to_num(kabsch_rmsd, nan=np.inf))
+        i = np.argmin(np.nan_to_num(kabsch_rmsds, nan=np.inf))
     elif choose_by == "centroid_distance":
-        i = np.argmin(np.nan_to_num(centroid_distances, nan=np.inf))
+        i = np.argmin(np.nan_to_num(intercentroids, nan=np.inf))
     else:
         raise ValueError(f"Invalid value {choose_by} for choose_by. Use 'rmsd', 'kabsch_rmsd', 'centroid_distance'.")
     rmsd = rmsds[i]
-    kabsch_rmsd = kabsch_rmsd[i]
-    centroid_distance = centroid_distances[i]
+    kabsch_rmsd = kabsch_rmsds[i]
+    centroid_dist = intercentroids[i]
 
     rmsd_within_threshold = rmsd <= rmsd_threshold
 
     results = {
         "rmsd": rmsd,
         "kabsch_rmsd": kabsch_rmsd,
-        "centroid_distance": centroid_distance,
+        "centroid_distance": centroid_dist,
         "rmsd_within_threshold": rmsd_within_threshold,
     }
     return {"results": results}
@@ -161,7 +161,7 @@ def _rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_ref: int, ka
         return CalcRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
 
 
-def calculate_centroid_distance(
+def intercentroid(
     mol_probe: Mol, mol_ref: Mol, conf_id_probe: int = -1, conf_id_ref: int = -1, heavy_only: bool = True
 ) -> float:
     """Distance between centroids of two molecules."""
