@@ -67,6 +67,9 @@ per-file-ignores = """
     tests/*: D
 """
 
+[tool.pylint]
+max-line-length = 120
+
 [tool.coverage.run]
 branch = true
 
