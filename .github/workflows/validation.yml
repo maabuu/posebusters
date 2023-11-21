@@ -10,12 +10,12 @@ jobs:
     steps:
 
     - name: Checkout source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.x'
+        python-version: '3.11'
 
     - name: Install dependencies
       run: |
@@ -23,14 +23,16 @@ jobs:
         pip install pre-commit
 
     - name: Cache for pre-commit
+      id: cache-pre-commit
       uses: actions/cache@v3
       env:
-        cache-name: cache_pre-commit
+        cache-name: pre-commit-environment
       with:
-        path: ~/.cache/pre-commit_env
-        key: ${{ env.cache-name }}_${{ env.pythonLocation }}_${{ hashFiles('.pre-commit-config.yaml') }}
+        # pre-commit cache files are stored in `~/.cache/pre-commit` by default
+        path: ~/.cache/pre-commit
+        key: ${{ runner.os }}_${{ env.cache-name }}
         restore-keys: |
-          - ${{ env.cache-name }}_${{ env.pythonLocation }}
+          - ${{ runner.os }}_${{ env.cache-name }}
           - ${{ env.cache-name }}
 
 
