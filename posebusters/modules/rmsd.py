@@ -26,7 +26,7 @@ tautomer_enumerator.SetRemoveSp3Stereo(True)
 
 
 def check_rmsd(
-    mol_pred: Mol, mol_true: Mol, rmsd_threshold: float = 2.0, choose_by: str = "rmsd"
+    mol_pred: Mol, mol_true: Mol, rmsd_threshold: float = 2.0, heavy_only: bool = True, choose_by: str = "rmsd"
 ) -> dict[str, dict[str, bool | float]]:
     """Calculate RMSD and related metrics between predicted molecule and closest ground truth molecule.
 
@@ -35,6 +35,7 @@ def check_rmsd(
         mol_true: Ground truth molecule (crystal ligand) with at least one conformer. If multiple conformers are
             present, the lowest RMSD will be reported.
         rmsd_threshold: Threshold in angstrom for reporting whether RMSD is within threshold. Defaults to 2.0.
+        heavy_only: Whether to only consider heavy atoms for RMSD calculation. Defaults to True.
         choose_by: Metric to choose which mol_true conformation to compare to. Defaults to "rmsd".
 
     Returns:
@@ -46,9 +47,13 @@ def check_rmsd(
     assert num_conf > 0, "Crystal ligand needs at least one conformer."
     assert mol_pred.GetNumConformers() == 1, "Docked ligand should only have one conformer."
 
-    rmsds = [robust_rmsd(mol_true, mol_pred, conf_id_probe=i) for i in range(num_conf)]
-    kabsch_rmsd = [robust_rmsd(mol_true, mol_pred, conf_id_probe=i, kabsch=True) for i in range(num_conf)]
-    centroid_distances = [calculate_centroid_distance(mol_true, mol_pred, conf_id_probe=i) for i in range(num_conf)]
+    rmsds = [robust_rmsd(mol_true, mol_pred, conf_id_probe=i, heavy_only=heavy_only) for i in range(num_conf)]
+    kabsch_rmsd = [
+        robust_rmsd(mol_true, mol_pred, conf_id_probe=i, kabsch=True, heavy_only=heavy_only) for i in range(num_conf)
+    ]
+    centroid_distances = [
+        calculate_centroid_distance(mol_true, mol_pred, conf_id_probe=i, heavy_only=heavy_only) for i in range(num_conf)
+    ]
 
     if choose_by == "rmsd":
         i = np.argmin(np.nan_to_num(rmsds, nan=np.inf))
