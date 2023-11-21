@@ -22,27 +22,24 @@ def bae(val: float, lb: float, ub: float) -> float:
     """Calculate out of bounds absolute error."""
     if val < lb:
         return ae(val, lb)
-    elif val > ub:
+    if val > ub:
         return ae(val, ub)
-    else:
-        return 0.0
+    return 0.0
 
 
 def bpe(val: float, lb: float, ub: float) -> float:
     """Calculate out of bounds percentage error."""
     if val < lb:
         return pe(val, lb)
-    elif val > ub:
+    if val > ub:
         return pe(val, ub)
-    else:
-        return 0.0
+    return 0.0
 
 
 def bape(val: float, lb: float, ub: float) -> float:
     """Calculate out of bounds absolute percentage error."""
     if val < lb:
         return ape(val, lb)
-    elif val > ub:
+    if val > ub:
         return ape(val, ub)
-    else:
-        return 0.0
+    return 0.0

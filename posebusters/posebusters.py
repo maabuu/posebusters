@@ -43,19 +43,26 @@ molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 class PoseBusters:
     """Class to run all tests on a set of molecules."""
 
+    file_paths: pd.DataFrame
+    module_name: list
+    module_func: list
+    module_args: list
+    fname: list
+
     def __init__(self, config: str | dict[str, Any] = "redock", top_n: int | None = None):
         """Initialize PoseBusters object."""
         self.module_func: list  # dict[str, Callable]
         self.module_args: list  # dict[str, set[str]]
 
         if isinstance(config, str) and config in {"dock", "redock", "mol"}:
-            logger.info(f"Using default configuration for mode {config}.")
-            self.config = safe_load(open(Path(__file__).parent / "config" / f"{config}.yml"))
+            logger.info("Using default configuration for mode %s.", config)
+            with open(Path(__file__).parent / "config" / f"{config}.yml", encoding="utf-8") as config_file:
+                self.config = safe_load(config_file)
         elif isinstance(config, dict):
             logger.info("Using configuration dictionary provided by user.")
             self.config = config
         else:
-            logger.error(f"Configuration {config} not valid. Provide either 'dock', 'redock', 'mol' or a dictionary.")
+            logger.error("Configuration %s not valid. Provide either 'dock', 'redock', 'mol' or a dictionary.", config)
         assert len(set(self.config.get("tests", {}).keys()) - set(module_dict.keys())) == 0
 
         self.config["top_n"] = self.config.get("top_n", top_n)
@@ -175,16 +182,16 @@ class PoseBusters:
             self.fname.append(module["function"])
             self.module_func.append(partial(function, **parameters))
             self.module_args.append(module_args)
-        pass
 
     @staticmethod
     def _get_name(mol: Mol, i: int) -> str:
         if mol is None:
             return f"invalid_mol_at_pos_{i}"
-        elif not mol.HasProp("_Name") or mol.GetProp("_Name") == "":
+
+        if not mol.HasProp("_Name") or mol.GetProp("_Name") == "":
             return f"mol_at_pos_{i}"
-        else:
-            return mol.GetProp("_Name")
+
+        return mol.GetProp("_Name")
 
 
 def _dataframe_from_output(results_dict, config, full_report: bool = False) -> pd.DataFrame:
