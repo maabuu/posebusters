@@ -56,28 +56,28 @@ def check_energy_ratio(
         mol_pred = assert_sanity(mol_pred)
         AddHs(mol_pred, addCoords=True)
     except Exception as e:
-        logger.warning(f"Failed to prepare molecule: {e}")
+        logger.warning("Failed to prepare molecule: %s", e)
         return _empty_results
 
     try:
         inchi = get_inchi(mol_pred, inchi_strict=inchi_strict)
     except InchiReadWriteError as e:
-        logger.warning(f"Molecule does not sanitize: {e.args[1]}")
+        logger.warning("Molecule does not sanitize: %s", e.args[1])
         return _empty_results
     except Exception as e:
-        logger.warning(f"Molecule does not sanitize: {e}")
+        logger.warning("Molecule does not sanitize: %s", e)
         return _empty_results
 
     try:
         conf_energy = get_conf_energy(mol_pred)
     except Exception as e:
-        logger.warning(f"Failed to calculate conformation energy for {inchi}: {e}")
+        logger.warning("Failed to calculate conformation energy for %s: %s", inchi, e)
         conf_energy = np.nan
 
     try:
         avg_energy = float(get_average_energy(inchi, ensemble_number_conformations))
     except Exception as e:
-        logger.warning(f"Failed to calculate ensemble conformation energy for {inchi}: {e}")
+        logger.warning("Failed to calculate ensemble conformation energy for %s: %s", inchi, e)
         avg_energy = np.nan
 
     pred_factor = conf_energy / avg_energy

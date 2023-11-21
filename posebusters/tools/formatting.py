@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def _value_map(x):
-    if type(x) == bool:
+    if isinstance(x, bool):
         return ".   " if x else "Fail"
     return x
 

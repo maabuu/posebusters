@@ -167,9 +167,9 @@ def _renumber_mol1_to_match_mol2(mol1: Mol, mol2: Mol) -> Mol:
     n_atoms = mol1.GetNumAtoms()
     n_different = n_atoms - sum(is_identical_idx)
     if all(is_identical_idx):
-        logger.info("All {n_atoms} atoms are already in the same order")
+        logger.info("All %d atoms are already in the same order", n_atoms)
     else:
-        logger.info(f"Swapping {n_different} out of {n_atoms} indices")
+        logger.info("Swapping %d out of %d indices", n_different, n_atoms)
         mol1 = RenumberAtoms(mol1, [m[1] for m in atom_map])
     return mol1
 
