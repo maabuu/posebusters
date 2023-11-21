@@ -42,7 +42,8 @@ def bust(
     """PoseBusters: Plausibility checks for generated molecule poses."""
     if table is None and len(mol_pred) == 0:
         raise ValueError("Provide either MOLS_PRED or TABLE.")
-    elif table is not None:
+
+    if table is not None:
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
         mode = _select_mode(config, file_paths.columns.tolist())
@@ -115,26 +116,28 @@ def _parse_args(args):
 def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = False, index: int = 0) -> str:
     if outfmt == "long":
         return create_long_output(df)
-    elif outfmt == "csv":
+
+    if outfmt == "csv":
         header = (not no_header) and (index == 0)
         df.index.names = ["file", "molecule"]
         df.columns = [c.lower().replace(" ", "_") for c in df.columns]
         return df.to_csv(index=True, header=header)
-    elif outfmt == "short":
+
+    if outfmt == "short":
         return create_short_output(df)
-    else:
-        raise ValueError(f"Unknown output format {outfmt}")
+
+    raise ValueError(f"Unknown output format {outfmt}")
 
 
 def _select_mode(config, columns: Iterable[str]) -> str | dict[str, Any]:
     # decide on mode to run
 
     # load config if provided
-    if type(config) == Path:
-        return dict(safe_load(open(config)))
+    if isinstance(config, Path):
+        return dict(safe_load(open(config, encoding="utf-8")))
 
     # forward string if config provide
-    if type(config) == str:
+    if isinstance(config, str):
         return str(config)
 
     # select mode based on inputs

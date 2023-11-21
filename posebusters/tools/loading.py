@@ -39,7 +39,7 @@ def safe_load_mol(path: Path, load_all: bool = False, **load_params) -> Mol | No
             mol = _load_mol(path, load_all=load_all, **load_params)
         return mol
     except Exception as exception:
-        logger.warning(f"Could not load molecule from {path} with error: {exception}")
+        logger.warning("Could not load molecule from %s with error: %s", path, exception)
     return None
 
 
