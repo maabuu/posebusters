@@ -33,11 +33,13 @@ def test_bust_table() -> None:
 
 
 def test_output() -> None:
+    output = Path(".test_output.csv")
     bust(
         table=Path(mols_table),
         outfmt="csv",
-        output=Path(".test_output.csv"),
+        output=output,
     )
+    assert output.exists()
 
 
 def test_bust_none() -> None:
