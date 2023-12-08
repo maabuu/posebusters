@@ -3,6 +3,7 @@ data
 temp
 ignore*
 notebooks*
+.test*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

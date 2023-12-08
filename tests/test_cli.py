@@ -32,6 +32,16 @@ def test_bust_table() -> None:
     bust(table=Path(mols_table))
 
 
+def test_output() -> None:
+    output = Path(".test_output.csv")
+    bust(
+        table=Path(mols_table),
+        outfmt="csv",
+        output=output,
+    )
+    assert output.exists()
+
+
 def test_bust_none() -> None:
     # check that ValueError is raised when no molecules are provided
     try:

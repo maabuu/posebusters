@@ -5,7 +5,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, TextIO
 
 import pandas as pd
 from rdkit.Chem.rdchem import Mol
@@ -33,7 +33,7 @@ def bust(
     mol_cond: Path | Mol | None = None,
     table: Path | None = None,
     outfmt: str = "short",
-    output=sys.stdout,
+    output: Path | TextIO = sys.stdout,
     config: Path | None = None,
     no_header: bool = False,
     full_report: bool = False,
@@ -58,6 +58,9 @@ def bust(
         cols = ["mol_pred", "mol_true", "mol_cond"]
         posebusters.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred], columns=cols)
         posebusters_results = posebusters._run()
+
+    if isinstance(output, Path):
+        output = open(Path(output), "w", encoding="utf-8")
 
     for i, results_dict in enumerate(posebusters_results):
         results = _dataframe_from_output(results_dict, posebusters.config, full_report)
