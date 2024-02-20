@@ -68,15 +68,15 @@ def safe_supply_mols(path: Path, load_all=True, sanitize=True, **load_params) ->
     supplier = SDMolSupplier(str(path), sanitize=False, strictParsing=True)
     i = 0
     for mol in supplier:
-        mol = _process_mol(mol, sanitize=sanitize, **load_params)
+        mol_clean = _process_mol(mol, sanitize=sanitize, **load_params)
         i += 1
-        if mol is not None:
-            mol.SetProp("_Path", str(path))
-            mol.SetProp("_Index", str(i))
-        yield mol
+        if mol_clean is not None:
+            mol_clean.SetProp("_Path", str(path))
+            mol_clean.SetProp("_Index", str(i))
+        yield mol_clean
 
 
-def _load_mol(
+def _load_mol(  # noqa: PLR0913
     path: Path,
     load_all=False,
     sanitize=False,
@@ -136,7 +136,7 @@ def _load_and_combine_mols(path: Path, sanitize=True, removeHs=True, strictParsi
     return mol
 
 
-def _process_mol(
+def _process_mol(  # noqa: PLR0913
     mol: Mol | None,
     smiles: str | None = None,
     cleanup=False,

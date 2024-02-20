@@ -9,23 +9,10 @@ import numpy as np
 from rdkit import RDLogger
 from rdkit.Chem.AllChem import AssignBondOrdersFromTemplate
 from rdkit.Chem.Lipinski import HAcceptorSmarts, HDonorSmarts
-from rdkit.Chem.rdchem import (
-    AtomValenceException,
-    Bond,
-    Conformer,
-    GetPeriodicTable,
-    Mol,
-    RWMol,
-)
+from rdkit.Chem.rdchem import AtomValenceException, Bond, Conformer, GetPeriodicTable, Mol, RWMol
 from rdkit.Chem.rdMolAlign import GetBestAlignmentTransform
 from rdkit.Chem.rdmolfiles import MolFromSmarts
-from rdkit.Chem.rdmolops import (
-    AddHs,
-    RemoveHs,
-    RemoveStereochemistry,
-    RenumberAtoms,
-    SanitizeMol,
-)
+from rdkit.Chem.rdmolops import AddHs, RemoveHs, RemoveStereochemistry, RenumberAtoms, SanitizeMol
 from rdkit.Chem.rdMolTransforms import TransformConformer
 
 logger = getLogger(__name__)
@@ -184,7 +171,7 @@ def _get_atomic_number(atomic_symbol: str):
             symbol = "H"
         return _periodic_table.GetAtomicNumber(symbol)
     except Exception:
-        print(atomic_symbol)
+        logger.error("Unknown atomic symbol: %s", atomic_symbol)
         return atomic_symbol
 
 

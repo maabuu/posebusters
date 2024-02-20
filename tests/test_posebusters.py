@@ -65,13 +65,13 @@ def test_bust_mol_rdkit() -> None:
     assert df.all(axis=1).values[0]
 
 
-def test_bust_mols_hydrogen() -> None:
+def test_bust_mols_hydrogen(threshold=8) -> None:
     posebusters = PoseBusters("mol")
     df = posebusters.bust([mol_single_h])
-    assert df.sum(axis=1).values[0] >= 8  # energy ratio test fails
+    assert df.sum(axis=1).values[0] >= threshold  # energy ratio test fails
 
 
-def test_bust_mols_consistency() -> None:
+def test_bust_mols_consistency(atol=1e-6) -> None:
     # check that running the same molecule twice gives the same result
 
     posebusters = PoseBusters("mol")
@@ -84,4 +84,4 @@ def test_bust_mols_consistency() -> None:
     for v1, v2 in zip(result_2.values, result_3.values):
         if v1[2] == v2[2] or math.isnan(v1[2]):
             continue
-        assert abs(v1[2] - v2[2]) < 1e-6, f"{v1[0], v1[1]}: {v1[2]} != {v2[2]}"
+        assert abs(v1[2] - v2[2]) < atol, f"{v1[0], v1[1]}: {v1[2]} != {v2[2]}"

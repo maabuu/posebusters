@@ -13,7 +13,7 @@ from ..tools.protein import get_atom_type_mask
 logger = logging.getLogger(__name__)
 
 
-def check_volume_overlap(
+def check_volume_overlap(  # noqa: PLR0913
     mol_pred: Mol,
     mol_cond: Mol,
     clash_cutoff: float = 0.05,

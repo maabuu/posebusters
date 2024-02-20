@@ -27,7 +27,7 @@ def main():
         logger.error(e)
 
 
-def bust(
+def bust(  # noqa: PLR0913
     mol_pred: list[Path | Mol] = [],
     mol_true: Path | Mol | None = None,
     mol_cond: Path | Mol | None = None,
