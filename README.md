@@ -2,8 +2,7 @@
 
 PoseBusters: Plausibility checks for generated molecule poses.
 
-
-### [Paper on arXiv](https://arxiv.org/abs/2308.05777)
+### Paper in [Chemical Science](https://pubs.rsc.org/en/content/articlelanding/2024/sc/d3sc04185a) and preprint on [arXiv](https://arxiv.org/abs/2308.05777)
 
 ## Installation
 
