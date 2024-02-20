@@ -94,4 +94,4 @@ def test_bust_mols_consistency(atol=1e-6) -> None:
 def test_bust_gen() -> None:
     posebusters = PoseBusters("gen")
     result = posebusters.bust(mol_pred=mol_larger, mol_true=mol_smaller, mol_cond=mol_cond_smaller, full_report=True)
-    assert result["sucos"] > 0.2
+    assert result["sucos"][0] > 0.2
