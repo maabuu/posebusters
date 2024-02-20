@@ -23,6 +23,10 @@ mol_cond_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_no_ligand_no_solvent.pdb"
 
 mol_single_h = "tests/conftest/single_hydrogen.sdf"
 
+mol_smaller = "tests/conftest/2HA2_SCK_2HA3_CHT/2HA2_SCK_2HA3_CHT_smaller_ligand.sdf"
+mol_larger = "tests/conftest/2HA2_SCK_2HA3_CHT/2HA2_SCK_2HA3_CHT_larger_ligand.sdf"
+mol_cond_smaller = "tests/conftest/2HA2_SCK_2HA3_CHT/2HA2_SCK_2HA3_CHT_smaller_receptor.pdb"
+
 
 def test_bust_redocks_1ia1() -> None:
     posebusters = PoseBusters("redock")
@@ -85,3 +89,9 @@ def test_bust_mols_consistency(atol=1e-6) -> None:
         if v1[2] == v2[2] or math.isnan(v1[2]):
             continue
         assert abs(v1[2] - v2[2]) < atol, f"{v1[0], v1[1]}: {v1[2]} != {v2[2]}"
+
+
+def test_bust_gen() -> None:
+    posebusters = PoseBusters("gen")
+    result = posebusters.bust(mol_pred=mol_larger, mol_true=mol_smaller, mol_cond=mol_cond_smaller, full_report=True)
+    assert result["sucos"][0] > 0.2
