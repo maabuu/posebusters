@@ -92,7 +92,7 @@ def get_sucos_score(
     return sucos_score
 
 
-def check_sucos(mol_pred: Mol, mol_true: Mol) -> dict[str, dict[str, bool | float]]:
+def check_sucos(mol_pred: Mol, mol_true: Mol, sucos_threshold: float = 0.4) -> dict[str, dict[str, bool | float]]:
     """Calculate RMSD and related metrics between predicted molecule and closest ground truth molecule.
 
     Args:
@@ -115,11 +115,12 @@ def check_sucos(mol_pred: Mol, mol_true: Mol) -> dict[str, dict[str, bool | floa
         SanitizeMol(mol_pred)
         SanitizeMol(mol_true)
     except Exception:
-        return {"results": {"sucos": np.nan}}
+        return {"results": {"sucos": np.nan, "sucos_within_threshold": np.nan}}
 
     # iterate over all true molecules to find best sucos match
     sucos_scores = [get_sucos_score(mol_true, mol_pred, conf_id_reference=i) for i in range(num_conf)]
     best_sucos = max(sucos_scores)
+    sucos_within_threshold = best_sucos >= sucos_threshold
 
-    results = {"sucos": best_sucos}
+    results = {"sucos": best_sucos, "sucos_within_threshold": sucos_within_threshold}
     return {"results": results}

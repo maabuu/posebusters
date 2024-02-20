@@ -20,6 +20,7 @@ from .modules.intermolecular_distance import check_intermolecular_distance
 from .modules.loading import check_loading
 from .modules.rmsd import check_rmsd
 from .modules.sanity import check_chemistry
+from .modules.sucos import check_sucos
 from .modules.volume_overlap import check_volume_overlap
 from .tools.loading import safe_load_mol, safe_supply_mols
 
@@ -36,6 +37,7 @@ module_dict: dict[str, Callable] = {
     "intermolecular_distance": check_intermolecular_distance,
     "volume_overlap": check_volume_overlap,
     "rmsd": check_rmsd,
+    "sucos": check_sucos,
 }
 molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 
@@ -54,7 +56,7 @@ class PoseBusters:
         self.module_func: list  # dict[str, Callable]
         self.module_args: list  # dict[str, set[str]]
 
-        if isinstance(config, str) and config in {"dock", "redock", "mol"}:
+        if isinstance(config, str) and config in {"dock", "redock", "mol", "gen"}:
             logger.info("Using default configuration for mode %s.", config)
             with open(Path(__file__).parent / "config" / f"{config}.yml", encoding="utf-8") as config_file:
                 self.config = safe_load(config_file)
@@ -62,7 +64,7 @@ class PoseBusters:
             logger.info("Using configuration dictionary provided by user.")
             self.config = config
         else:
-            logger.error("Configuration %s not valid. Provide either 'dock', 'redock', 'mol' or a dictionary.", config)
+            logger.error("Configuration %s not valid. Provide 'dock', 'redock', 'mol', 'gen' or a dictionary.", config)
         assert len(set(self.config.get("tests", {}).keys()) - set(module_dict.keys())) == 0
 
         self.config["top_n"] = self.config.get("top_n", top_n)
@@ -198,8 +200,8 @@ def _dataframe_from_output(results_dict, config, full_report: bool = False) -> p
     d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}
     df = pd.DataFrame.from_dict(d, orient="index")
 
-    test_columns = [(c["name"], n) for c in config["modules"] for n in c["chosen_binary_test_output"]]
-    names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c["rename_outputs"].items()}
+    test_columns = [(c["name"], n) for c in config["modules"] for n in c.get("chosen_binary_test_output", [])]
+    names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c.get("rename_outputs", {}).items()}
     suffix_lookup = {c["name"]: c["rename_suffix"] for c in config["modules"] if "rename_suffix" in c}
 
     available_columns = df.columns.tolist()

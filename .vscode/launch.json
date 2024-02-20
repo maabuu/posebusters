@@ -56,6 +56,25 @@
             ]
         },
         {
+            "name": "bust conditioned on protein and ligand -- long -- full",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1ia1/1ia1_ligand.sdf",
+                "-l",
+                "tests/conftest/1ia1/1ia1_ligands.sdf",
+                "-p",
+                "tests/conftest/1ia1/1ia1_protein_one_lig_removed.pdb",
+                "--outfmt",
+                "long",
+                "--full-report"
+            ]
+        },
+        {
             "name": "bust conditioned on protein",
             "type": "debugpy",
             "request": "launch",
