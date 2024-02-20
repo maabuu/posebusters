@@ -28,7 +28,7 @@ dynamic = ["version", "description"]
 dependencies = ['rdkit >= 2020.09', 'pandas', 'numpy', 'pyyaml']
 
 [project.optional-dependencies]
-dev = ["isort", "black"]
+dev = ["ruff"]
 docs = [
     "ipython",
     "nbsphinx",
@@ -50,12 +50,14 @@ bust = "posebusters.cli:main"
 [tool.flit.module]
 name = "posebusters"
 
-[tool.isort]
-profile = "black"
-src_paths = ["posebusters", "tests"]
-
-[tool.black]
+[tool.ruff]
 line-length = 120
+show-fixes = true
+lint.select = ["F", "W", "E", "I", "UP", "PL", "T201"]
+lint.ignore = ["E501"]
+
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.mypy]
 ignore_missing_imports = true
@@ -67,7 +69,7 @@ per-file-ignores = """
     tests/*: D
 """
 
-[tool.pylint]
+[tool.pylint.main]
 max-line-length = 120
 
 [tool.coverage.run]
@@ -75,10 +77,12 @@ branch = true
 
 [tool.coverage.report]
 fail_under = 100
+show_missing = true
+exclude_lines = ["pragma: no cover", "raise NotImplementedError"]
 
 [tool.pytest.ini_options]
 addopts = "--cov-report xml:coverage.xml --cov posebusters --cov-fail-under 0 --cov-append -m 'not integration'"
-pythonpath = "posebusters"
+pythonpath = ["posebusters"]
 testpaths = "tests"
 
 [tool.pycln]

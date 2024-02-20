@@ -5,8 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Debug Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "purpose": [
+                "debug-test"
+            ],
+            "console": "integratedTerminal",
+            "presentation": {
+                "hidden": true
+            },
+            "justMyCode": false,
+            "env": {
+                "PYTEST_ADDOPTS": "--no-cov"
+            }
+        },
+        {
             "name": "bust conditioned on protein and ligand",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -22,7 +39,7 @@
         },
         {
             "name": "bust conditioned on protein and ligand -- long",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -40,7 +57,7 @@
         },
         {
             "name": "bust conditioned on protein",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -54,7 +71,7 @@
         },
         {
             "name": "bust unconditioned",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -66,7 +83,7 @@
         },
         {
             "name": "bust unconditioned - yael test case",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -78,7 +95,7 @@
         },
         {
             "name": "bust table input",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -91,7 +108,7 @@
         },
         {
             "name": "bust table -- long",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -106,7 +123,7 @@
         },
         {
             "name": "bust table -- csv",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -120,24 +137,8 @@
             ]
         },
         {
-            "name": "Python: Debug Tests",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "cwd": "${workspaceFolder}",
-            "purpose": [
-                "debug-test"
-            ],
-            "stopOnEntry": false,
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "env": {
-                "PYTEST_ADDOPTS": "--no-cov"
-            }
-        },
-        {
             "name": "bust conditioned on protein and ligand -- 1ia1",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -156,7 +157,7 @@
         },
         {
             "name": "bust conditioned on protein -- 1ia1",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -170,7 +171,7 @@
         },
         {
             "name": "bust conditioned on protein -- 1w1p crystal",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -189,7 +190,7 @@
         },
         {
             "name": "bust conditioned on protein -- 1g9v gold",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -210,7 +211,7 @@
         },
         {
             "name": "bust conditioned on protein -- 1gkc",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "posebusters",
@@ -228,6 +229,6 @@
                 "--outfmt",
                 "long",
             ]
-        }
+        },
     ]
 }
