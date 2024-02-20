@@ -1,4 +1,5 @@
 """Module to calculate SuCOS score."""
+from __future__ import annotations
 
 import os
 
