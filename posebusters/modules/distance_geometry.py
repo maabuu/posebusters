@@ -64,7 +64,7 @@ _empty_results = {
 }
 
 
-def check_geometry(
+def check_geometry(  # noqa: PLR0913, PLR0915
     mol_pred: Mol,
     threshold_bad_bond_length: float = 0.2,
     threshold_clash: float = 0.2,
@@ -234,8 +234,8 @@ def _two_bonds_to_angle(bond1: tuple[int, int], bond2: tuple[int, int]) -> None 
     set1 = set(bond1)
     set2 = set(bond2)
     all_atoms = set1 | set2
-    # angle requires two bonds to share exactly one atom
-    if len(all_atoms) != 3:
+    # angle requires two bonds to share exactly one atom, that is we must have 3 atoms
+    if len(all_atoms) != 3:  # noqa: PLR2004
         return None
     # find shared atom
     shared_atom = set1 & set2

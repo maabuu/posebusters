@@ -12,7 +12,7 @@ from ..tools.protein import get_atom_type_mask
 _periodic_table = GetPeriodicTable()
 
 
-def check_intermolecular_distance(
+def check_intermolecular_distance(  # noqa: PLR0913
     mol_pred: Mol,
     mol_cond: Mol,
     radius_type: str = "vdw",

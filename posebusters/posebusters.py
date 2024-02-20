@@ -131,7 +131,7 @@ class PoseBusters:
         """
         self._initialize_modules()
 
-        for i, paths in self.file_paths.iterrows():
+        for _, paths in self.file_paths.iterrows():
             mol_args = {}
             if "mol_cond" in paths and paths["mol_cond"] is not None:
                 mol_cond_load_params = self.config.get("loading", {}).get("mol_cond", {})
@@ -151,15 +151,15 @@ class PoseBusters:
 
                 for name, fname, func, args in zip(self.module_name, self.fname, self.module_func, self.module_args):
                     # pick needed arguments for module
-                    args = {k: v for k, v in mol_args.items() if k in args}
+                    args_needed = {k: v for k, v in mol_args.items() if k in args}
                     # loading takes all inputs
                     if fname == "loading":
-                        args = {k: args.get(k, None) for k in args}
+                        args_needed = {k: args_needed.get(k, None) for k in args_needed}
                     # run module when all needed input molecules are valid Mol objects
-                    if fname != "loading" and not all(args.get(m, None) for m in args):
+                    if fname != "loading" and not all(args_needed.get(m, None) for m in args_needed):
                         module_output: dict[str, Any] = {"results": {}}
                     else:
-                        module_output = func(**args)
+                        module_output = func(**args_needed)
 
                     # save to object
                     self.results[results_key].extend([(name, k, v) for k, v in module_output["results"].items()])

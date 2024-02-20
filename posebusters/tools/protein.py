@@ -62,7 +62,7 @@ def get_atom_type_mask(mol: Mol, ignore_types: Iterable[str]) -> list[bool]:
     ]
 
 
-def _keep_atom(
+def _keep_atom(  # noqa: PLR0913, PLR0911
     atom: Atom, ignore_h: bool, ignore_protein: bool, ignore_org_cof: bool, ignore_inorg_cof: bool, ignore_water: bool
 ) -> bool:
     """Whether to keep atom for given ignore flags."""

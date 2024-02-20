@@ -78,7 +78,7 @@ def check_rmsd(
     return {"results": results}
 
 
-def robust_rmsd(
+def robust_rmsd(  # noqa: PLR0913
     mol_probe: Mol,
     mol_ref: Mol,
     conf_id_probe: int = -1,
