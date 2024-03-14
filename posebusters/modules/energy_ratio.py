@@ -47,7 +47,7 @@ def check_energy_ratio(
             average. Defaults to 100.
         inchi_strict: Whether to treat warnings in the InChI generation as errors. Defaults to False.
         ratio_passes_on_exception: Whether the energy ratio test will pass upon an energy calculation
-            exception. Defaults to False.
+            exception. Defaults to True.
 
     Returns:
         PoseBusters results dictionary.
@@ -89,7 +89,7 @@ def check_energy_ratio(
     except Exception as e:
         logger.warning("Failed to calculate prediction conformation energy for %s: %s", inchi, e)
         pred_factor = np.nan
-        ratio_passes = ratio_passes_on_exception
+        ratio_passes = ratio_passes_on_exception if ratio_passes_on_exception else np.nan
 
     results = {
         "ensemble_avg_energy": avg_energy,
