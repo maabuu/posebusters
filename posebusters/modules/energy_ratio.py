@@ -36,6 +36,7 @@ def check_energy_ratio(
     threshold_energy_ratio: float = 7.0,
     ensemble_number_conformations: int = 100,
     inchi_strict: bool = False,
+    ratio_passes_on_exception: bool = True,
 ):
     """Check whether the energy of the docked ligand is within user defined range.
 
@@ -45,6 +46,8 @@ def check_energy_ratio(
         ensemble_number_conformations: Number of conformations to generate for the ensemble over which to
             average. Defaults to 100.
         inchi_strict: Whether to treat warnings in the InChI generation as errors. Defaults to False.
+        ratio_passes_on_exception: Whether the energy ratio test will pass upon an energy calculation
+            exception. Defaults to False.
 
     Returns:
         PoseBusters results dictionary.
@@ -80,8 +83,13 @@ def check_energy_ratio(
         logger.warning("Failed to calculate ensemble conformation energy for %s: %s", inchi, e)
         avg_energy = np.nan
 
-    pred_factor = conf_energy / avg_energy
-    ratio_passes = pred_factor <= threshold_energy_ratio
+    try:
+        pred_factor = conf_energy / avg_energy
+        ratio_passes = pred_factor <= threshold_energy_ratio
+    except Exception as e:
+        logger.warning("Failed to calculate prediction conformation energy for %s: %s", inchi, e)
+        pred_factor = np.nan
+        ratio_passes = ratio_passes_on_exception
 
     results = {
         "ensemble_avg_energy": avg_energy,
