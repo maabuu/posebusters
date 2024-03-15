@@ -180,3 +180,8 @@ def mol_lig_7ztl_bcn():
 @pytest.fixture
 def mol_cond_7ztl_bcn():
     return MolFromPDBFile("tests/conftest/7ZTL_BCN/7ZTL_BCN_protein.pdb", sanitize=False, proximityBonding=False)
+
+
+@pytest.fixture
+def mol_disconnnected_atoms():
+    return MolFromMolFile("tests/conftest/mol_disconnected_atoms.sdf", sanitize=True)

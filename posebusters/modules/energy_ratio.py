@@ -1,4 +1,5 @@
 """Module to check energy of ligand conformations."""
+
 from __future__ import annotations
 
 import logging
@@ -78,6 +79,10 @@ def check_energy_ratio(
         avg_energy = float(get_average_energy(inchi, ensemble_number_conformations))
     except Exception as e:
         logger.warning("Failed to calculate ensemble conformation energy for %s: %s", inchi, e)
+        avg_energy = np.nan
+
+    if avg_energy == 0:
+        logger.warning("Average energy of molecule is 0 for %s", inchi)
         avg_energy = np.nan
 
     pred_factor = conf_energy / avg_energy

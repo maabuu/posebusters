@@ -16,3 +16,8 @@ def test_check_energy_ratio_approximate_consistency(mol_1a30_clash_2, mol_1a30_c
 
     # check numbers are approximately equal
     assert np.isclose(energy_2, energy_3)
+
+
+def test_check_energy_ratio_disconnected_atoms(mol_disconnnected_atoms):
+    out = check_energy_ratio(mol_disconnnected_atoms)
+    assert out["results"]["energy_ratio_passes"] is False
