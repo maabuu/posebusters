@@ -80,8 +80,13 @@ def check_energy_ratio(
         logger.warning("Failed to calculate ensemble conformation energy for %s: %s", inchi, e)
         avg_energy = np.nan
 
-    pred_factor = conf_energy / avg_energy
-    ratio_passes = pred_factor <= threshold_energy_ratio
+    try:
+        pred_factor = conf_energy / avg_energy
+        ratio_passes = pred_factor <= threshold_energy_ratio
+    except Exception as e:
+        logger.warning("Failed to calculate prediction conformation energy for %s: %s", inchi, e)
+        pred_factor = np.nan
+        ratio_passes = np.nan
 
     results = {
         "ensemble_avg_energy": avg_energy,
