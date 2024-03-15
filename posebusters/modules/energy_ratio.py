@@ -1,4 +1,5 @@
 """Module to check energy of ligand conformations."""
+
 from __future__ import annotations
 
 import logging
@@ -80,13 +81,12 @@ def check_energy_ratio(
         logger.warning("Failed to calculate ensemble conformation energy for %s: %s", inchi, e)
         avg_energy = np.nan
 
-    try:
-        pred_factor = conf_energy / avg_energy
-        ratio_passes = pred_factor <= threshold_energy_ratio
-    except Exception as e:
-        logger.warning("Failed to calculate prediction conformation energy for %s: %s", inchi, e)
-        pred_factor = np.nan
-        ratio_passes = np.nan
+    if avg_energy == 0:
+        logger.warning("Average energy of molecule is 0 for %s", inchi)
+        avg_energy = np.nan
+
+    pred_factor = conf_energy / avg_energy
+    ratio_passes = pred_factor <= threshold_energy_ratio
 
     results = {
         "ensemble_avg_energy": avg_energy,
