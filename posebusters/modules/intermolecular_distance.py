@@ -1,4 +1,5 @@
 """Module to check intermolecular distances between ligand and protein."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -46,8 +47,8 @@ def check_intermolecular_distance(  # noqa: PLR0913
     atoms_ligand = np.array([a.GetSymbol() for a in mol_pred.GetAtoms()])
     atoms_protein_all = np.array([a.GetSymbol() for a in mol_cond.GetAtoms()])
 
-    idxs_ligand = np.arange(len(atoms_ligand))
-    idxs_protein = np.arange(len(atoms_protein_all))
+    idxs_ligand = np.array([a.GetIdx() for a in mol_pred.GetAtoms()])
+    idxs_protein = np.array([a.GetIdx() for a in mol_cond.GetAtoms()])
 
     mask = [a.GetSymbol() != "H" for a in mol_pred.GetAtoms()]
     coords_ligand = coords_ligand[mask, :]
@@ -60,17 +61,11 @@ def check_intermolecular_distance(  # noqa: PLR0913
         mask_protein_idxs = idxs_protein[mask]
 
     # get radii
-    if radius_type == "vdw":
-        radius_ligand = np.array([_periodic_table.GetRvdw(a) for a in atoms_ligand])
-        radius_protein_all = np.array([_periodic_table.GetRvdw(a) for a in atoms_protein_all])
-    elif radius_type == "covalent":
-        radius_ligand = np.array([_periodic_table.GetRcovalent(a) for a in atoms_ligand])
-        radius_protein_all = np.array([_periodic_table.GetRcovalent(a) for a in atoms_protein_all])
-    else:
-        raise ValueError(f"Unknown radius type {radius_type}. Valid values are 'vdw' and 'covalent'.")
+    radius_ligand = _get_radii(atoms_ligand, radius_type)
+    radius_protein_all = _get_radii(atoms_protein_all, radius_type)
 
-    distances_all = _pairwise_distance(coords_ligand, coords_protein)
     # select atoms that are close to ligand to check for clash
+    distances_all = _pairwise_distance(coords_ligand, coords_protein)
     mask_protein = distances_all.min(axis=0) <= search_distance
     distances = distances_all[:, mask_protein]
     radius_protein = radius_protein_all[mask_protein]
@@ -109,6 +104,7 @@ def check_intermolecular_distance(  # noqa: PLR0913
         "no_clashes": not details["clash"].any(),
     }
 
+    # add most extreme values to results table
     i = np.argmin(details["relative_distance"]) if len(details) > 0 else None
     most_extreme = {"most_extreme_" + c: details.loc[i][str(c)] if i is not None else pd.NA for c in details.columns}
     results = {**results, **most_extreme}
@@ -118,3 +114,12 @@ def check_intermolecular_distance(  # noqa: PLR0913
 
 def _pairwise_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return np.linalg.norm(x[:, None, :] - y[None, :, :], axis=-1)
+
+
+def _get_radii(atoms: np.ndarray, radius_type: str) -> np.ndarray:
+    if radius_type == "vdw":
+        return np.array([_periodic_table.GetRvdw(a) for a in atoms])
+    elif radius_type == "covalent":
+        return np.array([_periodic_table.GetRcovalent(a) for a in atoms])
+    else:
+        raise ValueError(f"Unknown radius type {radius_type}. Valid values are 'vdw' and 'covalent'.")
