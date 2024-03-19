@@ -46,14 +46,18 @@ def check_intermolecular_distance(  # noqa: PLR0913
     atoms_ligand = np.array([a.GetSymbol() for a in mol_pred.GetAtoms()])
     atoms_protein_all = np.array([a.GetSymbol() for a in mol_cond.GetAtoms()])
 
+    idxs_ligand = np.arange(len(atoms_ligand))
+    idxs_protein = np.arange(len(atoms_protein_all))
+
     mask = [a.GetSymbol() != "H" for a in mol_pred.GetAtoms()]
     coords_ligand = coords_ligand[mask, :]
     atoms_ligand = atoms_ligand[mask]
-
+    mask_ligand_idxs = idxs_ligand[mask]
     if ignore_types:
         mask = get_atom_type_mask(mol_cond, ignore_types)
         coords_protein = coords_protein[mask, :]
         atoms_protein_all = atoms_protein_all[mask]
+        mask_protein_idxs = idxs_protein[mask]
 
     # get radii
     if radius_type == "vdw":
@@ -66,12 +70,12 @@ def check_intermolecular_distance(  # noqa: PLR0913
         raise ValueError(f"Unknown radius type {radius_type}. Valid values are 'vdw' and 'covalent'.")
 
     distances_all = _pairwise_distance(coords_ligand, coords_protein)
-
     # select atoms that are close to ligand to check for clash
     mask_protein = distances_all.min(axis=0) <= search_distance
     distances = distances_all[:, mask_protein]
     radius_protein = radius_protein_all[mask_protein]
     atoms_protein = atoms_protein_all[mask_protein]
+    mask_protein_idxs = mask_protein_idxs[mask_protein]
 
     radius_sum = radius_ligand[:, None] + radius_protein[None, :]
     relative_distance = distances / radius_sum
@@ -81,11 +85,13 @@ def check_intermolecular_distance(  # noqa: PLR0913
         violations[np.unravel_index(distances.argmin(), distances.shape)] = True  # add smallest distances as info
         violations[np.unravel_index(relative_distance.argmin(), relative_distance.shape)] = True
     violation_ligand, violation_protein = np.where(violations)
+    reverse_ligand_idxs = mask_ligand_idxs[violation_ligand]
+    reverse_protein_idxs = mask_protein_idxs[violation_protein]
 
     # collect details around those violations in a dataframe
     details = pd.DataFrame()
-    details["ligand_atom_id"] = violation_ligand
-    details["protein_atom_id"] = violation_protein
+    details["ligand_atom_id"] = reverse_ligand_idxs
+    details["protein_atom_id"] = reverse_protein_idxs
     details["ligand_element"] = [atoms_ligand[i] for i in violation_ligand]
     details["protein_element"] = [atoms_protein[i] for i in violation_protein]
     details["ligand_vdw"] = [radius_ligand[i] for i in violation_ligand]
