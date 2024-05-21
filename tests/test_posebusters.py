@@ -27,6 +27,10 @@ mol_smaller = "tests/conftest/2HA2_SCK_2HA3_CHT/2HA2_SCK_2HA3_CHT_smaller_ligand
 mol_larger = "tests/conftest/2HA2_SCK_2HA3_CHT/2HA2_SCK_2HA3_CHT_larger_ligand.sdf"
 mol_cond_smaller = "tests/conftest/2HA2_SCK_2HA3_CHT/2HA2_SCK_2HA3_CHT_smaller_receptor.pdb"
 
+mol_true_5ze6 = "tests/conftest/5ze6/5ze6_true.mol2"
+mol_pred_5ze6 = "tests/conftest/5ze6/5ze6_pred.sdf"
+mol_cond_5ze6 = "tests/conftest/5ze6/5ze6_cond.pdb"
+
 
 def test_bust_redocks_1ia1() -> None:
     posebusters = PoseBusters("redock")
@@ -38,6 +42,14 @@ def test_bust_redocks_1w1p() -> None:
     posebusters = PoseBusters("redock")
     df = posebusters.bust([mol_pred_1w1p], mol_true_1w1p, mol_cond_1w1p)
     assert df.all(axis=1).values[0]
+
+
+def test_bust_redocks_5ze6() -> None:
+    # check that mol2 files as true molecule can be loaded
+
+    posebusters = PoseBusters("redock")
+    df = posebusters.bust([mol_pred_5ze6], mol_true_5ze6, mol_cond_5ze6)
+    assert df["mol_true_loaded"].all()
 
 
 def test_bust_docks() -> None:
