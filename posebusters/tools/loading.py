@@ -84,21 +84,22 @@ def _load_mol(  # noqa: PLR0913
     removeHs=False,
     strictParsing=False,
     proximityBonding=False,
-    cleanupSubstructures=False,
+    cleanupSubstructures=True,
     **params,
 ) -> Mol | None:
-    """Load one molecule from a file, picking the right RDKit function."""
+    """Load molecule(s) from a file, picking the right RDKit function."""
+
     if load_all and path.suffix == ".sdf":
         mol = _load_and_combine_mols(path, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
-    elif load_all:
-        raise ValueError("Can only load multiple conformations from SDF file. Turn off `load_all` option.")
     elif path.suffix == ".sdf":
         mol = MolFromMolFile(str(path), sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
     elif path.suffix == ".mol2":
+        # only loads first molecule from mol2 file
         mol = MolFromMol2File(str(path), sanitize=False, removeHs=removeHs, cleanupSubstructures=cleanupSubstructures)
     elif path.suffix == ".pdb":
         mol = MolFromPDBFile(str(path), sanitize=False, removeHs=removeHs, proximityBonding=proximityBonding)
     elif path.suffix == ".mol":
+        # only loads first molecule from mol file
         block = "".join(open(path).readlines()).strip() + "\nM  END"
         mol = MolFromMolBlock(block, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
     else:
