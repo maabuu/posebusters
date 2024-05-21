@@ -1,4 +1,5 @@
 """Provides functions for loading molecules from files."""
+
 from __future__ import annotations
 
 import logging
