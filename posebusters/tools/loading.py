@@ -170,15 +170,15 @@ def _assign_bond_order(mol: Mol, smiles) -> Mol:
 
 
 def _cleanup(mol: Mol) -> Mol:
-    mol = Cleanup(mol)
+    Cleanup(mol)
     if mol is None:
         raise ValueError("Could not cleanup molecule.")
     return mol
 
 
 def _sanitize(mol: Mol) -> Mol:
-    mol = SanitizeMol(mol)
-    if mol is None:
+    flags = SanitizeMol(mol)
+    if mol is None or flags != 0:
         raise ValueError("Could not sanitize molecule.")
     return mol
 
