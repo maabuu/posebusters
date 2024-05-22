@@ -94,12 +94,14 @@ def _load_mol(  # noqa: PLR0913
     elif path.suffix == ".sdf":
         mol = MolFromMolFile(str(path), sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
     elif path.suffix == ".mol2":
-        # only loads first molecule from mol2 file
+        # MolFromMol2File only loads first molecule from mol2 file
+        if load_all and sum(ln.strip().startswith("@<TRIPOS>MOLECULE") for ln in open(path).readlines()) > 1:
+            logger.error("Cannot load multiple molecules from mol2 file, only loading first.")
         mol = MolFromMol2File(str(path), sanitize=False, removeHs=removeHs, cleanupSubstructures=cleanupSubstructures)
     elif path.suffix == ".pdb":
         mol = MolFromPDBFile(str(path), sanitize=False, removeHs=removeHs, proximityBonding=proximityBonding)
     elif path.suffix == ".mol":
-        # only loads first molecule from mol file
+        # .mol files only contain one molecule
         block = "".join(open(path).readlines()).strip() + "\nM  END"
         mol = MolFromMolBlock(block, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
     else:
