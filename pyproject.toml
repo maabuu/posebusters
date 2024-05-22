@@ -92,7 +92,7 @@ testpaths = "tests"
 all = false
 
 [tool.codespell]
-skip = '*.pdb,*.sdf,*.po,*.ts'
+skip = '*.pdb,*.mol2,*.sdf,*.po,*.ts'
 count = ''
 quiet-level = 3
 
