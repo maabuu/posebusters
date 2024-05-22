@@ -16,14 +16,14 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
 ]
-requires-python = "~=3.7"
+requires-python = "~=3.8"
 dynamic = ["version", "description"]
 dependencies = ['rdkit >= 2020.09', 'pandas', 'numpy', 'pyyaml']
 
@@ -92,7 +92,7 @@ testpaths = "tests"
 all = false
 
 [tool.codespell]
-skip = '*.pdb,*.sdf,*.po,*.ts'
+skip = '*.pdb,*.mol2,*.sdf,*.po,*.ts'
 count = ''
 quiet-level = 3
 

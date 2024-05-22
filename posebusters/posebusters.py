@@ -1,4 +1,5 @@
 """PoseBusters class for running all tests on a set of molecules."""
+
 from __future__ import annotations
 
 import inspect
@@ -73,9 +74,9 @@ class PoseBusters:
 
     def bust(
         self,
-        mol_pred: Iterable[Mol | Path] | Mol | Path,
-        mol_true: Mol | Path | None = None,
-        mol_cond: Mol | Path | None = None,
+        mol_pred: Iterable[Mol | Path | str] | Mol | Path | str,
+        mol_true: Mol | Path | str | None = None,
+        mol_cond: Mol | Path | str | None = None,
         full_report: bool = False,
     ) -> pd.DataFrame:
         """Run tests on one or more molecules.

@@ -1,4 +1,5 @@
 """Provides functions for loading molecules from files."""
+
 from __future__ import annotations
 
 import logging
@@ -83,21 +84,24 @@ def _load_mol(  # noqa: PLR0913
     removeHs=False,
     strictParsing=False,
     proximityBonding=False,
-    cleanupSubstructures=False,
+    cleanupSubstructures=True,
     **params,
 ) -> Mol | None:
-    """Load one molecule from a file, picking the right RDKit function."""
+    """Load molecule(s) from a file, picking the right RDKit function."""
+
     if load_all and path.suffix == ".sdf":
         mol = _load_and_combine_mols(path, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
-    elif load_all:
-        raise ValueError("Can only load multiple conformations from SDF file. Turn off `load_all` option.")
     elif path.suffix == ".sdf":
         mol = MolFromMolFile(str(path), sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
     elif path.suffix == ".mol2":
+        # MolFromMol2File only loads first molecule from mol2 file
+        if load_all and sum(ln.strip().startswith("@<TRIPOS>MOLECULE") for ln in open(path).readlines()) > 1:
+            logger.error("Cannot load multiple molecules from mol2 file, only loading first.")
         mol = MolFromMol2File(str(path), sanitize=False, removeHs=removeHs, cleanupSubstructures=cleanupSubstructures)
     elif path.suffix == ".pdb":
         mol = MolFromPDBFile(str(path), sanitize=False, removeHs=removeHs, proximityBonding=proximityBonding)
     elif path.suffix == ".mol":
+        # .mol files only contain one molecule
         block = "".join(open(path).readlines()).strip() + "\nM  END"
         mol = MolFromMolBlock(block, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
     else:
@@ -169,15 +173,15 @@ def _assign_bond_order(mol: Mol, smiles) -> Mol:
 
 
 def _cleanup(mol: Mol) -> Mol:
-    mol = Cleanup(mol)
+    Cleanup(mol)
     if mol is None:
         raise ValueError("Could not cleanup molecule.")
     return mol
 
 
 def _sanitize(mol: Mol) -> Mol:
-    mol = SanitizeMol(mol)
-    if mol is None:
+    flags = SanitizeMol(mol)
+    if mol is None or flags != 0:
         raise ValueError("Could not sanitize molecule.")
     return mol
 
