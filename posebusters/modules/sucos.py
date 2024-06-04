@@ -69,6 +69,7 @@ def get_sucos_score(
         SuCOS score.
 
     Notes:
+        SuCOS described in https://chemrxiv.org/engage/chemrxiv/article-details/60c741a99abda23230f8bed5
         Adapted from https://github.com/MarcMoesser/SuCOS/blob/master/calc_SuCOS_normalized.py
     """
 
