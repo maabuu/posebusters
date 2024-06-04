@@ -185,3 +185,13 @@ def mol_cond_7ztl_bcn():
 @pytest.fixture
 def mol_disconnnected_atoms():
     return MolFromMolFile("tests/conftest/mol_disconnected_atoms.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_small_7brv_f5r_7wb6_f5r():
+    return MolFromMolFile("tests/conftest/7BRV_F5R_7WB6_F5R/7BRV_F5R_7WB6_F5R_smaller_ligand.sdf", removeHs=True)
+
+
+@pytest.fixture
+def mol_large_7brv_f5r_7wb6_f5r():
+    return MolFromMolFile("tests/conftest/7BRV_F5R_7WB6_F5R/7BRV_F5R_7WB6_F5R_larger_ligand.sdf", removeHs=True)
