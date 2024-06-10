@@ -249,5 +249,24 @@
                 "long",
             ]
         },
+        {
+            "name": "bust -- memory problem",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/1W1P_GIO/1W1P_GIO_ligand.sdf",
+                "-l",
+                "tests/conftest/1W1P_GIO/1W1P_GIO_ligands.sdf",
+                "-p",
+                "tests/conftest/1W1P_GIO/1W1P_GIO_protein.pdb",
+                "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        },
     ]
 }

@@ -34,6 +34,9 @@ def safe_load_mol(path: Path, load_all: bool = False, **load_params) -> Mol | No
     Returns:
         Molecule object or None if loading failed.
     """
+    if isinstance(path, Mol):
+        return path
+
     try:
         path = _check_path(path)
         with CaptureLogger():
