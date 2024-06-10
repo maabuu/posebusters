@@ -1,6 +1,6 @@
 import math
 
-from rdkit.Chem.rdmolfiles import MolFromSmiles
+from rdkit.Chem.rdmolfiles import MolFromMolFile, MolFromPDBFile, MolFromSmiles
 
 from posebusters import PoseBusters
 
@@ -107,3 +107,16 @@ def test_bust_gen() -> None:
     posebusters = PoseBusters("gen")
     result = posebusters.bust(mol_pred=mol_larger, mol_true=mol_smaller, mol_cond=mol_cond_smaller, full_report=True)
     assert result["sucos"][0] > 0.2
+
+
+def test_bust_loaded_mols() -> None:
+    posebuster = PoseBusters("redock")
+
+    mol_pred = MolFromMolFile(mol_pred_1ia1)
+    mol_true = MolFromMolFile(mol_true_1ia1)
+    mol_cond = MolFromPDBFile(mol_cond_1ia1)
+
+    df = posebuster.bust([mol_pred], mol_true, mol_cond)
+    assert df["mol_pred_loaded"].all()
+    assert df["mol_true_loaded"].all()
+    assert df["mol_cond_loaded"].all()
