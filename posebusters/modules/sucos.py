@@ -41,15 +41,15 @@ def get_feature_map_score(
         Landrum Greg, 2023: https://greglandrum.github.io/rdkit-blog/posts/2023-02-24-using-feature-maps.html
     """
 
-    # raw features
+    # list features
     features_small = [f for f in FACTORY.GetFeaturesForMol(mol_small, confId=conf_id_small) if f.GetFamily() in KEEP]
     features_large = [f for f in FACTORY.GetFeaturesForMol(mol_large, confId=conf_id_large) if f.GetFamily() in KEEP]
 
-    # feature map based on small molecule
+    # create feature map based on small molecule
     feature_map = FeatMaps.FeatMap(feats=features_small, weights=[1] * len(features_small), params=PARAMETERS)
     feature_map.scoreMode = FeatMaps.FeatMapScoreMode.Best
 
-    # score feature in large molecule present in small molecule
+    # score features of large molecule present in small molecule
     feature_map_score = feature_map.ScoreFeats(features_large) / min(feature_map.GetNumFeatures(), len(features_large))
 
     return feature_map_score
