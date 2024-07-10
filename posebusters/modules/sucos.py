@@ -108,6 +108,7 @@ def get_sucos_score(
     else:
         sucos_score = shape_overlap
 
+    sucos_score = min(max(0.0, sucos_score), 1.0)  # clipping
     return sucos_score
 
 
