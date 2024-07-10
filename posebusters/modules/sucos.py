@@ -95,8 +95,9 @@ def get_sucos_score(
         vdwScale=0.8,
         ignoreHs=True,
     )
-    sucos_score = float(0.5 * feature_map_score + 0.5 * (1 - protrusion_distance))
+    shape_overlap = max(1 - protrusion_distance, 0)
 
+    sucos_score = 0.5 * feature_map_score + 0.5 * shape_overlap
     return sucos_score
 
 
