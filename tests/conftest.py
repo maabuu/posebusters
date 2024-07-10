@@ -195,3 +195,33 @@ def mol_small_7brv_f5r_7wb6_f5r():
 @pytest.fixture
 def mol_large_7brv_f5r_7wb6_f5r():
     return MolFromMolFile("tests/conftest/7BRV_F5R_7WB6_F5R/7BRV_F5R_7WB6_F5R_larger_ligand.sdf", removeHs=True)
+
+
+@pytest.fixture
+def mol_065():
+    return MolFromMolFile("tests/conftest/mol_065_ideal.sdf")
+
+
+@pytest.fixture
+def mol_065_left():
+    return MolFromMolFile("tests/conftest/mol_065_left.sdf")
+
+
+@pytest.fixture
+def mol_065_right():
+    return MolFromMolFile("tests/conftest/mol_065_right.sdf")
+
+
+@pytest.fixture
+def mol_TMO():
+    return MolFromMolFile("tests/conftest/mol_TMO.sdf")
+
+
+@pytest.fixture
+def mol_2YU():
+    return MolFromMolFile("tests/conftest/mol_2YU.mol")
+
+
+@pytest.fixture
+def mol_HQT():
+    return MolFromMolFile("tests/conftest/mol_HQT.mol")
