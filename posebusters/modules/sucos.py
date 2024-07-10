@@ -34,8 +34,11 @@ def get_feature_map_score(
 ) -> float:
     """Calculate the feature map score between two molecules.
 
-    Good introduction:
-        https://greglandrum.github.io/rdkit-blog/posts/2023-02-24-using-feature-maps.html
+    References:
+        Putta et al, 2005: https://pubs.acs.org/doi/abs/10.1021/jm049066l
+        Landrum et al, 2007: https://link.springer.com/article/10.1007/s10822-006-9085-8
+        Landrum Greg, 2017: https://rdkit.blogspot.com/2017/11/using-feature-maps.html
+        Landrum Greg, 2023: https://greglandrum.github.io/rdkit-blog/posts/2023-02-24-using-feature-maps.html
     """
 
     # raw features
@@ -68,9 +71,9 @@ def get_sucos_score(
     Returns:
         SuCOS score.
 
-    Notes:
-        SuCOS described in https://chemrxiv.org/engage/chemrxiv/article-details/60c741a99abda23230f8bed5
-        Adapted from https://github.com/MarcMoesser/SuCOS/blob/master/calc_SuCOS_normalized.py
+    References:
+        Leung et al, 2019: https://chemrxiv.org/engage/chemrxiv/article-details/60c741a99abda23230f8bed5
+        Moesser, Marc: https://github.com/MarcMoesser/SuCOS/blob/master/calc_SuCOS_normalized.py
     """
 
     # explicit or implicit hydrogens should be same for both molecules
