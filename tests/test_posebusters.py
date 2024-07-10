@@ -21,7 +21,7 @@ mol_pred_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_ligand.sdf"
 mol_true_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_ligands.sdf"
 mol_cond_7w2p = "tests/conftest/7W2P_8AI/7W2P_8AI_no_ligand_no_solvent.pdb"
 
-mol_single_h = "tests/conftest/single_hydrogen.sdf"
+mol_single_h = "tests/conftest/mol_single_hydrogen.sdf"
 
 mol_smaller = "tests/conftest/2HA2_SCK_2HA3_CHT/2HA2_SCK_2HA3_CHT_smaller_ligand.sdf"
 mol_larger = "tests/conftest/2HA2_SCK_2HA3_CHT/2HA2_SCK_2HA3_CHT_larger_ligand.sdf"
