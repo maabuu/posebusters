@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import numpy as np
 import pytest
 from rdkit.Chem.rdmolops import AddHs, RemoveHs
 
@@ -50,7 +49,7 @@ def test_get_sucos_score_065(mol_065, mol_065_left, mol_065_right):
 def test_get_sucos_score_TMO(mol_TMO):
     # this molecule has no features
     out = check_sucos(mol_TMO, mol_TMO)
-    assert np.isnan(out["results"]["sucos"])
+    assert out["results"]["sucos"] == 1.0
 
 
 def test_get_sucos_score_2YU_HQT(mol_2YU, mol_HQT):

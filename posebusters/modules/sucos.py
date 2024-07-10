@@ -50,9 +50,14 @@ def get_feature_map_score(
     feature_map.scoreMode = FeatMaps.FeatMapScoreMode.Best
 
     # score features of large molecule present in small molecule
-    feature_map_score = feature_map.ScoreFeats(features_large) / min(feature_map.GetNumFeatures(), len(features_large))
+    feature_score = feature_map.ScoreFeats(features_large)
 
-    return feature_map_score
+    # normalize score
+    normalization_constant = min(feature_map.GetNumFeatures(), len(features_large))
+    if normalization_constant > 0:
+        return feature_score / normalization_constant
+
+    return np.nan
 
 
 def get_sucos_score(
@@ -97,7 +102,12 @@ def get_sucos_score(
     )
     shape_overlap = max(1 - protrusion_distance, 0)
 
-    sucos_score = 0.5 * feature_map_score + 0.5 * shape_overlap
+    # if no features, base on shape alone
+    if not np.isnan(feature_map_score):
+        sucos_score = 0.5 * feature_map_score + 0.5 * shape_overlap
+    else:
+        sucos_score = shape_overlap
+
     return sucos_score
 
 
