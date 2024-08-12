@@ -8,7 +8,7 @@ from functools import lru_cache
 
 import numpy as np
 from rdkit import ForceField  # noqa: F401
-from rdkit.Chem.inchi import InchiReadWriteError, MolFromInchi, MolToInchi
+from rdkit.Chem.inchi import InchiReadWriteError, MolFromInchi
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdDistGeom import EmbedMultipleConfs, ETKDGv3
 from rdkit.Chem.rdForceFieldHelpers import (
@@ -17,6 +17,7 @@ from rdkit.Chem.rdForceFieldHelpers import (
 )
 from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D
 
+from ..tools.inchi import get_inchi
 from ..tools.logging import CaptureLogger
 from ..tools.molecules import assert_sanity
 
@@ -95,16 +96,6 @@ def check_energy_ratio(
         "energy_ratio_passes": ratio_passes,
     }
     return {"results": results}
-
-
-def get_inchi(mol: Mol, inchi_strict: bool = False) -> str:
-    """Prepare and check InChI of a molecule."""
-    with CaptureLogger() as log:
-        inchi = MolToInchi(mol, treatWarningAsError=inchi_strict)
-        # check inchi because inchi generation does not raise an error if the inchi is invalid
-        if MolFromInchi(inchi, sanitize=True) is None:
-            raise Exception(log["ERROR"].split("ERROR: ")[-1])
-    return inchi
 
 
 @lru_cache(maxsize=None)
