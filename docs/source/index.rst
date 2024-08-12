@@ -134,24 +134,26 @@ Docking methods comparison
 ====================================
 
 .. _preprint: https://arxiv.org/abs/2308.05777
+.. _paper: https://doi.org/10.1039/D3SC04185A
 
-For more detailed information about the tests and for a study using PoseBusters to compare docking methods, refer to our `preprint`_:
+For more detailed information about the tests and for a study using PoseBusters to compare docking methods, refer to our `paper`_:
 
 .. code-block:: bibtex
 
-   @online{buttenschoen2023posebusters,
+   @article{buttenschoen2023posebusters,
       title = {{{PoseBusters}}: {{AI-based}} Docking Methods Fail to Generate Physically Valid Poses or Generalise to Novel Sequences},
       shorttitle = {{{PoseBusters}}},
       author = {Buttenschoen, Martin and Morris, Garrett M. and Deane, Charlotte M.},
-      date = {2023-08-10},
-      eprint = {2308.05777},
-      eprinttype = {arxiv}
+      year = "2023",
+      publisher = "The Royal Society of Chemistry",
+      doi = "10.1039/D3SC04185A",
+      url = "http://dx.doi.org/10.1039/D3SC04185A",
    }
 
 Sample checks
 ====================================
 
-For more information on the checks, see :ref:`checks`.
+For more examples and information on the checks, see :ref:`checks`.
 
 +---------------------------------------------+----------------------------------------+
 | Steric clash                                                                         |
@@ -184,7 +186,7 @@ For more information on the checks, see :ref:`checks`.
 +---------------------------------------------+----------------------------------------+
 
 
-For more information on the checks, see :ref:`checks`.
+For more examples and information on the checks, see :ref:`checks`.
 
 Contents
 ====================================
