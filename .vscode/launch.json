@@ -268,5 +268,85 @@
                 "long",
             ]
         },
+        {
+            "name": "bust -- conversion failed -- 14gs_0",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/mol_14gs_0_out.sdf",
+                "--config=posebusters/config/mol.yml",
+                // "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust -- conversion failed -- 1afs_87",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/mol_1afs_87_out.sdf",
+                "--config=posebusters/config/mol.yml",
+                // "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust -- conversion failed -- 1afs_94",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/mol_1afs_94_out.sdf",
+                "--config=posebusters/config/mol.yml",
+                // "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust -- conversion failed -- 1jn2_3",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/mol_1jn2_3_out.sdf",
+                "--config=posebusters/config/mol.yml",
+                // "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        },
+        {
+            "name": "bust -- conversion failed -- 1jn2_62",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "module": "posebusters",
+            "justMyCode": true,
+            "stopOnEntry": false,
+            "args": [
+                "tests/conftest/mol_1jn2_62_out.sdf",
+                "--config=posebusters/config/mol.yml",
+                // "--full-report",
+                "--outfmt",
+                "long",
+            ]
+        },
     ]
 }
