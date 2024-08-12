@@ -120,3 +120,48 @@ def test_bust_loaded_mols() -> None:
     assert df["mol_pred_loaded"].all()
     assert df["mol_true_loaded"].all()
     assert df["mol_cond_loaded"].all()
+
+
+def test_check_energy_ratio_14gs_0(mol_pred_14gs_gen0):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_14gs_gen0)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()
+
+
+def test_check_energy_ratio_1afs_87(mol_pred_1afs_gen87):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_1afs_gen87)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()
+
+
+def test_check_energy_ratio_1afs_94(mol_pred_1afs_gen94):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_1afs_gen94)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()
+
+
+def test_check_energy_ratio_1jn2_3(mol_pred_1jn2_gen3):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_1jn2_gen3)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()
+
+
+def test_check_energy_ratio_1jn2_62(mol_pred_1jn2_gen62):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_1jn2_gen62)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()
