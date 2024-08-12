@@ -132,7 +132,7 @@ def _load_and_combine_mols(path: Path, sanitize=True, removeHs=True, strictParsi
     """Load mols from SDF file and combine into one molecule."""
     supplier = SDMolSupplier(str(path), sanitize=sanitize, removeHs=removeHs, strictParsing=strictParsing)
 
-    # warning: combines molecules within checking identity or atom order
+    # warning: combines molecules without checking identity or atom order
     mol = next(supplier)
     while mol is None and supplier.atEnd() is False:
         mol = next(supplier)
