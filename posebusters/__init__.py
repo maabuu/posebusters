@@ -7,13 +7,19 @@ from posebusters.modules.identity import check_identity
 from posebusters.modules.intermolecular_distance import check_intermolecular_distance
 from posebusters.modules.loading import check_loading
 from posebusters.modules.rmsd import check_rmsd
-from posebusters.modules.sanity import check_chemistry
+from posebusters.modules.sanity import (
+    check_all_atoms_connected,
+    check_chemistry_using_inchi,
+    check_chemistry_using_rdkit,
+)
 from posebusters.modules.volume_overlap import check_volume_overlap
 from posebusters.posebusters import PoseBusters
 
 __all__ = [
     "PoseBusters",
-    "check_chemistry",
+    "check_all_atoms_connected",
+    "check_chemistry_using_inchi",
+    "check_chemistry_using_rdkit",
     "check_energy_ratio",
     "check_flatness",
     "check_geometry",
