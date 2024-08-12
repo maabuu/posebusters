@@ -7,12 +7,22 @@ modules:
     rename_outputs:
       mol_pred_loaded: "MOL_PRED loaded"
   - name: "Chemistry"
-    function: sanity
+    function: rdkit_sanity
     chosen_binary_test_output:
       - passes_rdkit_sanity_checks
+    rename_outputs:
+      passes_rdkit_sanity_checks: "RDKit sanitization"
+  - name: "Chemistry"
+    function: inchi_convertible
+    chosen_binary_test_output:
+      - inchi_convertible
+    rename_outputs:
+      inchi_convertible: "InChI convertible"
+  - name: "Chemistry"
+    function: atoms_connected
+    chosen_binary_test_output:
       - all_atoms_connected
     rename_outputs:
-      passes_rdkit_sanity_checks: "Sanitization"
       all_atoms_connected: "All atoms connected"
   - name: "Geometry"
     function: "distance_geometry"
@@ -67,6 +77,7 @@ modules:
     parameters:
       threshold_energy_ratio: 100.0
       ensemble_number_conformations: 50
+      inchi_strict: False
     chosen_binary_test_output:
       - energy_ratio_passes
     rename_outputs:

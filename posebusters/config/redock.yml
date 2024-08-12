@@ -11,13 +11,21 @@ modules:
       mol_true_loaded: "MOL_TRUE loaded"
       mol_cond_loaded: "MOL_COND loaded"
   - name: "Chemistry"
-    function: sanity
+    function: rdkit_sanity
     chosen_binary_test_output:
       - passes_rdkit_sanity_checks
-      - all_atoms_connected
     rename_outputs:
-      passes_rdkit_sanity_checks: "Sanitization"
-      all_atoms_connected: "All atoms connected"
+      passes_rdkit_sanity_checks: "RDKit sanitization"
+  - name: "Chemistry"
+    function: inchi_convertible
+    chosen_binary_test_output:
+      - inchi_convertible
+    rename_outputs:
+      inchi_convertible: "InChI convertible"
+  - name: "Chemistry"
+    function: atoms_connected
+    chosen_binary_test_output:
+      - all_atoms_connected
   - name: "Chemistry"
     function: identity
     parameters:
