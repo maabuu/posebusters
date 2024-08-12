@@ -67,3 +67,18 @@ def check_all_atoms_connected(mol_pred: Mol):
     details = {"number_fragments": num_frags}
 
     return {"results": results, "details": details}
+
+
+def check_chemistry(mol_pred: Mol):
+    """Check sanity using RDKit and connectedness.
+
+    Notes:
+    - Only for backward compatibility. Use `check_chemistry_using_rdkit` and `check_all_atoms_connected` separately.
+    """
+
+    rdkit_sanity = check_chemistry_using_rdkit(mol_pred)
+    connectedness = check_all_atoms_connected(mol_pred)
+    return {
+        "results": rdkit_sanity["results"] | connectedness["results"],
+        "details": rdkit_sanity["details"] | connectedness["details"],
+    }
