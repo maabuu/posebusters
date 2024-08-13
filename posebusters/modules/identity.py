@@ -1,28 +1,14 @@
 """Module to check identity of docked and crystal ligand."""
+
 from __future__ import annotations
 
 import logging
-from copy import deepcopy
-from re import findall
 from typing import Any
 
-from rdkit.Chem.inchi import MolFromInchi, MolToInchi
-from rdkit.Chem.MolStandardize.rdMolStandardize import Uncharger
-from rdkit.Chem.rdchem import AtomValenceException, Mol
-from rdkit.Chem.rdmolops import (
-    AssignStereochemistryFrom3D,
-    RemoveHs,
-    RemoveStereochemistry,
-)
+from rdkit.Chem.rdchem import Mol
 from rdkit.rdBase import LogToPythonLogger
 
-from ..tools.logging import CaptureLogger
-from ..tools.molecules import (
-    add_stereo_hydrogens,
-    assert_sanity,
-    neutralize_atoms,
-    remove_isotopic_info,
-)
+from ..tools.inchi import is_valid_inchi, split_inchi, standardize_and_get_inchi
 
 LogToPythonLogger()
 logger = logging.getLogger(__name__)
@@ -44,8 +30,8 @@ def check_identity(mol_pred: Mol, mol_true: Mol, inchi_options: str = "") -> dic
     inchi_docked = standardize_and_get_inchi(mol_pred, options=inchi_options)
 
     # check inchis are valid
-    inchi_crystal_valid = _is_valid_inchi(inchi_crystal)
-    inchi_docked_valid = _is_valid_inchi(inchi_docked)
+    inchi_crystal_valid = is_valid_inchi(inchi_crystal)
+    inchi_docked_valid = is_valid_inchi(inchi_docked)
 
     # compare inchis
     if inchi_crystal_valid and inchi_docked_valid:
@@ -85,36 +71,6 @@ stereo_all_layers = ["stereo_dbond", "stereo_sp3", "stereo_sp3_inverted", "stere
 stereo_tetrahedral_layers = ["stereo_sp3", "stereo_sp3_inverted", "stereo_type"]
 
 
-def standardize_and_get_inchi(mol: Mol, options: str = "", log_level=None, warnings_as_errors=False) -> str:
-    """Return InChI after standardising molecule and inferring stereo from coordinates."""
-    mol = deepcopy(mol)
-    mol = assert_sanity(mol)
-
-    # standardise molecule
-    mol = remove_isotopic_info(mol)
-
-    # assign stereo from 3D coordinates only if 3D coordinates are present
-    has_pose = mol.GetNumConformers() > 0
-    if has_pose:
-        RemoveStereochemistry(mol)
-
-    mol = RemoveHs(mol)
-    try:
-        mol = neutralize_atoms(mol)
-    except AtomValenceException:
-        logger.warning("Failed to neutralize molecule. Using uncharger. InChI check might fail.")
-        mol = Uncharger().uncharge(mol)
-    mol = add_stereo_hydrogens(mol)
-
-    if has_pose:
-        AssignStereochemistryFrom3D(mol, replaceExistingTags=True)
-
-    with CaptureLogger():
-        inchi = MolToInchi(mol, options=options, logLevel=log_level, treatWarningAsError=warnings_as_errors)
-
-    return inchi
-
-
 def _compare_inchis(inchi_true: str, inchi_pred: str, layers: list[str] = standard_layers) -> dict[str, bool]:
     results = {}
 
@@ -129,8 +85,8 @@ def _compare_inchis(inchi_true: str, inchi_pred: str, layers: list[str] = standa
 
     # otherwise comparison by layer
     results["inchi_overall"] = False
-    layers_true = _split_inchi(inchi_true)
-    layers_pred = _split_inchi(inchi_pred)
+    layers_true = split_inchi(inchi_true)
+    layers_pred = split_inchi(inchi_pred)
     assert "/" in layers_true, "Molecular formula layer missing from InChI string"
     for layer in layers:
         name = layer_names[layer]
@@ -144,32 +100,3 @@ def _compare_inchis(inchi_true: str, inchi_pred: str, layers: list[str] = standa
     results["stereo"] = all(results.get(name, True) for name in stereo_all_layers)
 
     return results
-
-
-def _split_inchi(inchi: str) -> dict[str, str]:
-    """Split the standard InChI string without isotopic info into its layers."""
-    if not inchi.startswith("InChI="):
-        raise ValueError("InChI string must start with 'InChI='")
-
-    # inchi always InChi=1S/...formula.../...layer.../...layer.../...layer...
-    version = inchi[6:].split(r"/", 1)[0]
-    layers = findall(r"(?=.*)(\/[a-z]{0,1})(.*?)(?=\/.*|$)", inchi[6:])
-
-    inchi_parts = {"=": version}
-    for prefix, layer in layers:
-        # standard inchi strings without isotopic info have each layer no more than once
-        assert prefix not in inchi_parts, f"Layer {prefix} more than once!"
-        inchi_parts[prefix] = layer
-
-    return inchi_parts
-
-
-def _is_valid_inchi(inchi: str) -> bool:
-    """Check that InChI can be parsed and sanitization does not fail."""
-    try:
-        mol = MolFromInchi(inchi)
-        assert_sanity(mol)
-        assert mol is not None
-        return True
-    except Exception:
-        return False

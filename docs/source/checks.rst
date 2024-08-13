@@ -177,6 +177,12 @@ with in a receptor's binding pocket without any steric clash.
 | Ligand and receptor clash                   |                                        |
 +---------------------------------------------+----------------------------------------+
 
+.. _sanitisation: https://www.rdkit.org/docs/RDKit_Book.html#molecular-sanitization
+
+In addition to these geometric considerations, molecules should always pass RDKit's chemical `sanitisation`_ checks, as well as be interconvertible with InChI strings.
+
+
+
 More details on tests and docking method comparison
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

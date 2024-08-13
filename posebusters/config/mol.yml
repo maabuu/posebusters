@@ -6,14 +6,28 @@ modules:
       - mol_pred_loaded
     rename_outputs:
       mol_pred_loaded: "MOL_PRED loaded"
+
   - name: "Chemistry"
-    function: sanity
+    function: rdkit_sanity
     chosen_binary_test_output:
       - passes_rdkit_sanity_checks
-      - all_atoms_connected
     rename_outputs:
       passes_rdkit_sanity_checks: "Sanitization"
+
+  - name: "Chemistry"
+    function: inchi_convertible
+    chosen_binary_test_output:
+      - inchi_convertible
+    rename_outputs:
+      inchi_convertible: "InChI convertible"
+
+  - name: "Chemistry"
+    function: atoms_connected
+    chosen_binary_test_output:
+      - all_atoms_connected
+    rename_outputs:
       all_atoms_connected: "All atoms connected"
+
   - name: "Geometry"
     function: "distance_geometry"
     parameters:
@@ -35,6 +49,7 @@ modules:
       bond_lengths_within_bounds: "Bond lengths"
       bond_angles_within_bounds: "Bond angles"
       no_internal_clash: "Internal steric clash"
+
   - name: "Ring flatness"
     function: "flatness"
     parameters:
@@ -49,6 +64,7 @@ modules:
       num_systems_passed: number_aromatic_rings_pass
       max_distance: aromatic_ring_maximum_distance_from_plane
       flatness_passes: "Aromatic ring flatness"
+
   - name: "Double bond flatness"
     function: "flatness"
     parameters:
@@ -62,11 +78,13 @@ modules:
       num_systems_passed: number_double_bonds_pass
       max_distance: double_bond_maximum_distance_from_plane
       flatness_passes: "Double bond flatness"
+
   - name: "Energy ratio"
     function: energy_ratio
     parameters:
       threshold_energy_ratio: 100.0
       ensemble_number_conformations: 50
+      inchi_strict: False
     chosen_binary_test_output:
       - energy_ratio_passes
     rename_outputs:

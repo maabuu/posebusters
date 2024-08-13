@@ -8,14 +8,28 @@ modules:
     rename_outputs:
       mol_pred_loaded: "MOL_PRED loaded"
       mol_cond_loaded: "MOL_COND loaded"
+
   - name: "Chemistry"
-    function: sanity
+    function: rdkit_sanity
     chosen_binary_test_output:
       - passes_rdkit_sanity_checks
-      - all_atoms_connected
     rename_outputs:
       passes_rdkit_sanity_checks: "Sanitization"
+
+  - name: "Chemistry"
+    function: inchi_convertible
+    chosen_binary_test_output:
+      - inchi_convertible
+    rename_outputs:
+      inchi_convertible: "InChI convertible"
+
+  - name: "Chemistry"
+    function: atoms_connected
+    chosen_binary_test_output:
+      - all_atoms_connected
+    rename_outputs:
       all_atoms_connected: "All atoms connected"
+
   - name: "Geometry"
     function: "distance_geometry"
     parameters:
@@ -37,6 +51,7 @@ modules:
       bond_lengths_within_bounds: "Bond lengths"
       bond_angles_within_bounds: "Bond angles"
       no_internal_clash: "Internal steric clash"
+
   - name: "Ring flatness"
     function: "flatness"
     parameters:
@@ -51,6 +66,7 @@ modules:
       num_systems_passed: number_aromatic_rings_pass
       max_distance: aromatic_ring_maximum_distance_from_plane
       flatness_passes: "Aromatic ring flatness"
+
   - name: "Double bond flatness"
     function: "flatness"
     parameters:
@@ -64,6 +80,7 @@ modules:
       num_systems_passed: number_double_bonds_pass
       max_distance: double_bond_maximum_distance_from_plane
       flatness_passes: "Double bond flatness"
+
   - name: "Energy ratio"
     function: energy_ratio
     parameters:
@@ -73,6 +90,7 @@ modules:
       - energy_ratio_passes
     rename_outputs:
       energy_ratio_passes: "Internal energy"
+
   - name: "Distance to protein"
     function: "intermolecular_distance"
     parameters:
@@ -92,6 +110,7 @@ modules:
       not_too_far_away: "Protein-ligand maximum distance"
       no_clashes: "Minimum distance to protein"
     rename_suffix: "_protein"
+
   - name: "Distance to organic cofactors"
     function: "intermolecular_distance"
     parameters:
@@ -109,6 +128,7 @@ modules:
     rename_outputs:
       no_clashes: "Minimum distance to organic cofactors"
     rename_suffix: "_organic_cofactors"
+
   - name: "Distance to inorganic cofactors"
     function: "intermolecular_distance"
     parameters:
@@ -126,6 +146,7 @@ modules:
     rename_outputs:
       no_clashes: "Minimum distance to inorganic cofactors"
     rename_suffix: "_inorganic_cofactors"
+
   - name: "Distance to waters"
     function: "intermolecular_distance"
     parameters:
@@ -143,6 +164,7 @@ modules:
     rename_outputs:
       no_clashes: "Minimum distance to waters"
     rename_suffix: "_waters"
+
   - name: "Volume overlap with protein"
     function: volume_overlap
     parameters:
@@ -159,6 +181,7 @@ modules:
       volume_overlap: "volume_overlap_protein"
       no_volume_clash: "Volume overlap with protein"
     rename_suffix: "_protein"
+
   - name: "Volume overlap with organic cofactors"
     function: volume_overlap
     parameters:
@@ -175,6 +198,7 @@ modules:
       volume_overlap: "volume_overlap_organic_cofactors"
       no_volume_clash: "Volume overlap with organic cofactors"
     rename_suffix: "_organic_cofactors"
+
   - name: "Volume overlap with inorganic cofactors"
     function: volume_overlap
     parameters:
@@ -191,6 +215,7 @@ modules:
       volume_overlap: "volume_overlap_inorganic_cofactors"
       no_volume_clash: "Volume overlap with inorganic cofactors"
     rename_suffix: "_inorganic_cofactors"
+
   - name: "Volume overlap with waters"
     function: volume_overlap
     parameters:

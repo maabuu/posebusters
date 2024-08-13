@@ -62,6 +62,31 @@ def mol_1a30_clash_3():
 
 
 @pytest.fixture
+def mol_pred_14gs_gen0():
+    return MolFromMolFile("tests/conftest/mol_14gs_0_out.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_pred_1afs_gen87():
+    return MolFromMolFile("tests/conftest/mol_1afs_87_out.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_pred_1afs_gen94():
+    return MolFromMolFile("tests/conftest/mol_1afs_94_out.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_pred_1jn2_gen3():
+    return MolFromMolFile("tests/conftest/mol_1jn2_3_out.sdf", sanitize=True)
+
+
+@pytest.fixture
+def mol_pred_1jn2_gen62():
+    return MolFromMolFile("tests/conftest/mol_1jn2_62_out.sdf", sanitize=True)
+
+
+@pytest.fixture
 def mol_calcium():
     return MolFromMolFile("tests/conftest/mol_calcium.sdf", sanitize=True)
 

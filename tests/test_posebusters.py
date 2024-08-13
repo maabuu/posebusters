@@ -106,7 +106,7 @@ def test_bust_mols_consistency(atol=1e-6) -> None:
 def test_bust_gen() -> None:
     posebusters = PoseBusters("gen")
     result = posebusters.bust(mol_pred=mol_larger, mol_true=mol_smaller, mol_cond=mol_cond_smaller, full_report=True)
-    assert result["sucos"][0] > 0.2
+    assert result["sucos"].iloc[0] > 0.2
 
 
 def test_bust_loaded_mols() -> None:
@@ -120,3 +120,48 @@ def test_bust_loaded_mols() -> None:
     assert df["mol_pred_loaded"].all()
     assert df["mol_true_loaded"].all()
     assert df["mol_cond_loaded"].all()
+
+
+def test_check_energy_ratio_14gs_0(mol_pred_14gs_gen0):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_14gs_gen0)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()
+
+
+def test_check_energy_ratio_1afs_87(mol_pred_1afs_gen87):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_1afs_gen87)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()
+
+
+def test_check_energy_ratio_1afs_94(mol_pred_1afs_gen94):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_1afs_gen94)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()
+
+
+def test_check_energy_ratio_1jn2_3(mol_pred_1jn2_gen3):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_1jn2_gen3)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()
+
+
+def test_check_energy_ratio_1jn2_62(mol_pred_1jn2_gen62):
+    posebuster = PoseBusters("mol")
+    df = posebuster.bust(mol_pred_1jn2_gen62)
+
+    assert df["mol_pred_loaded"].all()
+    # assert that there is not a NA value given everyything else is correct
+    assert not (df.eq(False) | df.isna()).all(axis=1).any()

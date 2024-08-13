@@ -3,11 +3,10 @@ from __future__ import annotations
 from rdkit.Chem.rdmolfiles import MolFromSmiles
 
 from posebusters.modules.identity import (
-    _is_valid_inchi,
-    _split_inchi,
     check_identity,
     standardize_and_get_inchi,
 )
+from posebusters.tools.inchi import is_valid_inchi, split_inchi
 
 mol_ethane = MolFromSmiles("CC")
 mol_ethene = MolFromSmiles("C=C")
@@ -66,7 +65,7 @@ def test_standardize_and_get_inchi():
 
 def test_split_inchi():
     inchi_ethane = standardize_and_get_inchi(mol_ethane)
-    split_inchi_ethane = _split_inchi(inchi_ethane)
+    split_inchi_ethane = split_inchi(inchi_ethane)
     assert split_inchi_ethane["/"] == "C2H6"
     assert split_inchi_ethane["/c"] == "1-2"
     assert split_inchi_ethane["/h"] == "1-2H3"
@@ -74,8 +73,8 @@ def test_split_inchi():
 
 def test_is_valid_inchi():
     phenol_inchi = "InChI=1S/C6H6O/c7-6-4-2-1-3-5-6/h1-5,7H"
-    assert _is_valid_inchi(phenol_inchi) is True
-    assert _is_valid_inchi("1S/C6H6O/c7-6-4-2-1-3-5-6/h1-5,7H") is False
-    assert _is_valid_inchi("InChI=1S/c7-6-4-2-1-3-5-6/h1-5,7H") is False
-    assert _is_valid_inchi("InChI=1S/C6H6O/c7-6-4-1-3-5-6/h1-5,7H") is False
-    assert _is_valid_inchi("InChI=1S/C6H6O/c7-6-4-1-3-5-6") is False
+    assert is_valid_inchi(phenol_inchi) is True
+    assert is_valid_inchi("1S/C6H6O/c7-6-4-2-1-3-5-6/h1-5,7H") is False
+    assert is_valid_inchi("InChI=1S/c7-6-4-2-1-3-5-6/h1-5,7H") is False
+    assert is_valid_inchi("InChI=1S/C6H6O/c7-6-4-1-3-5-6/h1-5,7H") is False
+    assert is_valid_inchi("InChI=1S/C6H6O/c7-6-4-1-3-5-6") is False

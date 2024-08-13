@@ -20,7 +20,12 @@ from .modules.identity import check_identity
 from .modules.intermolecular_distance import check_intermolecular_distance
 from .modules.loading import check_loading
 from .modules.rmsd import check_rmsd
-from .modules.sanity import check_chemistry
+from .modules.sanity import (
+    check_all_atoms_connected,
+    check_chemistry,
+    check_chemistry_using_inchi,
+    check_chemistry_using_rdkit,
+)
 from .modules.sucos import check_sucos
 from .modules.volume_overlap import check_volume_overlap
 from .tools.loading import safe_load_mol, safe_supply_mols
@@ -30,7 +35,10 @@ logger = logging.getLogger(__name__)
 
 module_dict: dict[str, Callable] = {
     "loading": check_loading,
-    "sanity": check_chemistry,
+    "sanity": check_chemistry,  # for backwards compatibility
+    "rdkit_sanity": check_chemistry_using_rdkit,
+    "inchi_convertible": check_chemistry_using_inchi,
+    "atoms_connected": check_all_atoms_connected,
     "identity": check_identity,
     "distance_geometry": check_geometry,
     "flatness": check_flatness,

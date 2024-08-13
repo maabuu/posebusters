@@ -8,7 +8,7 @@ from functools import lru_cache
 
 import numpy as np
 from rdkit import ForceField  # noqa: F401
-from rdkit.Chem.inchi import InchiReadWriteError, MolFromInchi, MolToInchi
+from rdkit.Chem.inchi import InchiReadWriteError, MolFromInchi
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdDistGeom import EmbedMultipleConfs, ETKDGv3
 from rdkit.Chem.rdForceFieldHelpers import (
@@ -17,11 +17,13 @@ from rdkit.Chem.rdForceFieldHelpers import (
 )
 from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D
 
+from ..tools.inchi import get_inchi
 from ..tools.logging import CaptureLogger
 from ..tools.molecules import assert_sanity
 
 logger = logging.getLogger(__name__)
 
+_warning_prefix = "WARNING: Energy ratio module "
 _empty_results = {
     "results": {
         "ensemble_avg_energy": np.nan,
@@ -57,32 +59,32 @@ def check_energy_ratio(
         mol_pred = assert_sanity(mol_pred)
         AddHs(mol_pred, addCoords=True)
     except Exception as e:
-        logger.warning("Failed to prepare molecule: %s", e)
+        logger.warning(_warning_prefix + "failed because RDKit sanitization failed for molecule: %s", e)
         return _empty_results
 
     try:
         inchi = get_inchi(mol_pred, inchi_strict=inchi_strict)
     except InchiReadWriteError as e:
-        logger.warning("Molecule does not sanitize: %s", e.args[1])
+        logger.warning(_warning_prefix + "failed because InChI creation failed for molecule: %s", e.args[1])
         return _empty_results
     except Exception as e:
-        logger.warning("Molecule does not sanitize: %s", e)
+        logger.warning(_warning_prefix + "failed because InChI creation failed for molecule: %s", e)
         return _empty_results
 
     try:
         conf_energy = get_conf_energy(mol_pred)
     except Exception as e:
-        logger.warning("Failed to calculate conformation energy for %s: %s", inchi, e)
+        logger.warning(_warning_prefix + "failed to calculate conformation energy for %s: %s", inchi, e)
         conf_energy = np.nan
 
     try:
         avg_energy = float(get_average_energy(inchi, ensemble_number_conformations))
     except Exception as e:
-        logger.warning("Failed to calculate ensemble conformation energy for %s: %s", inchi, e)
+        logger.warning(_warning_prefix + "failed to calculate ensemble conformation energy for %s: %s", inchi, e)
         avg_energy = np.nan
 
     if avg_energy == 0:
-        logger.warning("Average energy of molecule is 0 for %s", inchi)
+        logger.warning(_warning_prefix + "calculated average energy of molecule 0 for %s", inchi)
         avg_energy = np.nan
 
     pred_factor = conf_energy / avg_energy
@@ -95,16 +97,6 @@ def check_energy_ratio(
         "energy_ratio_passes": ratio_passes,
     }
     return {"results": results}
-
-
-def get_inchi(mol: Mol, inchi_strict: bool = False) -> str:
-    """Prepare and check InChI of a molecule."""
-    with CaptureLogger() as log:
-        inchi = MolToInchi(mol, treatWarningAsError=inchi_strict)
-        # check inchi because inchi generation does not raise an error if the inchi is invalid
-        if MolFromInchi(inchi, sanitize=True) is None:
-            raise Exception(log["ERROR"].split("ERROR: ")[-1])
-    return inchi
 
 
 @lru_cache(maxsize=None)
