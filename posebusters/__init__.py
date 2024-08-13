@@ -9,6 +9,7 @@ from posebusters.modules.loading import check_loading
 from posebusters.modules.rmsd import check_rmsd
 from posebusters.modules.sanity import (
     check_all_atoms_connected,
+    check_chemistry,
     check_chemistry_using_inchi,
     check_chemistry_using_rdkit,
 )
@@ -20,6 +21,7 @@ __all__ = [
     "check_all_atoms_connected",
     "check_chemistry_using_inchi",
     "check_chemistry_using_rdkit",
+    "check_chemistry",
     "check_energy_ratio",
     "check_flatness",
     "check_geometry",
