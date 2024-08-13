@@ -16,7 +16,7 @@ modules:
     chosen_binary_test_output:
       - passes_rdkit_sanity_checks
     rename_outputs:
-      passes_rdkit_sanity_checks: "RDKit sanitization"
+      passes_rdkit_sanity_checks: "Sanitization"
 
   - name: "Chemistry"
     function: inchi_convertible
@@ -29,6 +29,8 @@ modules:
     function: atoms_connected
     chosen_binary_test_output:
       - all_atoms_connected
+    rename_outputs:
+      all_atoms_connected: "All atoms connected"
 
   - name: "Geometry"
     function: "distance_geometry"
