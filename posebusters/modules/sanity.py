@@ -80,5 +80,5 @@ def check_chemistry(mol_pred: Mol):
     connectedness = check_all_atoms_connected(mol_pred)
     return {
         "results": rdkit_sanity["results"] | connectedness["results"],
-        "details": rdkit_sanity["details"] | connectedness["details"],
+        "details": rdkit_sanity["details"],
     }
