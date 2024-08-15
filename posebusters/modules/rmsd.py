@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import timeout_decorator
 from copy import deepcopy
 
 import numpy as np
@@ -10,6 +11,7 @@ from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdMolAlign import CalcRMS, GetBestRMS
 from rdkit.Chem.rdmolops import RemoveHs, RemoveStereochemistry
 from rdkit.rdBase import LogToPythonLogger
+from timeout_decorator import TimeoutError as TimeoutDecoratorError
 
 from ..tools.logging import CaptureLogger
 from ..tools.molecules import neutralize_atoms, remove_all_charges_and_hydrogens
@@ -23,6 +25,8 @@ tautomer_enumerator.SetMaxTransforms(100000)
 tautomer_enumerator.SetReassignStereo(True)
 tautomer_enumerator.SetRemoveBondStereo(True)
 tautomer_enumerator.SetRemoveSp3Stereo(True)
+
+RMSD_TIMEOUT_IN_SECONDS = 30
 
 
 def check_rmsd(
@@ -150,10 +154,13 @@ def _call_rdkit_rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_r
         pass
     except ValueError:
         pass
+    except TimeoutDecoratorError:
+        pass
 
     return np.nan
 
 
+@timeout_decorator.timeout(RMSD_TIMEOUT_IN_SECONDS, use_signals=False)
 def _rmsd(mol_probe: Mol, mol_ref: Mol, conf_id_probe: int, conf_id_ref: int, kabsch: bool = False, **params):
     if kabsch is True:
         return GetBestRMS(prbMol=mol_probe, refMol=mol_ref, prbId=conf_id_probe, refId=conf_id_ref, **params)
