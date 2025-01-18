@@ -11,8 +11,8 @@ jobs:
             issues: write
             pull-requests: write
     steps:
-        - name: "Close inactive issues, PRs, and stale issues"
-          uses: "actions/stale@v3"
+        - name: Close inactive issues, PRs, and stale issues
+          uses: actions/stale@v3
           with:
             repo-token: "${{ secrets.GITHUB_TOKEN }}"
             days-before-stale: 60
