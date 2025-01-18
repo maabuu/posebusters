@@ -25,7 +25,7 @@ classifiers = [
 ]
 requires-python = "~=3.8"
 dynamic = ["version", "description"]
-dependencies = ['rdkit >= 2020.09', 'pandas', 'numpy', 'pyyaml']
+dependencies = ['rdkit >= 2024.9', 'pandas', 'numpy', 'pyyaml']
 
 [project.optional-dependencies]
 dev = ["ruff"]
