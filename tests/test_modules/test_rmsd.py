@@ -50,3 +50,17 @@ def test_check_rmsd_multiple_ground_truth(mol_one_true_1w1p, mol_true_1w1p):
     out = check_rmsd(mol_one_true_1w1p, mol_true_1w1p)
     assert out["results"]["rmsd"] == pytest.approx(0.0, abs=1e-6)
     assert out["results"]["rmsd_within_threshold"] is True
+
+
+def test_check_rmsd_bond_orders(mol_3wrb_gde_true, mol_3wrb_gde_pred):
+    out = check_rmsd(mol_3wrb_gde_true, mol_3wrb_gde_true)
+    assert out["results"]["rmsd"] == pytest.approx(0.0, abs=1e-6)
+
+    out = check_rmsd(mol_3wrb_gde_pred, mol_3wrb_gde_pred)
+    assert out["results"]["rmsd"] == pytest.approx(0.0, abs=1e-6)
+
+    out = check_rmsd(mol_3wrb_gde_pred, mol_3wrb_gde_true)
+    assert out["results"]["rmsd"] == pytest.approx(1.091668, abs=1e-4)
+
+    out = check_rmsd(mol_3wrb_gde_true, mol_3wrb_gde_pred)
+    assert out["results"]["rmsd"] == pytest.approx(1.091668, abs=1e-4)
