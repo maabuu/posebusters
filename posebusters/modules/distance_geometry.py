@@ -1,9 +1,11 @@
 """Module to check bond lengths, bond angles, and internal clash of ligand conformations."""
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from copy import deepcopy
 from logging import getLogger
-from typing import Any, Iterable
+from typing import Any
 
 import numpy as np
 import pandas as pd

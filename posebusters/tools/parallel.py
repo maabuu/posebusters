@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from multiprocessing import Pool
-from typing import Callable, Iterable
+from typing import Callable
 
 from tqdm import tqdm
 

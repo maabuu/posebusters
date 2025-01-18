@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 from rdkit.Chem.AllChem import AssignBondOrdersFromTemplate
 from rdkit.Chem.rdchem import Mol
