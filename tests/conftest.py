@@ -250,3 +250,13 @@ def mol_2YU():
 @pytest.fixture
 def mol_HQT():
     return MolFromMolFile("tests/conftest/mol_HQT.mol")
+
+
+@pytest.fixture
+def mol_3wrb_gde_true():
+    return MolFromPDBFile("tests/conftest/mol_3WRB_1_GDE_0_ligand_true.pdb")
+
+
+@pytest.fixture
+def mol_3wrb_gde_pred():
+    return MolFromMolFile("tests/conftest/mol_3WRB_1_GDE_0_ligand_pred.sdf")
