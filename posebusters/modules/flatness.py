@@ -1,8 +1,10 @@
 """Module to check flatness of ligand substructures."""
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from copy import deepcopy
-from typing import Any, Iterable
+from typing import Any
 
 import numpy as np
 from numpy import ndarray as Array

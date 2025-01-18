@@ -1,4 +1,5 @@
 """Module to check volume overlap between docked ligand and protein."""
+
 from __future__ import annotations
 
 import logging

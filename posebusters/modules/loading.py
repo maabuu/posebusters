@@ -1,4 +1,5 @@
 """Module to check loading of protein and ligand files."""
+
 from __future__ import annotations
 
 from typing import Any

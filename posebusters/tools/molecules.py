@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from copy import deepcopy
 from logging import getLogger
-from typing import Iterable
 
 import numpy as np
 from rdkit import RDLogger
