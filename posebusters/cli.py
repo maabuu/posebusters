@@ -1,11 +1,13 @@
 """Command line interface for PoseBusters."""
+
 from __future__ import annotations
 
 import argparse
 import logging
 import sys
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable, TextIO
+from typing import Any, TextIO
 
 import pandas as pd
 from rdkit.Chem.rdchem import Mol

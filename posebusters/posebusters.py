@@ -5,9 +5,10 @@ from __future__ import annotations
 import inspect
 import logging
 from collections import defaultdict
+from collections.abc import Generator, Iterable
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Generator, Iterable
+from typing import Any, Callable
 
 import pandas as pd
 from rdkit.Chem.rdchem import Mol

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from copy import deepcopy
-from functools import lru_cache
+from functools import cache
 from math import isfinite
 
 from rdkit import ForceField  # noqa: F401
@@ -127,7 +127,7 @@ def get_average_energy(inchi: str, n_confs: int = 50, num_threads: int = 0) -> M
     return sum(energies) / len(energies)
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_energies(inchi: str, n_confs: int = 50, num_threads: int = 0) -> list[float]:
     """Get energies of an ensemble of molecule conformations."""
     with CaptureLogger():
