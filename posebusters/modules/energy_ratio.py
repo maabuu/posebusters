@@ -5,8 +5,8 @@ from __future__ import annotations
 import logging
 from copy import deepcopy
 from functools import lru_cache
+from math import isfinite
 
-import numpy as np
 from rdkit import ForceField  # noqa: F401
 from rdkit.Chem.inchi import InchiReadWriteError, MolFromInchi
 from rdkit.Chem.rdchem import Mol
@@ -23,13 +23,14 @@ from ..tools.molecules import assert_sanity
 
 logger = logging.getLogger(__name__)
 
+
 _warning_prefix = "WARNING: Energy ratio module "
 _empty_results = {
     "results": {
-        "ensemble_avg_energy": np.nan,
-        "mol_pred_energy": np.nan,
-        "energy_ratio": np.nan,
-        "energy_ratio_passes": np.nan,
+        "ensemble_avg_energy": float("nan"),
+        "mol_pred_energy": float("nan"),
+        "energy_ratio": float("nan"),
+        "energy_ratio_passes": float("nan"),
     }
 }
 
@@ -39,7 +40,8 @@ def check_energy_ratio(
     threshold_energy_ratio: float = 7.0,
     ensemble_number_conformations: int = 100,
     inchi_strict: bool = False,
-):
+    epsilon=1e-10,
+) -> dict[str, dict[str, float | bool]]:
     """Check whether the energy of the docked ligand is within user defined range.
 
     Args:
@@ -72,40 +74,65 @@ def check_energy_ratio(
         return _empty_results
 
     try:
-        conf_energy = get_conf_energy(mol_pred)
+        observed_energy = get_conf_energy(mol_pred)
     except Exception as e:
         logger.warning(_warning_prefix + "failed to calculate conformation energy for %s: %s", inchi, e)
-        conf_energy = np.nan
+        observed_energy = float("nan")
 
     try:
-        avg_energy = float(get_average_energy(inchi, ensemble_number_conformations))
+        energies = get_energies(inchi, ensemble_number_conformations)
+        mean_energy = sum(energies) / len(energies)
+        std_energy = sum((energy - mean_energy) ** 2 for energy in energies) / (len(energies) - 1)
+        std_energy = max(epsilon, std_energy)  # clipping
     except Exception as e:
         logger.warning(_warning_prefix + "failed to calculate ensemble conformation energy for %s: %s", inchi, e)
-        avg_energy = np.nan
+        mean_energy = float("nan")
+        std_energy = float("nan")
 
-    if avg_energy == 0:
+    if mean_energy == 0:
         logger.warning(_warning_prefix + "calculated average energy of molecule 0 for %s", inchi)
-        avg_energy = np.nan
+        mean_energy = epsilon  # clipping
 
-    pred_factor = conf_energy / avg_energy
-    ratio_passes = pred_factor <= threshold_energy_ratio
+    # simple ratio
+    ratio = observed_energy / mean_energy
+    ratio_passes = ratio <= threshold_energy_ratio if isfinite(ratio) else float("nan")
+
+    # ratio after subtracting mean
+    deviation = observed_energy - mean_energy
+    relative_deviation = deviation / mean_energy
+    relative_deviation_passes = (
+        relative_deviation <= threshold_energy_ratio if isfinite(relative_deviation) else float("nan")
+    )
+
+    # standard score (ratio after subtracting by population mean and dividing by population std)
+    z_value = (observed_energy - mean_energy) / std_energy
+    z_value_passes = z_value <= threshold_energy_ratio if isfinite(z_value) else float("nan")
 
     results = {
-        "ensemble_avg_energy": avg_energy,
-        "mol_pred_energy": conf_energy,
-        "energy_ratio": pred_factor,
+        "ensemble_avg_energy": mean_energy,
+        "mol_pred_energy": observed_energy,
+        "energy_ratio": ratio,
+        "relative_deviation": relative_deviation,
+        "z_value": z_value,
         "energy_ratio_passes": ratio_passes,
+        "relative_deviation_passes": relative_deviation_passes,
+        "z_value_passes": z_value_passes,
     }
     return {"results": results}
 
 
-@lru_cache(maxsize=None)
 def get_average_energy(inchi: str, n_confs: int = 50, num_threads: int = 0) -> Mol:
     """Get average energy of an ensemble of molecule conformations."""
+    energies = get_energies(inchi, n_confs, num_threads)
+    return sum(energies) / len(energies)
+
+
+@lru_cache(maxsize=None)
+def get_energies(inchi: str, n_confs: int = 50, num_threads: int = 0) -> list[float]:
+    """Get energies of an ensemble of molecule conformations."""
     with CaptureLogger():
         mol = MolFromInchi(inchi)
-    energies = new_conformation(mol, n_confs, num_threads)["energies"]
-    return sum(energies) / len(energies)
+    return new_conformation(mol, n_confs, num_threads)["energies"]
 
 
 def new_conformation(mol: Mol, n_confs: int = 1, num_threads: int = 0, energy_minimization=True) -> Mol:
