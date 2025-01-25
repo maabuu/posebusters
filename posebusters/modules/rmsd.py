@@ -117,7 +117,10 @@ def robust_rmsd(  # noqa: PLR0913
         return rmsd
 
     # try assigning the bond orders of one molecule to the other
-    mol_probe_new_bonds = AssignBondOrdersFromTemplate(mol_ref, mol_probe)
+    try:
+        mol_probe_new_bonds = AssignBondOrdersFromTemplate(mol_ref, mol_probe)
+    except ValueError:
+        return np.nan
     rmsd = _call_rdkit_rmsd(mol_probe_new_bonds, mol_ref, conf_id_probe, conf_id_ref, **params)
     if not np.isnan(rmsd):
         return rmsd
