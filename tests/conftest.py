@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import pytest
 from rdkit import Chem
-from rdkit.Chem import AllChem
-from rdkit.Chem.rdDistGeom import EmbedMolecule
+from rdkit.Chem.rdDistGeom import EmbedMolecule, srETKDGv3
 from rdkit.Chem.rdmolfiles import (
     MolFromMol2File,
     MolFromMolFile,
@@ -277,7 +276,7 @@ def mol_pip_pred():
 
 def embed_mol(smi: str) -> Chem.Mol:
     hmol = Chem.AddHs(Chem.MolFromSmiles(smi))
-    ps = AllChem.srETKDGv3()
+    ps = srETKDGv3()
     ps.randomState = 42
     _ = EmbedMolecule(hmol, params=ps)
     return hmol
@@ -287,6 +286,8 @@ def embed_mol(smi: str) -> Chem.Mol:
 def mols_flat_etkdgv3():
     # non-aromatic flat
     smis_flat = ["C1=CC2=CC=CC2=C1", "C1=C[CH]C=C1", "N1C=CNC=C1", "C1C=CN=CN1"]
+    # aromatic flat
+    smis_flat.extend(["c1ccccc1", "c1cnc[nH]1"])
     return [embed_mol(smi) for smi in smis_flat]
 
 
