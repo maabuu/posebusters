@@ -18,12 +18,12 @@ _flat = {
     "trigonal_planar_double_bonds": "[C;X3;^2](*)(*)=[C;X3;^2](*)(*)",
 }
 nonflat = {
-    "nonaromatic_5_membered_rings": "[C,O,S,N&!a]~1[C,O,S,N&!a][C,O,S,N&!a][C,O,S,N&!a][C,O,S,N&!a]1",
-    "nonaromatic_6_membered_rings": "[C,O,S,N&!a]~1[C,O,S,N&!a][C,O,S,N&!a][C,O,S,N&!a][C,O,S,N&!a][C,O,S,N&!a]1",
-    "nonaromatic_6_membered_rings_db03_0": "[C&!a]~1[C&!a][C,O,S,N&!a]~[C,O,S,N&!a][C&!a][C&!a]1",
-    "nonaromatic_6_membered_rings_db03_1": "[C&!a]~1[C&!a][C&!a]~[C&!a][C,O,S,N&!a][C&!a]1",
-    "nonaromatic_6_membered_rings_db02_0": "[C&!a]~1[C&!a][C&!a][C,O,S,N&!a]~[C,O,S,N&!a][C&!a]1",
-    "nonaromatic_6_membered_rings_db02_1": "[C&!a]~1[C&!a][C,O,S,N&!a][C&!a]~[C&!a][C&!a]1",
+    "nonaromatic_5_membered_rings": "[C,O,S,N]~1[C,O,S,N][C,O,S,N][C,O,S,N][C,O,S,N]1",
+    "nonaromatic_6_membered_rings": "[C,O,S,N]~1[C,O,S,N][C,O,S,N][C,O,S,N][C,O,S,N][C,O,S,N]1",
+    "nonaromatic_6_membered_rings_db03_0": "[C]~1[C][C,O,S,N]~[C,O,S,N][C][C]1",
+    "nonaromatic_6_membered_rings_db03_1": "[C]~1[C][C]~[C][C,O,S,N][C]1",
+    "nonaromatic_6_membered_rings_db02_0": "[C]~1[C][C][C,O,S,N]~[C,O,S,N][C]1",
+    "nonaromatic_6_membered_rings_db02_1": "[C]~1[C][C,O,S,N][C]~[C][C]1",
 }
 _empty_results = {
     "results": {
