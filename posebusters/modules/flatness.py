@@ -17,6 +17,14 @@ _flat = {
     "aromatic_6_membered_rings_sp2": "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1",
     "trigonal_planar_double_bonds": "[C;X3;^2](*)(*)=[C;X3;^2](*)(*)",
 }
+nonflat = {
+    "nonaromatic_5_membered_rings": "[C,O,S,N]~1[C,O,S,N][C,O,S,N][C,O,S,N][C,O,S,N]1",
+    "nonaromatic_6_membered_rings": "[C,O,S,N]~1[C,O,S,N][C,O,S,N][C,O,S,N][C,O,S,N][C,O,S,N]1",
+    "nonaromatic_6_membered_rings_db03_0": "[C]~1[C][C,O,S,N]~[C,O,S,N][C][C]1",
+    "nonaromatic_6_membered_rings_db03_1": "[C]~1[C][C]~[C][C,O,S,N][C]1",
+    "nonaromatic_6_membered_rings_db02_0": "[C]~1[C][C][C,O,S,N]~[C,O,S,N][C]1",
+    "nonaromatic_6_membered_rings_db02_1": "[C]~1[C][C,O,S,N][C]~[C][C]1",
+}
 _empty_results = {
     "results": {
         "num_systems_checked": np.nan,
@@ -28,15 +36,20 @@ _empty_results = {
 
 
 def check_flatness(
-    mol_pred: Mol, threshold_flatness: float = 0.1, flat_systems: dict[str, str] = _flat
+    mol_pred: Mol,
+    threshold_flatness: float = 0.1,
+    flat_systems: dict[str, str] = _flat,
+    check_nonflat: bool = False,
 ) -> dict[str, Any]:
     """Check whether substructures of molecule are flat.
 
     Args:
         mol_pred: Molecule with exactly one conformer.
         threshold_flatness: Maximum distance from shared plane used as cutoff. Defaults to 0.1.
-        flat_systems: Patterns of flat systems provided as SMARTS. Defaults to 5 and 6 membered
-            aromatic rings and carbon sigma bonds.
+        flat_systems: Patterns of flat (or non-flat) systems provided as SMARTS. Defaults to
+             5 and 6 membered aromatic rings and carbon sigma bonds.
+        check_nonflat: Whether to check the ring non-flatness instead of flatness.
+            Turns (flatness <= threshold_flatness) to (flatness >= threshold_flatness).
 
     Returns:
         PoseBusters results dictionary.
@@ -60,8 +73,10 @@ def check_flatness(
     # calculate distances to plane and check threshold
     coords = [_get_coords(mol, group) for group in planar_groups]
     max_distances = [float(_get_distances_to_plane(X).max()) for X in coords]
-    flatness_passes = [bool(d <= threshold_flatness) for d in max_distances]
-
+    if not check_nonflat:
+        flatness_passes = [bool(d <= threshold_flatness) for d in max_distances]
+    else:
+        flatness_passes = [bool(d >= threshold_flatness) for d in max_distances]
     details = {
         "type": types,
         "planar_group": planar_groups,
