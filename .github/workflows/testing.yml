@@ -48,8 +48,8 @@ jobs:
         pytest --doctest-modules --junitxml=junit/test-results-${{ matrix.python-version }}.xml
 
     - name: Upload pytest test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: pytest-results-${{ matrix.python-version }}
+        name: pytest-results-${{ matrix.python-version }}-${{ github.run_number }}
         path: junit/test-results-${{ matrix.python-version }}.xml
       if: ${{ always() }}
