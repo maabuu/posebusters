@@ -73,7 +73,6 @@ def check_flatness(
     # calculate distances to plane and check threshold
     coords = [_get_coords(mol, group) for group in planar_groups]
     max_distances = [float(_get_distances_to_plane(X).max()) for X in coords]
-    # operator for the flatness check
     if not check_nonflat:
         flatness_passes = [bool(d <= threshold_flatness) for d in max_distances]
     else:
@@ -91,7 +90,6 @@ def check_flatness(
         "max_distance": max(max_distances) if max_distances else np.nan,
         "flatness_passes": all(flatness_passes) if len(flatness_passes) > 0 else True,
     }
-    # print(flatness_passes, max_distances, results["flatness_passes"])
 
     return {"results": results, "details": details}
 
