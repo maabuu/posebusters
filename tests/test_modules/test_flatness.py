@@ -1,12 +1,6 @@
 from __future__ import annotations
 
-from posebusters.modules.flatness import check_flatness, nonflat
-
-rings = {
-    "aromatic_5_membered_rings_sp2": "[ar5^2]1[ar5^2][ar5^2][ar5^2][ar5^2]1",
-    "aromatic_6_membered_rings_sp2": "[ar6^2]1[ar6^2][ar6^2][ar6^2][ar6^2][ar6^2]1",
-}
-bonds = {"trigonal_planar_double_bonds": "[C;X3;^2](*)(*)=[C;X3;^2](*)(*)"}
+from posebusters.modules.flatness import check_flatness, flat_bonds, flat_rings, nonflat
 
 
 def test_check_flatness(mol_pm2, mol_cgb):
@@ -29,11 +23,11 @@ def test_check_flatness_6yr2_t1c(mol_pred_6yr2_t1c, mol_true_6yr2_t1c):
     assert out["results"]["flatness_passes"] is False
 
     # fail rings
-    out = check_flatness(mol_pred_6yr2_t1c, flat_systems=rings)
+    out = check_flatness(mol_pred_6yr2_t1c, flat_systems=flat_rings)
     assert out["results"]["flatness_passes"] is False
 
     # pass bonds
-    out = check_flatness(mol_pred_6yr2_t1c, flat_systems=bonds, threshold_flatness=0.5)
+    out = check_flatness(mol_pred_6yr2_t1c, flat_systems=flat_bonds, threshold_flatness=0.5)
     assert out["results"]["flatness_passes"] is False
 
 
@@ -55,21 +49,30 @@ def test_check_nonflatness_synthetic(mols_flat_etkdgv3, mols_nonflat_etkdgv3):
         assert out["results"]["flatness_passes"]
 
 
+def test_check_nonflatness_awj_ideal(mol_awj_ideal):
+    # RDKit does not recognize the 5-membered ring as aromatic (2 < 4n + 2 for all n)
+    out = check_flatness(mol_awj_ideal)
+    assert out["results"]["flatness_passes"] is True
+    out = check_flatness(mol_awj_ideal, flat_systems=nonflat, check_nonflat=True, threshold_flatness=0.05)
+    assert out["results"]["flatness_passes"] is True
+
+
+def test_check_nonflatness_o2u_ideal(mol_o2u_ideal):
+    out = check_flatness(mol_o2u_ideal)
+    assert out["results"]["flatness_passes"] is True
+    out = check_flatness(mol_o2u_ideal, flat_systems=nonflat, check_nonflat=True, threshold_flatness=0.05)
+    assert out["results"]["flatness_passes"] is True
+
+
 def test_check_nonflatness_pip_ideal(mol_pip_ideal):
-    # ignored
     out = check_flatness(mol_pip_ideal)
     assert out["results"]["flatness_passes"] is True
-
-    # correct geometry
-    out = check_flatness(mol_pip_ideal, flat_systems=nonflat, check_nonflat=True)
+    out = check_flatness(mol_pip_ideal, flat_systems=nonflat, check_nonflat=True, threshold_flatness=0.05)
     assert out["results"]["flatness_passes"] is True
 
 
-def test_check_nonflatness_pip_pred(mol_pip_pred):
-    # ignored
-    out = check_flatness(mol_pip_pred)
+def test_check_nonflatness_pip_wrong(mol_pip_wrong):
+    out = check_flatness(mol_pip_wrong)
     assert out["results"]["flatness_passes"] is True
-
-    # flat geometry
-    out = check_flatness(mol_pip_pred, flat_systems=nonflat, check_nonflat=True)
+    out = check_flatness(mol_pip_wrong, flat_systems=nonflat, check_nonflat=True, threshold_flatness=0.05)
     assert out["results"]["flatness_passes"] is False
