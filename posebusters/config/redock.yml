@@ -90,12 +90,11 @@ modules:
     parameters:
       check_nonflat: True
       flat_systems: # list atoms which together should definitely not lie on plane as SMARTS matches
-        "non-aromatic_5_membered_rings": "[C,O,S,N]~1[C,O,S,N][C,O,S,N][C,O,S,N][C,O,S,N]1"
-        "non-aromatic_6_membered_rings": "[C,O,S,N]~1[C,O,S,N][C,O,S,N][C,O,S,N][C,O,S,N][C,O,S,N]1"
-        "non-aromatic_6_membered_rings_db03_0": "[C]~1[C][C,O,S,N]~[C,O,S,N][C][C]1"
-        "non-aromatic_6_membered_rings_db03_1": "[C]~1[C][C]~[C][C,O,S,N][C]1"
-        "non-aromatic_6_membered_rings_db02_0": "[C]~1[C][C][C,O,S,N]~[C,O,S,N][C]1"
-        "non-aromatic_6_membered_rings_db02_1": "[C]~1[C][C,O,S,N][C]~[C][C]1"
+        non-aromatic_6_membered_rings: "[C,O,S,N;R1]~1[C,O,S,N;R1][C,O,S,N;R1][C,O,S,N;R1][C,O,S,N;R1][C,O,S,N;R1]1"
+        non-aromatic_6_membered_rings_db03_0: "[C;R1]~1[C;R1][C,O,S,N;R1]~[C,O,S,N;R1][C;R1][C;R1]1"
+        non-aromatic_6_membered_rings_db03_1: "[C;R1]~1[C;R1][C;R1]~[C;R1][C,O,S,N;R1][C;R1]1"
+        non-aromatic_6_membered_rings_db02_0: "[C;R1]~1[C;R1][C;R1][C,O,S,N;R1]~[C,O,S,N;R1][C;R1]1"
+        non-aromatic_6_membered_rings_db02_1: "[C;R1]~1[C;R1][C,O,S,N;R1][C;R1]~[C;R1][C;R1]1"
       threshold_flatness: 0.05 # minimally required distance in A of at least one atom from the closest shared plane
     chosen_binary_test_output:
       - flatness_passes
