@@ -285,7 +285,7 @@ def mols_nonflat_etkdgv3():
 
 @pytest.fixture()
 def mol_awj_ideal():
-    return MolFromMolFile("tests/conftest/mol_awj_ideal.sdf")
+    return MolFromMolFile("tests/conftest/mol_AWJ_ideal.sdf")
 
 
 @pytest.fixture()
