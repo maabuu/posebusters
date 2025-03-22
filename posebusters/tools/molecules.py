@@ -94,13 +94,6 @@ def add_stereo_hydrogens(mol: Mol) -> Mol:
     return mol
 
 
-def assert_sanity(mol: Mol) -> Mol:
-    """Check that RDKit sanitization does not fail."""
-    flags = SanitizeMol(mol)
-    assert flags == 0, f"Sanitization failed with flags {flags}"
-    return mol
-
-
 def remove_isotopic_info(mol: Mol) -> Mol:
     """Remove isotopic information from molecule."""
     for atom in mol.GetAtoms():
