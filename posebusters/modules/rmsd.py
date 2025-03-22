@@ -100,8 +100,8 @@ def robust_rmsd(  # noqa: PLR0913
         RemoveStereochemistry(mol_ref)
 
     if heavy_only:
-        mol_probe = RemoveHs(mol_probe)
-        mol_ref = RemoveHs(mol_ref)
+        mol_probe = RemoveHs(mol_probe, sanitize=False)
+        mol_ref = RemoveHs(mol_ref, sanitize=False)
 
     # combine parameters
     params = dict(symmetrizeConjugatedTerminalGroups=symmetrizeConjugatedTerminalGroups, kabsch=kabsch, **params)
@@ -186,11 +186,15 @@ def intercentroid(
     mol_probe: Mol, mol_ref: Mol, conf_id_probe: int = -1, conf_id_ref: int = -1, heavy_only: bool = True
 ) -> float:
     """Distance between centroids of two molecules."""
-    if heavy_only:
-        mol_probe = RemoveHs(mol_probe)
-        mol_ref = RemoveHs(mol_ref)
 
-    centroid_probe = mol_probe.GetConformer(conf_id_probe).GetPositions().mean(axis=0)
-    centroid_ref = mol_ref.GetConformer(conf_id_ref).GetPositions().mean(axis=0)
-
+    centroid_probe = get_centroid(mol_probe, heavy_only, conf_id_probe)
+    centroid_ref = get_centroid(mol_ref, heavy_only, conf_id_ref)
     return float(np.linalg.norm(centroid_probe - centroid_ref))
+
+
+def get_centroid(mol: Mol, heavy_only: bool = True, conf_id: int = -1) -> np.ndarray:
+    """Get centroid of molecule."""
+    pos = mol.GetConformer(conf_id).GetPositions()
+    if heavy_only:
+        pos = pos[[atom.GetAtomicNum() != 1 for atom in mol.GetAtoms()], :]
+    return pos.mean(axis=0)

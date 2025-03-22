@@ -11,7 +11,7 @@ from rdkit.Chem.rdchem import AtomValenceException, Mol
 from rdkit.Chem.rdmolops import AssignStereochemistryFrom3D, RemoveHs, RemoveStereochemistry, SanitizeMol
 
 from .logging import CaptureLogger
-from .molecules import add_stereo_hydrogens, assert_sanity, neutralize_atoms, remove_isotopic_info
+from .molecules import add_stereo_hydrogens, neutralize_atoms, remove_isotopic_info
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +33,12 @@ def get_inchi(mol: Mol, inchi_strict: bool = False) -> str:
 
 def standardize_and_get_inchi(mol: Mol, options: str = "", log_level=None, warnings_as_errors=False) -> str:
     """Return InChI after standardising molecule and inferring stereo from coordinates."""
+
     mol = deepcopy(mol)
-    mol = assert_sanity(mol)
+
+    if flags := SanitizeMol(mol, catchErrors=True):
+        logger.debug("Cannot get InChI because molecule doesn't sanitize due to %s.", flags)
+        return ""
 
     # standardise molecule
     mol = remove_isotopic_info(mol)
@@ -65,8 +69,8 @@ def is_valid_inchi(inchi: str) -> bool:
     """Check that InChI can be parsed and sanitization does not fail."""
     try:
         mol = MolFromInchi(inchi)
-        assert_sanity(mol)
-        assert mol is not None
+        assert mol is not None, "Molecule is None."
+        assert not SanitizeMol(mol, catchErrors=True), "Molecule does not sanitize."
         return True
     except Exception:
         return False
