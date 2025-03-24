@@ -53,14 +53,18 @@ DockBuster().bust(ligand_pred_file, protein_crystal_file)
 
 Documentation is available at [https://posebusters.readthedocs.io](https://posebusters.readthedocs.io).
 
-For more information about the tests and for a study using PoseBusters to compare docking methods, refer to our [paper](https://pubs.rsc.org/en/content/articlelanding/2024/sc/d3sc04185a) or [preprint](https://arxiv.org/abs/2308.05777):
+For more information about the tests and for a study using PoseBusters to compare docking methods, refer to our [paper](http://dx.doi.org/10.1039/D3SC04185A) or [preprint](https://arxiv.org/abs/2308.05777):
 
 ```
-@article{buttenschoen2023posebusters,
+@article{buttenschoen2024posebusters,
   title = {{{PoseBusters}}: {{AI-based}} Docking Methods Fail to Generate Physically Valid Poses or Generalise to Novel Sequences},
   shorttitle = {{{PoseBusters}}},
   author = {Buttenschoen, Martin and Morris, Garrett M. and Deane, Charlotte M.},
-  year = "2023",
+  year = "2024",
+  journal = "Chemical Science",
+  volume = "15",
+  issue = "9",
+  pages = "3130-3139",
   publisher = "The Royal Society of Chemistry",
   doi = "10.1039/D3SC04185A",
   url = "http://dx.doi.org/10.1039/D3SC04185A",

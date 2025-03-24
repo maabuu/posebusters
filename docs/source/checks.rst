@@ -187,16 +187,22 @@ More details on tests and docking method comparison
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _preprint: https://arxiv.org/abs/2308.05777
+.. _paper: https://doi.org/10.1039/D3SC04185A
 
-For more detailed information about the tests and for a study using PoseBusters to compare docking methods, refer to our `preprint`_:
+For more detailed information about the tests and for a study using PoseBusters to compare docking methods, refer to our `preprint`_ or `paper`_:
 
 .. code-block:: bibtex
 
-   @online{buttenschoen2023posebusters,
-   title = {{{PoseBusters}}: {{AI-based}} Docking Methods Fail to Generate Physically Valid Poses or Generalise to Novel Sequences},
-   shorttitle = {{{PoseBusters}}},
-   author = {Buttenschoen, Martin and Morris, Garrett M. and Deane, Charlotte M.},
-   date = {2023-08-10},
-   eprint = {2308.05777},
-   eprinttype = {arxiv}
+   @article{buttenschoen2024posebusters,
+      title = {{{PoseBusters}}: {{AI-based}} Docking Methods Fail to Generate Physically Valid Poses or Generalise to Novel Sequences},
+      shorttitle = {{{PoseBusters}}},
+      author = {Buttenschoen, Martin and Morris, Garrett M. and Deane, Charlotte M.},
+      year = "2024",
+      journal = "Chemical Science",
+      volume = "15",
+      issue = "9",
+      pages = "3130-3139",
+      publisher = "The Royal Society of Chemistry",
+      doi = "10.1039/D3SC04185A",
+      url = "http://dx.doi.org/10.1039/D3SC04185A",
    }
