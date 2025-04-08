@@ -115,6 +115,7 @@ def check_geometry(  # noqa: PLR0913, PLR0915
     bound_matrix_params: dict[str, Any] = bound_matrix_params,
     ignore_hydrogens: bool = True,
     sanitize: bool = True,
+    symmetrize_conjugated_terminal_groups: bool = True,
 ) -> dict[str, Any]:
     """Use RDKit distance geometry bounds to check the geometry of a molecule.
 
@@ -129,6 +130,8 @@ def check_geometry(  # noqa: PLR0913, PLR0915
         bound_matrix_params: Parameters passe to RDKit's GetMoleculeBoundsMatrix function.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
         sanitize: Sanitize molecule before running DG module (recommended). Defaults to True.
+        symmetrize_conjugated_terminal_groups: Will symmetrize the lower and upper bounds of the terminal
+            conjugated bonds. Defaults to True.
 
     Returns:
         PoseBusters results dictionary.
@@ -183,7 +186,8 @@ def check_geometry(  # noqa: PLR0913, PLR0915
     df_12[col_lb] = bounds[lower_triangle_idcs]
     df_12[col_ub] = bounds[upper_triangle_idcs]
 
-    df_12 = symmetrize_conjugated_terminal_bonds(df_12, mol)
+    if symmetrize_conjugated_terminal_groups:
+        df_12 = symmetrize_conjugated_terminal_bonds(df_12, mol)
 
     # add observed dimensions
     conformer = mol.GetConformer()
