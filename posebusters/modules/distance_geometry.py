@@ -9,6 +9,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from rdkit.Chem import MolFromSmarts
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdDistGeom import GetMoleculeBoundsMatrix
 from rdkit.Chem.rdmolops import SanitizeMol
@@ -66,6 +67,46 @@ _empty_results = {
 }
 
 
+def symmetrize_conjugated_terminal_bonds(df: pd.DataFrame, mol: Mol) -> pd.DataFrame:
+    """
+    Symmetrize the lower and upper bounds of the conjugated terminal bonds so that
+    the new lower and upper bounds are the minimum and maximum of the original
+    lower and upper bounds for each pair of atom elements.
+
+    Args:
+        df: Dataframe with the bond geometry information and bounds.
+        mol: RDKit molecule object (conformer id doesn't matter I think)
+
+    Returns:
+        Dataframe with the bond geometry information and bounds, lower/upper bounds
+        for conjugated terminal bonds are symmetrized.
+    """
+
+    def _sort_bond_ids(bond_ids: tuple[tuple | list]):
+        return tuple(tuple(sorted(_)) for _ in bond_ids)
+
+    def _get_terminal_group_matches(_mol: Mol):
+        qsmarts = "[O,N;D1;$([O,N;D1]-[*]=[O,N;D1]),$([O,N;D1]=[*]-[O,N;D1])]~[*]"
+        qsmarts = MolFromSmarts(qsmarts)
+        matches = _mol.GetSubstructMatches(qsmarts)
+        return _sort_bond_ids(matches)
+
+    # sorting the atom types to use them as an index
+    df["atom_types_sorted"] = df["atom_types"].apply(lambda a: tuple(sorted(a.split("--"))))
+    # conjugated terminal atoms matches
+    matches = _get_terminal_group_matches(mol)
+    matched = df[df["atom_pair"].isin(matches)].copy()
+    # min and max of lower and upper bounds
+    grouped = matched.groupby("atom_types_sorted").agg({"lower_bound": np.amin, "upper_bound": np.amax})
+    # updating the matches dataframe and the original dataframe
+    index_orig = matched.index
+    matched = matched.set_index("atom_types_sorted")
+    matched.update(grouped)
+    matched = matched.set_index(index_orig)
+    df.update(matched)
+    return df.drop(columns=["atom_types_sorted"])
+
+
 def check_geometry(  # noqa: PLR0913, PLR0915
     mol_pred: Mol,
     threshold_bad_bond_length: float = 0.2,
@@ -74,6 +115,7 @@ def check_geometry(  # noqa: PLR0913, PLR0915
     bound_matrix_params: dict[str, Any] = bound_matrix_params,
     ignore_hydrogens: bool = True,
     sanitize: bool = True,
+    symmetrize_conjugated_terminal_groups: bool = True,
 ) -> dict[str, Any]:
     """Use RDKit distance geometry bounds to check the geometry of a molecule.
 
@@ -88,6 +130,8 @@ def check_geometry(  # noqa: PLR0913, PLR0915
         bound_matrix_params: Parameters passe to RDKit's GetMoleculeBoundsMatrix function.
         ignore_hydrogens: Whether to ignore hydrogens. Defaults to True.
         sanitize: Sanitize molecule before running DG module (recommended). Defaults to True.
+        symmetrize_conjugated_terminal_groups: Will symmetrize the lower and upper bounds of the terminal
+            conjugated bonds. Defaults to True.
 
     Returns:
         PoseBusters results dictionary.
@@ -141,6 +185,9 @@ def check_geometry(  # noqa: PLR0913, PLR0915
     df_12["is_angle"] = df_12["angle"].apply(lambda x: x is not None)
     df_12[col_lb] = bounds[lower_triangle_idcs]
     df_12[col_ub] = bounds[upper_triangle_idcs]
+
+    if symmetrize_conjugated_terminal_groups:
+        df_12 = symmetrize_conjugated_terminal_bonds(df_12, mol)
 
     # add observed dimensions
     conformer = mol.GetConformer()
