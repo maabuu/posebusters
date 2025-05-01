@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import inspect
 import logging
-from collections import defaultdict
 from collections.abc import Generator, Iterable
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 from pathlib import Path
 from typing import Any, Callable
@@ -51,6 +52,11 @@ module_dict: dict[str, Callable] = {
 }
 molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 
+ResultKey = tuple[str, str, int]
+ResultList = list[tuple[str, str, Any]]
+ResultTuple = tuple[ResultKey, ResultList]
+ResultDict = dict[ResultKey, ResultList]
+
 
 class PoseBusters:
     """Class to run all tests on a set of molecules."""
@@ -61,7 +67,13 @@ class PoseBusters:
     module_args: list
     fname: list
 
-    def __init__(self, config: str | dict[str, Any] = "redock", top_n: int | None = None):
+    def __init__(
+        self,
+        config: str | dict[str, Any] = "redock",
+        top_n: int | None = None,
+        allow_parallel: bool = True,
+        pose_indicators: bool = False,
+    ) -> None:
         """Initialize PoseBusters object."""
         self.module_func: list  # dict[str, Callable]
         self.module_args: list  # dict[str, set[str]]
@@ -78,8 +90,8 @@ class PoseBusters:
         assert len(set(self.config.get("tests", {}).keys()) - set(module_dict.keys())) == 0
 
         self.config["top_n"] = self.config.get("top_n", top_n)
-
-        self.results: dict[tuple[str, str], list[tuple[str, str, Any]]] = defaultdict(list)
+        self.config["allow_parallel"] = self.config.get("allow_parallel", allow_parallel)
+        self.config["pose_indicators"] = self.config.get("pose_indicators", pose_indicators)
 
     def bust(
         self,
@@ -106,14 +118,9 @@ class PoseBusters:
 
         columns = ["mol_pred", "mol_true", "mol_cond"]
         self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred_list], columns=columns)
-
-        results_gen = self._run()
-
-        df = pd.concat([_dataframe_from_output(d, self.config, full_report=full_report) for d in results_gen])
-        df.index.names = ["file", "molecule"]
-        df.columns = [c.lower().replace(" ", "_") for c in df.columns]
-
-        return df
+        generator = self._run()
+        results = self._collect_in_table(generator, full_report=full_report)
+        return results
 
     def bust_table(self, mol_table: pd.DataFrame, full_report: bool = False) -> pd.DataFrame:
         """Run tests on molecules provided in pandas dataframe as paths or rdkit molecule objects.
@@ -126,59 +133,91 @@ class PoseBusters:
             Pandas dataframe with results.
         """
         self.file_paths = mol_table
+        generator = self._run()
+        results = self._collect_in_table(generator, full_report=full_report)
+        return results
 
-        results_gen = self._run()
-
-        df = pd.concat([_dataframe_from_output(d, self.config, full_report=full_report) for d in results_gen])
-        df.index.names = ["file", "molecule"]
-        df.columns = [c.lower().replace(" ", "_") for c in df.columns]
-
-        return df
-
-    def _run(self) -> Generator[dict, None, None]:
+    def _run(self) -> Generator[ResultTuple, None, None]:
         """Run all tests on molecules provided in file paths.
 
         Yields:
             Generator of result dictionaries.
         """
+        if self.config.get("allow_parallel", False) and len(self.file_paths) > 1:
+            yield from self._run_parallel()
+        yield from self._run_single_thread()
+
+    def _run_single_thread(self) -> Generator[ResultTuple, None, None]:
         self._initialize_modules()
-
         for _, paths in self.file_paths.iterrows():
-            mol_args = {}
-            if "mol_cond" in paths and paths["mol_cond"] is not None:
-                mol_cond_load_params = self.config.get("loading", {}).get("mol_cond", {})
-                mol_args["mol_cond"] = safe_load_mol(path=paths["mol_cond"], **mol_cond_load_params)
-            if "mol_true" in paths and paths["mol_true"] is not None:
-                mol_true_load_params = self.config.get("loading", {}).get("mol_true", {})
-                mol_args["mol_true"] = safe_load_mol(path=paths["mol_true"], **mol_true_load_params)
+            yield from self._run_all_poses(paths)
 
-            mol_pred_load_params = self.config.get("loading", {}).get("mol_pred", {})
-            for i, mol_pred in enumerate(safe_supply_mols(paths["mol_pred"], **mol_pred_load_params)):
-                if self.config["top_n"] is not None and i >= self.config["top_n"]:
-                    break
+    def _run_parallel(
+        self, timeout: int | None = None, max_workers: int | None = None
+    ) -> Generator[ResultTuple, None, None]:
+        self._initialize_modules()
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(self._run_and_combine, paths) for _, paths in self.file_paths.iterrows()]
+            for future in as_completed(futures, timeout=None):
+                try:
+                    results = future.result(timeout=timeout)
+                except BrokenProcessPool as exception:
+                    logger.critical("BrokenProcessPool: %s", exception)
+                    raise exception
+                except Exception as exception:
+                    logger.critical("Error in process: %s", exception)
+                    raise exception
 
-                mol_args["mol_pred"] = mol_pred
+                yield from results
 
-                results_key = (str(paths["mol_pred"]), self._get_name(mol_pred, i))
+    def _run_and_combine(self, paths: pd.Series) -> list[ResultTuple]:
+        """Run and collect all tests for all poses in the prediction file."""
+        return list(self._run_all_poses(paths))
 
-                for name, fname, func, args in zip(self.module_name, self.fname, self.module_func, self.module_args):
-                    # pick needed arguments for module
-                    args_needed = {k: v for k, v in mol_args.items() if k in args}
-                    # loading takes all inputs
-                    if fname == "loading":
-                        args_needed = {k: args_needed.get(k, None) for k in args_needed}
-                    # run module when all needed input molecules are valid Mol objects
-                    if fname != "loading" and not all(args_needed.get(m, None) for m in args_needed):
-                        module_output: dict[str, Any] = {"results": {}}
-                    else:
-                        module_output = func(**args_needed)
+    def _run_all_poses(self, paths: pd.Series) -> Generator[ResultTuple, None, None]:
+        """Run all tests on all poses in the prediction file."""
 
-                    # save to object
-                    self.results[results_key].extend([(name, k, v) for k, v in module_output["results"].items()])
-                    # self.results[results_key]["details"].append(module_output["details"])
+        mol_args = {}
+        if "mol_cond" in paths and paths["mol_cond"] is not None:
+            mol_cond_load_params = self.config.get("loading", {}).get("mol_cond", {})
+            mol_args["mol_cond"] = safe_load_mol(path=paths["mol_cond"], **mol_cond_load_params)
+        if "mol_true" in paths and paths["mol_true"] is not None:
+            mol_true_load_params = self.config.get("loading", {}).get("mol_true", {})
+            mol_args["mol_true"] = safe_load_mol(path=paths["mol_true"], **mol_true_load_params)
 
-                # return results for this entry
-                yield {results_key: self.results[results_key]}
+        mol_pred_load_params = self.config.get("loading", {}).get("mol_pred", {})
+        for i, mol_pred in enumerate(safe_supply_mols(paths["mol_pred"], **mol_pred_load_params)):
+            if self.config["top_n"] is not None and i >= self.config["top_n"]:
+                break
+            mol_args["mol_pred"] = mol_pred
+
+            key: ResultKey = (str(paths["mol_pred"]), self._get_name(mol_pred, i), i)
+            results: ResultList = self._run_one_pose(mol_args)
+
+            yield key, results
+
+    def _run_one_pose(self, molecules: dict[str, Any]) -> ResultList:
+        """Run all tests on a single pose."""
+        results = []
+        for name, fname, func, args in zip(self.module_name, self.fname, self.module_func, self.module_args):
+            # pick needed arguments for module
+            args_needed = {k: v for k, v in molecules.items() if k in args}
+
+            # loading takes all inputs
+            if fname == "loading":
+                args_needed = {k: args_needed.get(k, None) for k in args_needed}
+
+            # run module when all needed input molecules are valid Mol objects
+            if fname != "loading" and not all(args_needed.get(m, None) for m in args_needed):
+                module_output: dict[str, Any] = {"results": {}}
+            else:
+                module_output = func(**args_needed)
+
+            # save to object
+            results.extend([(name, k, v) for k, v in module_output["results"].items()])
+            # self.results[results_key]["details"].append(module_output["details"])
+
+        return results
 
     def _initialize_modules(self) -> None:
         self.module_name = []
@@ -205,22 +244,36 @@ class PoseBusters:
 
         return mol.GetProp("_Name")
 
+    def _collect_in_table(self, results_gen, full_report) -> pd.DataFrame:
+        """Collect generator results in a pandas dataframe."""
 
-def _dataframe_from_output(results_dict, config, full_report: bool = False) -> pd.DataFrame:
-    d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}
-    df = pd.DataFrame.from_dict(d, orient="index")
+        df = pd.concat([self._make_table({k: v}, self.config, full_report=full_report) for k, v in results_gen])
+        df.index.names = ["file", "molecule", "position"]
+        df.columns = [c.lower().replace(" ", "_") for c in df.columns]
 
-    test_columns = [(c["name"], n) for c in config["modules"] for n in c.get("chosen_binary_test_output", [])]
-    names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c.get("rename_outputs", {}).items()}
-    suffix_lookup = {c["name"]: c["rename_suffix"] for c in config["modules"] if "rename_suffix" in c}
+        if not self.config.get("pose_indicators", False):
+            df.index = df.index.droplevel(-1)
 
-    available_columns = df.columns.tolist()
-    missing_columns = [c for c in test_columns if c not in available_columns]
-    extra_columns = [c for c in available_columns if c not in test_columns]
-    columns = test_columns + extra_columns if full_report else test_columns
+        return df
 
-    df[missing_columns] = pd.NA
-    df = df[columns]
-    df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]
+    @staticmethod
+    def _make_table(results_dict: ResultDict, config, full_report: bool = False) -> pd.DataFrame:
+        """Generate a table from the output of the tests."""
 
-    return df
+        d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}
+        df = pd.DataFrame.from_dict(d, orient="index")
+
+        test_columns = [(c["name"], n) for c in config["modules"] for n in c.get("chosen_binary_test_output", [])]
+        names_lookup = {(c["name"], k): v for c in config["modules"] for k, v in c.get("rename_outputs", {}).items()}
+        suffix_lookup = {c["name"]: c["rename_suffix"] for c in config["modules"] if "rename_suffix" in c}
+
+        available_columns = df.columns.tolist()
+        missing_columns = [c for c in test_columns if c not in available_columns]
+        extra_columns = [c for c in available_columns if c not in test_columns]
+        columns = test_columns + extra_columns if full_report else test_columns
+
+        df[missing_columns] = pd.NA
+        df = df[columns]
+        df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]
+
+        return df
