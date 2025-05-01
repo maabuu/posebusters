@@ -24,7 +24,9 @@ def create_long_output(df: pd.DataFrame) -> str:
     output = ""
     segments = []
     for col in cols:
-        segments.append("Long summary for " + " ".join(col) + "\n" + df[[col]].to_string(index=True, header=False))
+        segments.append(
+            "Long summary for " + " ".join(map(str, col)) + "\n" + df[[col]].to_string(index=True, header=False)
+        )
     output += "\n\n".join(segments)
     return output + "\n"
 
