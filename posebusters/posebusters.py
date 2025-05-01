@@ -72,7 +72,6 @@ class PoseBusters:
         config: str | dict[str, Any] = "redock",
         top_n: int | None = None,
         max_workers: int | None = None,  # None for all available cores, 0 for no parallelization
-        pose_indicators: bool = False,
     ) -> None:
         """Initialize PoseBusters object."""
         self.module_func: list  # dict[str, Callable]
@@ -91,7 +90,6 @@ class PoseBusters:
 
         self.config["top_n"] = self.config.get("top_n", top_n)
         self.config["max_workers"] = self.config.get("max_workers", max_workers)
-        self.config["pose_indicators"] = self.config.get("pose_indicators", pose_indicators)
 
     def bust(
         self,
@@ -145,7 +143,7 @@ class PoseBusters:
         """
         max_workers = self.config.get("max_workers", None)
         if (max_workers is None or max_workers > 0) and len(self.file_paths) > 1:
-            yield from self._run_parallel(max_workers=max_workers)
+            yield from self._run_parallel_over_files(max_workers=max_workers)
         else:
             yield from self._run_single_thread()
 
@@ -154,7 +152,7 @@ class PoseBusters:
         for _, paths in self.file_paths.iterrows():
             yield from self._run_all_poses(paths)
 
-    def _run_parallel(
+    def _run_parallel_over_files(
         self, timeout: int | None = None, max_workers: int | None = None
     ) -> Generator[ResultTuple, None, None]:
         self._initialize_modules()
@@ -248,9 +246,6 @@ class PoseBusters:
         df = pd.concat([self._make_table({k: v}, self.config, full_report=full_report) for k, v in results_gen])
         df.index.names = ["file", "molecule", "position"]
         df.columns = [c.lower().replace(" ", "_") for c in df.columns]
-
-        if not self.config.get("pose_indicators", False):
-            df.index = df.index.droplevel(-1)
 
         return df
 
