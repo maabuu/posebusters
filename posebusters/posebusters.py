@@ -193,7 +193,7 @@ class PoseBusters:
                 break
             mol_args["mol_pred"] = mol_pred
 
-            key: ResultKey = (str(paths["mol_pred"]), self._get_name(mol_pred, i), i)
+            key: ResultKey = (str(paths["mol_pred"]), self._get_name(mol_pred), i)
             results: ResultList = self._run_one_pose(mol_args)
 
             yield key, results
@@ -237,13 +237,9 @@ class PoseBusters:
             self.module_args.append(module_args)
 
     @staticmethod
-    def _get_name(mol: Mol, i: int) -> str:
-        if mol is None:
-            return f"invalid_mol_at_pos_{i}"
-
-        if not mol.HasProp("_Name") or mol.GetProp("_Name") == "":
-            return f"mol_at_pos_{i}"
-
+    def _get_name(mol: Mol) -> str:
+        if mol is None or not mol.HasProp("_Name"):
+            return ""
         return mol.GetProp("_Name")
 
     def _collect_in_table(self, results_gen, full_report) -> pd.DataFrame:
