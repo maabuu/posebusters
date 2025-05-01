@@ -40,6 +40,7 @@ def bust(  # noqa: PLR0913
     no_header: bool = False,
     full_report: bool = False,
     top_n: int | None = None,
+    max_workers: bool = False,
 ):
     """PoseBusters: Plausibility checks for generated molecule poses."""
     if table is None and len(mol_pred) == 0:
@@ -49,14 +50,14 @@ def bust(  # noqa: PLR0913
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
         mode = _select_mode(config, file_paths.columns.tolist())
-        posebusters = PoseBusters(mode, top_n=top_n)
+        posebusters = PoseBusters(mode, top_n=top_n, max_workers=max_workers)
         posebusters.file_paths = file_paths
         posebusters_results = posebusters._run()
     else:
         # run on single input
         d = {k for k, v in dict(mol_pred=mol_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
         mode = _select_mode(config, d)
-        posebusters = PoseBusters(mode, top_n=top_n)
+        posebusters = PoseBusters(mode, top_n=top_n, max_workers=max_workers)
         cols = ["mol_pred", "mol_true", "mol_cond"]
         posebusters.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred], columns=cols)
         posebusters_results = posebusters._run()
@@ -99,6 +100,7 @@ def _parse_args(args):
     cfg_group.add_argument(
         "--top-n", type=int, default=None, help="run on TOP_N results in MOL_PRED only (default: all)"
     )
+    cfg_group.add_argument("--max-workers", type=int, help="run files in parallel using max number of workers")
 
     # other
     inf_group.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
