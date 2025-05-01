@@ -14,7 +14,7 @@ from rdkit.Chem.rdchem import Mol
 from yaml import safe_load
 
 from . import __version__
-from .posebusters import PoseBusters, _dataframe_from_output
+from .posebusters import PoseBusters
 from .tools.formatting import create_long_output, create_short_output
 
 logger = logging.getLogger(__name__)
@@ -64,8 +64,8 @@ def bust(  # noqa: PLR0913
     if isinstance(output, Path):
         output = open(Path(output), "w", encoding="utf-8")
 
-    for i, results_dict in enumerate(posebusters_results):
-        results = _dataframe_from_output(results_dict, posebusters.config, full_report)
+    for i, (k, v) in enumerate(posebusters_results):
+        results = posebusters._make_table({k: v}, posebusters.config, full_report=full_report)
         output.write(_format_results(results, outfmt, no_header, i))
 
 
@@ -124,7 +124,7 @@ def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = F
 
     if outfmt == "csv":
         header = (not no_header) and (index == 0)
-        df.index.names = ["file", "molecule"]
+        df.index.names = ["file", "molecule", "position"]
         df.columns = [c.lower().replace(" ", "_") for c in df.columns]
         return df.to_csv(index=True, header=header)
 
