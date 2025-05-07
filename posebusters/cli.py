@@ -104,7 +104,8 @@ def _parse_args(args):
     cfg_group.add_argument(
         "--max-workers",
         type=int,
-        help="number workers for parallel processing. (0: single thread, default: use all available cores)",
+        default=0,
+        help="number workers for parallel processing. (0: single thread, None: all available cores)",
     )
     cfg_group.add_argument(
         "--chunk-size", type=int, help="chunk size for parallel processing of SDF files (default: 100)", default=100

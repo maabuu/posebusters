@@ -72,7 +72,7 @@ class PoseBusters:
         self,
         config: str | dict[str, Any] = "redock",
         top_n: int | None = None,
-        max_workers: int | None = None,
+        max_workers: int | None = 0,
         chunk_size: int | None = 100,
     ) -> None:
         """Initialize PoseBusters object.
