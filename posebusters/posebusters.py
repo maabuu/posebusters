@@ -176,10 +176,10 @@ class PoseBusters:
                 try:
                     results = future.result(timeout=timeout)
                 except BrokenProcessPool as exception:
-                    logger.critical("BrokenProcessPool: %s", exception)
+                    # logger.critical("BrokenProcessPool: %s", exception)
                     raise exception
                 except Exception as exception:
-                    logger.critical("Error in process: %s", exception)
+                    # logger.critical("Error in process: %s", exception)
                     raise exception
 
                 yield from results
@@ -200,10 +200,10 @@ class PoseBusters:
                 try:
                     results = future.result(timeout=timeout)
                 except BrokenProcessPool as exception:
-                    logger.critical("BrokenProcessPool: %s", exception)
+                    # logger.critical("BrokenProcessPool: %s", exception)
                     raise exception
                 except Exception as exception:
-                    logger.critical("Error in process: %s", exception)
+                    # logger.critical("Error in process: %s", exception)
                     raise exception
 
                 yield from results

@@ -66,8 +66,6 @@ def safe_supply_mols(
     if path.suffix == ".sdf":
         pass
     elif path.suffix in {".mol", ".mol2"}:
-        if indices is not None:
-            logger.warning("Indices are not supported for .mol and .mol2 files. Ignoring indices.")
         yield safe_load_mol(path, sanitize=True, **load_params)
         return None
     else:
