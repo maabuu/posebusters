@@ -96,14 +96,14 @@ def mol_cholesterol():
 @pytest.fixture
 def mol_true_1g9v():
     path = "tests/conftest/1G9V_RQ3/1G9V_RQ3_ligands.sdf"
-    supplier = SDMolSupplier(str(path), sanitize=True, removeHs=True, strictParsing=True)
-    mol = next(supplier)
-    while mol is None and supplier.atEnd() is False:
+    with SDMolSupplier(str(path), sanitize=True, removeHs=True, strictParsing=True) as supplier:
         mol = next(supplier)
-    for mol_next in supplier:
-        if mol_next is not None:
-            mol.AddConformer(mol_next.GetConformer(), assignId=True)
-    return mol
+        while mol is None and supplier.atEnd() is False:
+            mol = next(supplier)
+        for mol_next in supplier:
+            if mol_next is not None:
+                mol.AddConformer(mol_next.GetConformer(), assignId=True)
+        return mol
 
 
 @pytest.fixture
@@ -119,14 +119,14 @@ def mol_pred_1g9v():
 @pytest.fixture
 def mol_true_1w1p():
     path = "tests/conftest/1W1P_GIO/1W1P_GIO_ligands.sdf"
-    supplier = SDMolSupplier(str(path), sanitize=True, removeHs=True, strictParsing=True)
-    mol = next(supplier)
-    while mol is None and supplier.atEnd() is False:
+    with SDMolSupplier(str(path), sanitize=True, removeHs=True, strictParsing=True) as supplier:
         mol = next(supplier)
-    for mol_next in supplier:
-        if mol_next is not None:
-            mol.AddConformer(mol_next.GetConformer(), assignId=True)
-    return mol
+        while mol is None and supplier.atEnd() is False:
+            mol = next(supplier)
+        for mol_next in supplier:
+            if mol_next is not None:
+                mol.AddConformer(mol_next.GetConformer(), assignId=True)
+        return mol
 
 
 @pytest.fixture

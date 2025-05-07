@@ -14,7 +14,7 @@ from rdkit.Chem.rdchem import Mol
 from yaml import safe_load
 
 from . import __version__
-from .posebusters import PoseBusters, _dataframe_from_output
+from .posebusters import PoseBusters
 from .tools.formatting import create_long_output, create_short_output
 
 logger = logging.getLogger(__name__)
@@ -40,6 +40,8 @@ def bust(  # noqa: PLR0913
     no_header: bool = False,
     full_report: bool = False,
     top_n: int | None = None,
+    max_workers: bool = False,
+    chunk_size: int | None = None,
 ):
     """PoseBusters: Plausibility checks for generated molecule poses."""
     if table is None and len(mol_pred) == 0:
@@ -49,14 +51,14 @@ def bust(  # noqa: PLR0913
         # run on table
         file_paths = pd.read_csv(table, index_col=None)
         mode = _select_mode(config, file_paths.columns.tolist())
-        posebusters = PoseBusters(mode, top_n=top_n)
+        posebusters = PoseBusters(mode, top_n=top_n, max_workers=max_workers, chunk_size=chunk_size)
         posebusters.file_paths = file_paths
         posebusters_results = posebusters._run()
     else:
         # run on single input
         d = {k for k, v in dict(mol_pred=mol_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
         mode = _select_mode(config, d)
-        posebusters = PoseBusters(mode, top_n=top_n)
+        posebusters = PoseBusters(mode, top_n=top_n, max_workers=max_workers, chunk_size=chunk_size)
         cols = ["mol_pred", "mol_true", "mol_cond"]
         posebusters.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred], columns=cols)
         posebusters_results = posebusters._run()
@@ -64,8 +66,8 @@ def bust(  # noqa: PLR0913
     if isinstance(output, Path):
         output = open(Path(output), "w", encoding="utf-8")
 
-    for i, results_dict in enumerate(posebusters_results):
-        results = _dataframe_from_output(results_dict, posebusters.config, full_report)
+    for i, (k, v) in enumerate(posebusters_results):
+        results = posebusters._make_table({k: v}, posebusters.config, full_report=full_report)
         output.write(_format_results(results, outfmt, no_header, i))
 
 
@@ -99,6 +101,14 @@ def _parse_args(args):
     cfg_group.add_argument(
         "--top-n", type=int, default=None, help="run on TOP_N results in MOL_PRED only (default: all)"
     )
+    cfg_group.add_argument(
+        "--max-workers",
+        type=int,
+        help="number workers for parallel processing. (0: single thread, default: use all available cores)",
+    )
+    cfg_group.add_argument(
+        "--chunk-size", type=int, help="chunk size for parallel processing of SDF files (default: 100)", default=100
+    )
 
     # other
     inf_group.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
@@ -124,7 +134,7 @@ def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = F
 
     if outfmt == "csv":
         header = (not no_header) and (index == 0)
-        df.index.names = ["file", "molecule"]
+        df.index.names = ["file", "molecule", "position"]
         df.columns = [c.lower().replace(" ", "_") for c in df.columns]
         return df.to_csv(index=True, header=header)
 
