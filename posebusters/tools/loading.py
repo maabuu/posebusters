@@ -70,10 +70,8 @@ def safe_supply_mols(path: Path, load_all=True, sanitize=True, **load_params) ->
         raise ValueError(f"Molecule file {path} has unknown format. Only .sdf, .mol and .mol2 are supported.")
 
     supplier = SDMolSupplier(str(path), sanitize=False, strictParsing=True)
-    i = 0
-    for mol in supplier:
+    for i, mol in enumerate(supplier):
         mol_clean = _process_mol(mol, sanitize=sanitize, **load_params)
-        i += 1
         if mol_clean is not None:
             mol_clean.SetProp("_Path", str(path))
             mol_clean.SetProp("_Index", str(i))
