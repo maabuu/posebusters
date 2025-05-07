@@ -153,25 +153,23 @@ class PoseBusters:
         Yields:
             Generator of result dictionaries.
         """
+        self._initialize_modules()
         max_workers = self.config.get("max_workers", None)
         chunk_size = self.config.get("chunk_size", 100)
-        if max_workers is None or max_workers > 0:
-            if chunk_size is None:
-                yield from self._run_parallel_over_files(max_workers=max_workers)
-            else:
-                yield from self._run_parallel_over_poses(max_workers=max_workers, chunk_size=chunk_size)
-        else:
+        if max_workers is not None and max_workers <= 0:
             yield from self._run_single_thread()
+        elif chunk_size is None:
+            yield from self._run_parallel_over_files(max_workers=max_workers)
+        else:
+            yield from self._run_parallel_over_poses(max_workers=max_workers, chunk_size=chunk_size)
 
     def _run_single_thread(self) -> Generator[ResultTuple, None, None]:
-        self._initialize_modules()
         for _, paths in self.file_paths.iterrows():
             yield from self._run_all_poses(paths)
 
     def _run_parallel_over_files(
         self, timeout: int | None = None, max_workers: int | None = None
     ) -> Generator[ResultTuple, None, None]:
-        self._initialize_modules()
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = [executor.submit(self._run_and_combine, paths) for _, paths in self.file_paths.iterrows()]
             for future in as_completed(futures, timeout=None):
@@ -189,7 +187,6 @@ class PoseBusters:
     def _run_parallel_over_poses(
         self, timeout: int | None = None, max_workers: int | None = None, chunk_size: int = 100
     ) -> Generator[ResultTuple, None, None]:
-        self._initialize_modules()
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for _, paths in self.file_paths.iterrows():
