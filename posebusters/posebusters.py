@@ -165,7 +165,7 @@ class PoseBusters:
 
     def _run_single_thread(self) -> Generator[ResultTuple, None, None]:
         for _, paths in self.file_paths.iterrows():
-            yield from self._run_all_poses(paths)
+            yield from self._run_multiple_poses(paths)
 
     def _run_parallel_over_files(
         self, timeout: int | None = None, max_workers: int | None = None
@@ -210,12 +210,20 @@ class PoseBusters:
 
     def _run_and_combine(self, paths: pd.Series, indices: Iterable[int] | None = None) -> list[ResultTuple]:
         """Run and collect all tests for all poses in the prediction file."""
-        return list(self._run_all_poses(paths, indices=indices))
+        return list(self._run_multiple_poses(paths, indices=indices))
 
-    def _run_all_poses(
+    def _run_multiple_poses(
         self, paths: pd.Series, indices: Iterable[int] | None = None
     ) -> Generator[ResultTuple, None, None]:
-        """Run all tests on all poses in the prediction file."""
+        """Run all tests on indexed poses in the prediction file.
+
+        Args:
+            paths: Pandas series with keys "mol_pred", "mol_true", "mol_cond" containing paths to molecules.
+            indices: Indices of poses to process. If None, all poses are processed.
+
+        Yields:
+            Generator of result dictionaries.
+        """
 
         mol_args = {}
         if "mol_cond" in paths and paths["mol_cond"] is not None:
@@ -276,6 +284,7 @@ class PoseBusters:
 
     @staticmethod
     def _get_name(mol: Mol) -> str:
+        """Get the name of a molecule from the RDKit molecule object. Returns empty string if no name found."""
         if mol is None or not mol.HasProp("_Name"):
             return ""
         return mol.GetProp("_Name")
