@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Generator
+from collections.abc import Generator, Iterable
 from pathlib import Path
 
 from rdkit.Chem.AllChem import AssignBondOrdersFromTemplate
@@ -47,7 +47,9 @@ def safe_load_mol(path: Path, load_all: bool = False, **load_params) -> Mol | No
     return None
 
 
-def safe_supply_mols(path: Path, load_all=True, sanitize=True, **load_params) -> Generator[Mol | None, None, None]:
+def safe_supply_mols(
+    path: Path, load_all=True, sanitize=True, indices: Iterable[int] | None = None, **load_params
+) -> Generator[Mol | None, None, None]:
     """Supply molecules from a file, optionally adding hydrogens and assigning bond orders.
 
     Args:
@@ -64,18 +66,33 @@ def safe_supply_mols(path: Path, load_all=True, sanitize=True, **load_params) ->
     if path.suffix == ".sdf":
         pass
     elif path.suffix in {".mol", ".mol2"}:
+        if indices is not None:
+            logger.warning("Indices are not supported for .mol and .mol2 files. Ignoring indices.")
         yield safe_load_mol(path, sanitize=True, **load_params)
         return None
     else:
         raise ValueError(f"Molecule file {path} has unknown format. Only .sdf, .mol and .mol2 are supported.")
 
-    supplier = SDMolSupplier(str(path), sanitize=False, strictParsing=True)
-    for i, mol in enumerate(supplier):
-        mol_clean = _process_mol(mol, sanitize=sanitize, **load_params)
-        if mol_clean is not None:
-            mol_clean.SetProp("_Path", str(path))
-            mol_clean.SetProp("_Index", str(i))
-        yield mol_clean
+    with SDMolSupplier(str(path), sanitize=False, strictParsing=True) as supplier:
+        for index in range(len(supplier)) if indices is None else indices:
+            mol_clean = _process_mol(supplier[index], sanitize=sanitize, **load_params)
+            if mol_clean is not None:
+                mol_clean.SetProp("_Path", str(path))
+                mol_clean.SetProp("_Index", str(index))
+            yield mol_clean
+
+
+def get_num_mols(path: Path) -> int:
+    """Get number of molecules in a file. Only supports multiple molecules in SDF files."""
+
+    if isinstance(path, Mol):
+        return 1
+
+    path = Path(path)
+    if path.suffix == ".sdf":
+        with SDMolSupplier(str(path), sanitize=False, strictParsing=False) as supplier:
+            return len(supplier)
+    return 1
 
 
 def _load_mol(  # noqa: PLR0913
@@ -86,25 +103,32 @@ def _load_mol(  # noqa: PLR0913
     strictParsing=False,
     proximityBonding=False,
     cleanupSubstructures=True,
+    index: int | None = None,
     **params,
 ) -> Mol | None:
     """Load molecule(s) from a file, picking the right RDKit function."""
 
-    if load_all and path.suffix == ".sdf":
-        mol = _load_and_combine_mols(path, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
-    elif path.suffix == ".sdf":
-        mol = MolFromMolFile(str(path), sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
+    if path.suffix == ".sdf":
+        if load_all:
+            mol = _load_and_combine_mols(path, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
+        elif index is not None:
+            with SDMolSupplier(str(path), sanitize=False, removeHs=removeHs, strictParsing=strictParsing) as supplier:
+                mol = supplier[index]
+        else:
+            mol = MolFromMolFile(str(path), sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
     elif path.suffix == ".mol2":
-        # MolFromMol2File only loads first molecule from mol2 file
-        if load_all and sum(ln.strip().startswith("@<TRIPOS>MOLECULE") for ln in open(path).readlines()) > 1:
-            logger.error("Cannot load multiple molecules from mol2 file, only loading first.")
+        # MolFromMol2File only loads only first molecule from mol2 file
+        with open(path) as file:
+            if load_all and sum(ln.strip().startswith("@<TRIPOS>MOLECULE") for ln in file.readlines()) > 1:
+                logger.error("Cannot load multiple molecules from mol2 file, only loading first.")
         mol = MolFromMol2File(str(path), sanitize=False, removeHs=removeHs, cleanupSubstructures=cleanupSubstructures)
     elif path.suffix == ".pdb":
         mol = MolFromPDBFile(str(path), sanitize=False, removeHs=removeHs, proximityBonding=proximityBonding)
     elif path.suffix == ".mol":
         # .mol files only contain one molecule
-        block = "".join(open(path).readlines()).strip() + "\nM  END"
-        mol = MolFromMolBlock(block, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
+        with open(path) as file:
+            block = "".join(file.readlines()).strip() + "\nM  END"
+            mol = MolFromMolBlock(block, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
     else:
         raise ValueError(f"Unknown file type {path.suffix}")
 

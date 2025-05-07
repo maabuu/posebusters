@@ -8,6 +8,7 @@ from collections.abc import Generator, Iterable
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
+from math import ceil
 from pathlib import Path
 from typing import Any, Callable
 
@@ -30,7 +31,7 @@ from .modules.sanity import (
 )
 from .modules.sucos import check_sucos
 from .modules.volume_overlap import check_volume_overlap
-from .tools.loading import safe_load_mol, safe_supply_mols
+from .tools.loading import get_num_mols, safe_load_mol, safe_supply_mols
 
 logger = logging.getLogger(__name__)
 
@@ -71,9 +72,19 @@ class PoseBusters:
         self,
         config: str | dict[str, Any] = "redock",
         top_n: int | None = None,
-        max_workers: int | None = None,  # None for all available cores, 0 for no parallelization
+        max_workers: int | None = None,
+        chunk_size: int | None = 100,
     ) -> None:
-        """Initialize PoseBusters object."""
+        """Initialize PoseBusters object.
+
+        Args:
+            config: Configuration file or dictionary. If a string, it should be one of "dock", "redock", "mol", "gen".
+            top_n: Number of poses to process. If None, all poses are processed.
+            max_workers: Maximum number of workers for parallelization. If None, all available cores are used. If 0 or
+                negative, no parallelization is used.
+            chunk_size: Number of poses to process per process if parallelization is used. If None, parallelization over
+                files only.
+        """
         self.module_func: list  # dict[str, Callable]
         self.module_args: list  # dict[str, set[str]]
 
@@ -90,6 +101,7 @@ class PoseBusters:
 
         self.config["top_n"] = self.config.get("top_n", top_n)
         self.config["max_workers"] = self.config.get("max_workers", max_workers)
+        self.config["chunk_size"] = self.config.get("chunk_size", chunk_size)
 
     def bust(
         self,
@@ -142,8 +154,12 @@ class PoseBusters:
             Generator of result dictionaries.
         """
         max_workers = self.config.get("max_workers", None)
-        if (max_workers is None or max_workers > 0) and len(self.file_paths) > 1:
-            yield from self._run_parallel_over_files(max_workers=max_workers)
+        chunk_size = self.config.get("chunk_size", 100)
+        if max_workers is None or max_workers > 0:
+            if chunk_size is None:
+                yield from self._run_parallel_over_files(max_workers=max_workers)
+            else:
+                yield from self._run_parallel_over_poses(max_workers=max_workers, chunk_size=chunk_size)
         else:
             yield from self._run_single_thread()
 
@@ -170,11 +186,38 @@ class PoseBusters:
 
                 yield from results
 
-    def _run_and_combine(self, paths: pd.Series) -> list[ResultTuple]:
-        """Run and collect all tests for all poses in the prediction file."""
-        return list(self._run_all_poses(paths))
+    def _run_parallel_over_poses(
+        self, timeout: int | None = None, max_workers: int | None = None, chunk_size: int = 100
+    ) -> Generator[ResultTuple, None, None]:
+        self._initialize_modules()
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = []
+            for _, paths in self.file_paths.iterrows():
+                num_mols_pred = get_num_mols(paths["mol_pred"])
+                for chunk in range(ceil(num_mols_pred / chunk_size)):
+                    indices = range(chunk * chunk_size, min((chunk + 1) * chunk_size, num_mols_pred))
+                    future = executor.submit(self._run_and_combine, paths=paths, indices=indices)
+                    futures.append(future)
 
-    def _run_all_poses(self, paths: pd.Series) -> Generator[ResultTuple, None, None]:
+            for future in as_completed(futures, timeout=None):
+                try:
+                    results = future.result(timeout=timeout)
+                except BrokenProcessPool as exception:
+                    logger.critical("BrokenProcessPool: %s", exception)
+                    raise exception
+                except Exception as exception:
+                    logger.critical("Error in process: %s", exception)
+                    raise exception
+
+                yield from results
+
+    def _run_and_combine(self, paths: pd.Series, indices: Iterable[int] | None = None) -> list[ResultTuple]:
+        """Run and collect all tests for all poses in the prediction file."""
+        return list(self._run_all_poses(paths, indices=indices))
+
+    def _run_all_poses(
+        self, paths: pd.Series, indices: Iterable[int] | None = None
+    ) -> Generator[ResultTuple, None, None]:
         """Run all tests on all poses in the prediction file."""
 
         mol_args = {}
@@ -186,7 +229,7 @@ class PoseBusters:
             mol_args["mol_true"] = safe_load_mol(path=paths["mol_true"], **mol_true_load_params)
 
         mol_pred_load_params = self.config.get("loading", {}).get("mol_pred", {})
-        for i, mol_pred in enumerate(safe_supply_mols(paths["mol_pred"], **mol_pred_load_params)):
+        for i, mol_pred in enumerate(safe_supply_mols(paths["mol_pred"], indices=indices, **mol_pred_load_params)):
             if self.config["top_n"] is not None and i >= self.config["top_n"]:
                 break
             mol_args["mol_pred"] = mol_pred
