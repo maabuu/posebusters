@@ -128,17 +128,15 @@ def _check_path(path: Path | str) -> Path:
 
 def _load_and_combine_mols(path: Path, sanitize=True, removeHs=True, strictParsing=True) -> Mol | None:
     """Load mols from SDF file and combine into one molecule."""
-    supplier = SDMolSupplier(str(path), sanitize=sanitize, removeHs=removeHs, strictParsing=strictParsing)
-
-    # warning: combines molecules without checking identity or atom order
-    mol = next(supplier)
-    while mol is None and supplier.atEnd() is False:
+    with SDMolSupplier(str(path), sanitize=sanitize, removeHs=removeHs, strictParsing=strictParsing) as supplier:
+        # warning: combines molecules without checking identity or atom order
         mol = next(supplier)
-    for mol_next in supplier:
-        if mol_next is not None:
-            mol.AddConformer(mol_next.GetConformer(), assignId=True)
-
-    return mol
+        while mol is None and supplier.atEnd() is False:
+            mol = next(supplier)
+        for mol_next in supplier:
+            if mol_next is not None:
+                mol.AddConformer(mol_next.GetConformer(), assignId=True)
+        return mol
 
 
 def _process_mol(  # noqa: PLR0913
