@@ -25,7 +25,7 @@ LogToPythonLogger()
 logger = logging.getLogger(__name__)
 
 
-def safe_load_mol(path: Path, load_all: bool = False, **load_params) -> Mol | None:
+def safe_load_mol(path: Path | Mol, load_all: bool = False, **load_params) -> Mol | None:
     """Load one molecule from a file, optionally adding hydrogens and assigning bond orders.
 
     Args:
@@ -37,8 +37,12 @@ def safe_load_mol(path: Path, load_all: bool = False, **load_params) -> Mol | No
     if isinstance(path, Mol):
         return path
 
+    path = Path(path)
+    if not path.exists():
+        logger.warning("File %s does not exist", path)
+        return None
+
     try:
-        path = _check_path(path)
         with CaptureLogger():
             mol = _load_mol(path, load_all=load_all, **load_params)
         return mol
@@ -63,6 +67,9 @@ def safe_supply_mols(
         return None
 
     path = Path(path)
+    if not path.exists():
+        logger.warning("File %s not found.", path)
+        return None
     if path.suffix == ".sdf":
         pass
     elif path.suffix in {".mol", ".mol2"}:
@@ -80,13 +87,15 @@ def safe_supply_mols(
             yield mol_clean
 
 
-def get_num_mols(path: Path) -> int:
+def get_num_mols(path: Path | Mol) -> int:
     """Get number of molecules in a file. Only supports multiple molecules in SDF files."""
 
     if isinstance(path, Mol):
         return 1
 
     path = Path(path)
+    if not path.exists():
+        return 0
     if path.suffix == ".sdf":
         with SDMolSupplier(str(path), sanitize=False, strictParsing=False) as supplier:
             return len(supplier)
@@ -136,16 +145,6 @@ def _load_mol(  # noqa: PLR0913
     mol = _process_mol(mol, sanitize=sanitize, **params)
 
     return mol
-
-
-def _check_path(path: Path | str) -> Path:
-    if isinstance(path, str):
-        path = Path(path)
-    elif not isinstance(path, Path):
-        raise TypeError("Path must be a string or Path object")
-    if not path.exists():
-        raise FileNotFoundError("File does not exist")
-    return path
 
 
 def _load_and_combine_mols(path: Path, sanitize=True, removeHs=True, strictParsing=True) -> Mol | None:
