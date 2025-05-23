@@ -196,7 +196,7 @@ def check_geometry(  # noqa: PLR0913, PLR0915
     df_12["distance"] = conf_distances[lower_triangle_idcs]
 
     if ignore_hydrogens:
-        df_12 = df_12.loc[~df_12["has_hydrogen"], :]
+        df_12 = df_12.loc[df_12["has_hydrogen"]==False, :]
 
     # calculate violations
     df_bonds = _bond_check(df_12)
