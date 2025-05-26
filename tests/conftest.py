@@ -301,3 +301,8 @@ def mol_pip_ideal():
 @pytest.fixture()
 def mol_pip_wrong():
     return MolFromMolFile("tests/conftest/mol_PIP_wrong.sdf")
+
+
+@pytest.fixture()
+def mol_issue_67():
+    return MolFromMolFile("tests/conftest/mol_issue_67.sdf")

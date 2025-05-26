@@ -1,6 +1,8 @@
 import math
+from pathlib import Path
 
 from rdkit.Chem.rdmolfiles import MolFromMolFile, MolFromPDBFile, MolFromSmiles
+from rdkit.Chem.rdmolops import AddHs, SanitizeMol
 
 from posebusters import PoseBusters
 
@@ -187,3 +189,36 @@ def test_check_sanity_2():
     df = posebusters.bust([mol_pred_sanity_2], mol_true_sanity_2, mol_cond_sanity_2, full_report=True)
     assert df["mol_true_loaded"].all()
     assert (df["rmsd"] < 3).all()
+
+
+def test_parallel_with_path():
+    posebusters = PoseBusters("mol", max_workers=3)
+    df = posebusters.bust(mol_pred=Path("tests/conftest/mol_1jn2_62_out.sdf"))
+    assert df["mol_pred_loaded"].all()
+
+
+def test_parallel_with_mol(mol_pred_1jn2_gen62):
+    posebusters = PoseBusters("mol", max_workers=3)
+    df = posebusters.bust(mol_pred=mol_pred_1jn2_gen62)
+    assert df["mol_pred_loaded"].all()
+
+
+def test_issue_67(mol_issue_67):
+    # test the molecule that caused issue #67
+
+    # mol without sanitization
+    buster = PoseBusters(config="mol", max_workers=0)
+    pb_result = buster.bust([mol_issue_67], None, None)
+    assert pb_result["bond_lengths"][0]
+
+    # mol with sanitization
+    SanitizeMol(mol_issue_67, catchErrors=True)
+    buster = PoseBusters(config="mol", max_workers=0)
+    pb_result = buster.bust([mol_issue_67], None, None)
+    assert pb_result["bond_lengths"][0]
+
+    # mol with added hydrogens
+    mol_issue_67 = AddHs(mol_issue_67)
+    buster = PoseBusters(config="mol", max_workers=0)
+    pb_result = buster.bust([mol_issue_67], None, None)
+    assert pb_result["bond_lengths"][0]
