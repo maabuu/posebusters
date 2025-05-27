@@ -262,7 +262,7 @@ def mol_3wrb_gde_pred():
 def embed_mol(smi: str) -> Chem.Mol:
     hmol = Chem.AddHs(Chem.MolFromSmiles(smi))
     ps = srETKDGv3()
-    ps.randomState = 42
+    ps.randomSeed = 42
     _ = EmbedMolecule(hmol, params=ps)
     return hmol
 
