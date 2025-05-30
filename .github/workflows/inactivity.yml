@@ -1,45 +1,39 @@
 name: Inactivity
 
 on:
-    workflow_dispatch:
-    # push:
-    #   branches: [main]
-    # pull_request:
-    schedule:
-      #        ┌───────────── minute (0 - 59)
-      #        │  ┌───────────── hour (0 - 23)
-      #        │  │ ┌───────────── day of the month (1 - 31)
-      #        │  │ │ ┌───────────── month (1 - 12 or JAN-DEC)
-      #        │  │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
-      #        │  │ │ │ │
-      #        │  │ │ │ │
-      #        │  │ │ │ │
-      #        *  * * * *
-      - cron: '47 2 3 * *'
-
-permissions:
-  issues: write
-  pull-requests: write
+  schedule:
+    #        ┌───────────── minute (0 - 59)
+    #        │  ┌───────────── hour (0 - 23)
+    #        │  │ ┌───────────── day of the month (1 - 31)
+    #        │  │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+    #        │  │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+    #        │  │ │ │ │
+    #        │  │ │ │ │
+    #        │  │ │ │ │
+    #        *  * * * *
+    - cron: "30 3 * * *"
 
 jobs:
   close-issues:
     runs-on: ubuntu-latest
 
-    steps:
+    permissions:
+      issues: write
+      pull-requests: write
 
-    - name: Close inactive issues, PRs, and stale issues
-      uses: actions/stale@v3
-      with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        days-before-stale: 60
-        days-before-close: 7
-        # Issues
-        stale-issue-message: "This issue was marked as stale due to inactivity. Please feel free to reopen it if you still have this problem."
-        close-issue-message: "This issue was closed because it has been inactive for 14 days since being marked as stale."
-        stale-issue-label: "stale"
-        exempt-issue-labels: "in-progress"
-        # PRs
-        stale-pr-label: "stale"
-        exempt-all-pr-assignees: true
-        stale-pr-message: "This PR was marked as stale because it has been open for 60 days with no activity."
-        close-pr-message: "This PR was closed because it has been inactive for 14 days since being marked as stale."
+    steps:
+      - name: Close inactive issues, PRs, and stale issues
+        uses: actions/stale@v9
+        with:
+          # issues
+          days-before-issue-stale: 30
+          days-before-issue-close: 14
+          stale-issue-label: "stale"
+          stale-issue-message: "This issue is stale because it has been open for 30 days with no activity."
+          close-issue-message: "This issue was closed because it has been inactive for 14 days since being marked as stale."
+          # pull requests
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          stale-pr-label: "stale"
+          stale-pr-message: "This PR is stale because it has been open for 30 days with no activity."
+          close-pr-message: "This PR was closed because it has been inactive for 14 days since being marked as stale."
