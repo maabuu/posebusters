@@ -124,7 +124,7 @@ class PoseBusters:
         Returns:
             Pandas dataframe with results.
         """
-        mol_pred_list: Iterable[Mol | Path | str] = [mol_pred] if isinstance(mol_pred, Mol | Path | str) else mol_pred
+        mol_pred_list: Iterable[Mol | Path | str] = [mol_pred] if isinstance(mol_pred, (Mol, Path, str)) else mol_pred
 
         columns = ["mol_pred", "mol_true", "mol_cond"]
         self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred_list], columns=columns)
