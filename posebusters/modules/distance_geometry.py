@@ -195,8 +195,22 @@ def check_geometry(  # noqa: PLR0913, PLR0915
     df_12["conf_id"] = conformer.GetId()
     df_12["distance"] = conf_distances[lower_triangle_idcs]
 
+    # set types
+    df_12 = df_12.astype(
+        {
+            "has_hydrogen": "bool",
+            "is_bond": "bool",
+            "is_angle": "bool",
+            col_lb: "float",
+            col_ub: "float",
+            "conf_id": "int",
+            "distance": "float",
+        }
+    )
+
+    # remove hydrogens if requested
     if ignore_hydrogens:
-        df_12 = df_12.loc[~df_12["has_hydrogen"], :]
+        df_12 = df_12.loc[df_12["has_hydrogen"].eq(False), :]
 
     # calculate violations
     df_bonds = _bond_check(df_12)
