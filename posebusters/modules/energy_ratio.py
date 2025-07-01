@@ -37,6 +37,7 @@ def check_energy_ratio(
     ensemble_number_conformations: int = 100,
     inchi_strict: bool = False,
     epsilon=1e-10,
+    num_threads=0,
 ) -> dict[str, dict[str, float | bool]]:
     """Check whether the energy of the docked ligand is within user defined range.
 
@@ -46,6 +47,8 @@ def check_energy_ratio(
         ensemble_number_conformations: Number of conformations to generate for the ensemble over which to
             average. Defaults to 100.
         inchi_strict: Whether to treat warnings in the InChI generation as errors. Defaults to False.
+        num_threads: The number of threads to use for energy minimization.
+            By default, the number of available cores is used.
 
     Returns:
         PoseBusters results dictionary.
@@ -76,7 +79,7 @@ def check_energy_ratio(
         observed_energy = float("nan")
 
     try:
-        energies = get_energies(inchi, ensemble_number_conformations)
+        energies = get_energies(inchi, ensemble_number_conformations, num_threads)
         mean_energy = sum(energies) / len(energies)
         std_energy = sum((energy - mean_energy) ** 2 for energy in energies) / (len(energies) - 1)
         std_energy = max(epsilon, std_energy)  # clipping
