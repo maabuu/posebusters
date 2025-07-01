@@ -62,6 +62,9 @@ docstring-code-format = true
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D", "PLR2004"]
 
+[tool.ruff.lint.pylint]
+max-args = 6
+
 [tool.mypy]
 ignore_missing_imports = true
 
