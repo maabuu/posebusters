@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import inspect
 import logging
-from collections.abc import Generator, Iterable
+from collections.abc import Callable, Generator, Iterable
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 from math import ceil
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import pandas as pd
 from rdkit.Chem.rdchem import Mol
@@ -124,7 +124,7 @@ class PoseBusters:
         Returns:
             Pandas dataframe with results.
         """
-        mol_pred_list: Iterable[Mol | Path | str] = [mol_pred] if isinstance(mol_pred, (Mol, Path, str)) else mol_pred
+        mol_pred_list: Iterable[Mol | Path | str] = [mol_pred] if isinstance(mol_pred, Mol | Path | str) else mol_pred
 
         columns = ["mol_pred", "mol_true", "mol_cond"]
         self.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred_list], columns=columns)
