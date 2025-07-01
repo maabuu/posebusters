@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --group dev --group test
+          uv sync --extra dev --extra test
 
       - name: Run pre-commit hooks
         run: uv run pre-commit run --all-files --show-diff-on-failure --color=always

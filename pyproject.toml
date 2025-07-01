@@ -27,7 +27,6 @@ dynamic = ["version", "description"]
 dependencies = ['rdkit >= 2024.9', 'pandas', 'numpy', 'pyyaml']
 
 [project.optional-dependencies]
-all = ["posebusters[dev,docs,test]"]
 dev = ["ruff"]
 docs = [
     "ipython",
