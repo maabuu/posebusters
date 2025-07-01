@@ -2,9 +2,6 @@ name: Security
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [main]
-  # pull_request:
   schedule:
     #        ┌───────────── minute (0 - 59)
     #        │  ┌───────────── hour (0 - 23)
@@ -15,47 +12,26 @@ on:
     #        │  │ │ │ │
     #        │  │ │ │ │
     #        *  * * * *
-    - cron: '47 2 3 * *'
+    - cron: "47 2 * * 1"
 
 jobs:
   CodeQL-Build:
-    # CodeQL runs on ubuntu-latest, windows-latest, and macos-latest
     runs-on: ubuntu-latest
 
     permissions:
-      # required for all workflows
       security-events: write
 
-      # only required for workflows in private repositories
       actions: read
       contents: read
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        # Override language selection by uncommenting this and choosing your languages
+        uses: github/codeql-action/init@v3
         with:
           languages: python
 
-    #   # Autobuild attempts to build any compiled languages (C/C++, C#, Go, or Java).
-    #   # If this step fails, then you should remove it and run the build manually (see below).
-    #   - name: Autobuild
-    #     uses: github/codeql-action/autobuild@v2
-
-      # ℹ️ Command-line programs to run using the OS shell.
-      # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-
-      # ✏️ If the Autobuild fails above, remove it and uncomment the following
-      #    three lines and modify them (or add more) to build your code if your
-      #    project uses a compiled language
-
-      #- run: |
-      #     make bootstrap
-      #     make release
-
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3

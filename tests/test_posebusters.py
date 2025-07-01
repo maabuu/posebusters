@@ -209,16 +209,16 @@ def test_issue_67(mol_issue_67):
     # mol without sanitization
     buster = PoseBusters(config="mol", max_workers=0)
     pb_result = buster.bust([mol_issue_67], None, None)
-    assert pb_result["bond_lengths"][0]
+    assert pb_result["bond_lengths"].iloc[0]
 
     # mol with sanitization
     SanitizeMol(mol_issue_67, catchErrors=True)
     buster = PoseBusters(config="mol", max_workers=0)
     pb_result = buster.bust([mol_issue_67], None, None)
-    assert pb_result["bond_lengths"][0]
+    assert pb_result["bond_lengths"].iloc[0]
 
     # mol with added hydrogens
     mol_issue_67 = AddHs(mol_issue_67)
     buster = PoseBusters(config="mol", max_workers=0)
     pb_result = buster.bust([mol_issue_67], None, None)
-    assert pb_result["bond_lengths"][0]
+    assert pb_result["bond_lengths"].iloc[0]
