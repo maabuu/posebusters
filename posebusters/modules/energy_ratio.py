@@ -48,6 +48,7 @@ def check_energy_ratio(
             average. Defaults to 100.
         inchi_strict: Whether to treat warnings in the InChI generation as errors. Defaults to False.
         num_threads: The number of threads to use for energy minimization.
+            By default, the number of available cores is used.
 
     Returns:
         PoseBusters results dictionary.
