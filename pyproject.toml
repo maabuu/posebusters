@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
 ]
-requires-python = "~=3.9"
+requires-python = ">=3.9"
 dynamic = ["version", "description"]
 dependencies = ['rdkit >= 2024.9', 'pandas', 'numpy', 'pyyaml']
 
@@ -54,7 +54,6 @@ name = "posebusters"
 line-length = 120
 show-fixes = true
 lint.select = ["F", "W", "E", "I", "UP", "PL", "T201"]
-lint.ignore = ["E501"]
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -64,19 +63,6 @@ docstring-code-format = true
 
 [tool.ruff.lint.pylint]
 max-args = 6
-
-[tool.mypy]
-ignore_missing_imports = true
-
-[tool.flake8]
-max-complexity = 10
-max-line-length = 120
-per-file-ignores = """
-    tests/*: D
-"""
-
-[tool.pylint.main]
-max-line-length = 120
 
 [tool.coverage.run]
 branch = true
@@ -89,10 +75,7 @@ exclude_lines = ["pragma: no cover", "raise NotImplementedError"]
 [tool.pytest.ini_options]
 addopts = "--cov-report xml:coverage.xml --cov posebusters --cov-fail-under 0 --cov-append -m 'not integration'"
 pythonpath = ["posebusters"]
-testpaths = "tests"
-
-[tool.pycln]
-all = false
+testpaths = ["tests"]
 
 [tool.codespell]
 skip = '*.pdb,*.mol2,*.sdf,*.po,*.ts'

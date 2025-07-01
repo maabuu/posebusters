@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import inspect
 import logging
-from collections.abc import Generator, Iterable
+from collections.abc import Callable, Generator, Iterable
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 from math import ceil
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import pandas as pd
 from rdkit.Chem.rdchem import Mol
