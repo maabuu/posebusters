@@ -120,10 +120,10 @@ def check_energy_ratio(
     return {"results": results}
 
 
-def get_average_energy(inchi: str, n_confs: int = 50, num_threads: int = 0) -> Mol:
+def get_average_energy(inchi: str, n_confs: int = 50, num_threads: int = 0) -> float:
     """Get average energy of an ensemble of molecule conformations."""
     energies = get_energies(inchi, n_confs, num_threads)
-    return sum(energies) / len(energies)
+    return float(sum(energies) / len(energies))
 
 
 @cache

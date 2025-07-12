@@ -55,7 +55,7 @@ def get_feature_map_score(
     # normalize score
     normalization_constant = min(feature_map.GetNumFeatures(), len(features_large))
     if normalization_constant > 0:
-        return feature_score / normalization_constant
+        return float(feature_score / normalization_constant)
 
     return np.nan
 

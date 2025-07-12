@@ -63,10 +63,10 @@ class PoseBusters:
     """Class to run all tests on a set of molecules."""
 
     file_paths: pd.DataFrame
-    module_name: list
-    module_func: list
-    module_args: list
-    fname: list
+    module_name: list[str]
+    module_func: list[Callable]
+    module_args: list[set[str]]
+    fname: list[str]
 
     def __init__(
         self,
@@ -85,8 +85,6 @@ class PoseBusters:
             chunk_size: Number of poses to process per process if parallelization is used. If None, parallelization over
                 files only.
         """
-        self.module_func: list  # dict[str, Callable]
-        self.module_args: list  # dict[str, set[str]]
 
         if isinstance(config, str) and config in {"dock", "redock", "mol", "gen"}:
             logger.info("Using default configuration for mode %s.", config)
@@ -287,7 +285,7 @@ class PoseBusters:
         """Get the name of a molecule from the RDKit molecule object. Returns empty string if no name found."""
         if mol is None or not mol.HasProp("_Name"):
             return ""
-        return mol.GetProp("_Name")
+        return str(mol.GetProp("_Name", autoConvert=False))
 
     def _collect_in_table(self, results_gen: Generator, full_report: bool) -> pd.DataFrame:
         """Collect generator results in a pandas dataframe."""

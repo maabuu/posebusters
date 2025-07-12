@@ -21,7 +21,7 @@ def get_inchi(mol: Mol, inchi_strict: bool = False) -> str:
 
     with CaptureLogger() as log:
         SanitizeMol(mol)
-        inchi = MolToInchi(mol, treatWarningAsError=inchi_strict)
+        inchi = str(MolToInchi(mol, treatWarningAsError=inchi_strict))
         # check inchi because inchi generation does not raise an error if the inchi is invalid
         if MolFromInchi(inchi, sanitize=True) is None:
             warnings = re.split(r"\[.+?\] WARNING: ", log.get("WARNING", ""))[1:]
@@ -60,7 +60,7 @@ def standardize_and_get_inchi(mol: Mol, options: str = "", log_level=None, warni
         AssignStereochemistryFrom3D(mol, replaceExistingTags=True)
 
     with CaptureLogger():
-        inchi = MolToInchi(mol, options=options, logLevel=log_level, treatWarningAsError=warnings_as_errors)
+        inchi = str(MolToInchi(mol, options=options, logLevel=log_level, treatWarningAsError=warnings_as_errors))
 
     return inchi
 

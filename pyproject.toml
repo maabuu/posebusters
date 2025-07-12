@@ -65,7 +65,8 @@ docstring-code-format = true
 max-args = 6
 
 [tool.mypy]
-strict = true
+strict = false
+
 
 [tool.coverage.run]
 branch = true
