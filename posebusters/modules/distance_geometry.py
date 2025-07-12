@@ -82,10 +82,10 @@ def symmetrize_conjugated_terminal_bonds(df: pd.DataFrame, mol: Mol) -> pd.DataF
         for conjugated terminal bonds are symmetrized.
     """
 
-    def _sort_bond_ids(bond_ids: tuple[tuple | list]):
+    def _sort_bond_ids(bond_ids: tuple[tuple | list]) -> tuple[tuple, ...]:
         return tuple(tuple(sorted(_)) for _ in bond_ids)
 
-    def _get_terminal_group_matches(_mol: Mol):
+    def _get_terminal_group_matches(_mol: Mol) -> tuple[tuple, ...]:
         qsmarts = "[O,N;D1;$([O,N;D1]-[*]=[O,N;D1]),$([O,N;D1]=[*]-[O,N;D1])]~[*]"
         qsmarts = MolFromSmarts(qsmarts)
         matches = _mol.GetSubstructMatches(qsmarts)
@@ -263,7 +263,7 @@ def _clash_check(df: pd.DataFrame) -> pd.DataFrame:
     # clash is only when lower bound is violated
     df = df[(~df["is_bond"]) & (~df["is_angle"])].copy()
 
-    def _lb_pe(value, lower_bound):
+    def _lb_pe(value: float, lower_bound: float) -> float:
         if value >= lower_bound:
             return 0.0
         return pe(value, lower_bound)
@@ -310,7 +310,7 @@ def _sort_bond(bond: tuple[int, int]) -> tuple[int, int]:
     return (min(bond), max(bond))
 
 
-def _pairwise_distance(x):
+def _pairwise_distance(x: np.ndarray) -> np.ndarray:
     return np.linalg.norm(x[:, None, :] - x[None, :, :], axis=-1)
 
 

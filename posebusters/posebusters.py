@@ -283,13 +283,13 @@ class PoseBusters:
             self.module_args.append(module_args)
 
     @staticmethod
-    def _get_name(mol: Mol) -> str:
+    def _get_name(mol: Mol | None) -> str:
         """Get the name of a molecule from the RDKit molecule object. Returns empty string if no name found."""
         if mol is None or not mol.HasProp("_Name"):
             return ""
         return mol.GetProp("_Name")
 
-    def _collect_in_table(self, results_gen, full_report) -> pd.DataFrame:
+    def _collect_in_table(self, results_gen: Generator, full_report: bool) -> pd.DataFrame:
         """Collect generator results in a pandas dataframe."""
 
         df = pd.concat([self._make_table({k: v}, self.config, full_report=full_report) for k, v in results_gen])
@@ -299,7 +299,7 @@ class PoseBusters:
         return df
 
     @staticmethod
-    def _make_table(results_dict: ResultDict, config, full_report: bool = False) -> pd.DataFrame:
+    def _make_table(results_dict: ResultDict, config: dict[str, Any], full_report: bool = False) -> pd.DataFrame:
         """Generate a table from the output of the tests."""
 
         d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from copy import deepcopy
 from logging import getLogger
 
@@ -115,7 +114,7 @@ def get_hbond_donors(mol: Mol) -> set[int]:
     return {s[0] for s in mol.GetSubstructMatches(HDonorSmarts, uniquify=1)}
 
 
-def delete_atoms(mol: Mol, indices: Iterable[int]) -> Mol:
+def delete_atoms(mol: Mol, indices: list[int]) -> Mol:
     """Delete atoms from molecule.
 
     Args:
