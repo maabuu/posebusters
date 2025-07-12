@@ -64,6 +64,9 @@ docstring-code-format = true
 [tool.ruff.lint.pylint]
 max-args = 6
 
+[tool.mypy]
+strict = true
+
 [tool.coverage.run]
 branch = true
 
