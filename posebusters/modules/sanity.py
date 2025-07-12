@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from typing import Any
 
 import pandas as pd
 from rdkit import RDLogger
@@ -13,7 +14,7 @@ from rdkit.Chem.rdmolops import DetectChemistryProblems, GetMolFrags, SanitizeFl
 from ..tools.inchi import get_inchi
 
 
-def check_chemistry_using_rdkit(mol_pred: Mol):
+def check_chemistry_using_rdkit(mol_pred: Mol) -> dict[str, Any]:
     """Check sanity of molecule using RDKit sanitization rules."""
     assert isinstance(mol_pred, Mol)
     mol = deepcopy(mol_pred)
@@ -36,7 +37,7 @@ def check_chemistry_using_rdkit(mol_pred: Mol):
     return {"results": results, "details": details}
 
 
-def check_chemistry_using_inchi(mol_pred: Mol):
+def check_chemistry_using_inchi(mol_pred: Mol) -> dict[str, Any]:
     """Check sanity of a molecule using InChI rules."""
     assert isinstance(mol_pred, Mol)
     mol = deepcopy(mol_pred)
@@ -57,7 +58,7 @@ def check_chemistry_using_inchi(mol_pred: Mol):
     return {"results": {"inchi_convertible": passes}, "details": dict(errors=errors, inchi=inchi)}
 
 
-def check_all_atoms_connected(mol_pred: Mol):
+def check_all_atoms_connected(mol_pred: Mol) -> dict[str, Any]:
     """Check if all atoms in a molecule are connected."""
     assert isinstance(mol_pred, Mol)
     mol = deepcopy(mol_pred)
@@ -69,7 +70,7 @@ def check_all_atoms_connected(mol_pred: Mol):
     return {"results": results, "details": details}
 
 
-def check_chemistry(mol_pred: Mol):
+def check_chemistry(mol_pred: Mol) -> dict[str, Any]:
     """Check sanity using RDKit and connectedness.
 
     Notes:

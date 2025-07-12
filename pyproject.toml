@@ -23,12 +23,12 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
 ]
-requires-python = "~=3.9"
+requires-python = ">=3.9"
 dynamic = ["version", "description"]
 dependencies = ['rdkit >= 2024.9', 'pandas', 'numpy', 'pyyaml']
 
 [project.optional-dependencies]
-dev = ["ruff"]
+dev = ["ruff", "mypy"]
 docs = [
     "ipython",
     "nbsphinx",
