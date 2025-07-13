@@ -67,7 +67,6 @@ max-args = 6
 [tool.mypy]
 strict = false
 
-
 [tool.coverage.run]
 branch = true
 

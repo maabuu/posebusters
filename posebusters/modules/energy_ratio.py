@@ -134,15 +134,17 @@ def get_energies(inchi: str, n_confs: int = 50, num_threads: int = 0) -> list[fl
     return new_conformation(mol, n_confs, num_threads)["energies"]
 
 
-def new_conformation(mol: Mol, n_confs: int = 1, num_threads: int = 0, energy_minimization=True) -> Mol:
+def new_conformation(
+    mol: Mol, n_confs: int = 1, num_threads: int = 0, energy_minimization=True
+) -> dict[str, Mol | list[float]]:
     """Generate new conformation(s) for a molecule."""
     assert mol is not None
 
     etkdg = ETKDGv3()
-    etkdg.randomSeed = 42
-    etkdg.verbose = False
-    etkdg.useRandomCoords = True
-    etkdg.numThreads = num_threads
+    etkdg.randomSeed = 42  # type: ignore[assignment]
+    etkdg.verbose = False  # type: ignore[assignment]
+    etkdg.useRandomCoords = True  # type: ignore[assignment]
+    etkdg.numThreads = num_threads  # type: ignore[assignment]
 
     # prep mol
     mol_etkdg = deepcopy(mol)

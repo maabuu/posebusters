@@ -314,6 +314,6 @@ class PoseBusters:
 
         df[missing_columns] = pd.NA
         df = df[columns]
-        df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]
+        df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]  # type: ignore[call-overload]
 
         return df

@@ -47,7 +47,7 @@ def get_feature_map_score(
 
     # create feature map based on small molecule
     feature_map = FeatMaps.FeatMap(feats=features_small, weights=[1] * len(features_small), params=PARAMETERS)
-    feature_map.scoreMode = FeatMaps.FeatMapScoreMode.Best
+    feature_map.scoreMode = FeatMaps.FeatMapScoreMode.Best  # type: ignore[misc]
 
     # score features of large molecule present in small molecule
     feature_score = feature_map.ScoreFeats(features_large)

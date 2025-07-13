@@ -14,14 +14,14 @@ from rdkit.Chem.rdmolops import DetectChemistryProblems, GetMolFrags, SanitizeFl
 from ..tools.inchi import get_inchi
 
 
-def check_chemistry_using_rdkit(mol_pred: Mol) -> dict[str, Any]:
+def check_chemistry_using_rdkit(mol_pred: Mol) -> dict[str, dict[str, bool] | dict[str, bool | str] | pd.DataFrame]:
     """Check sanity of molecule using RDKit sanitization rules."""
     assert isinstance(mol_pred, Mol)
     mol = deepcopy(mol_pred)
 
-    RDLogger.DisableLog("rdApp.*")
+    RDLogger.DisableLog("rdApp.*")  # type: ignore[attr-defined]
     errors = DetectChemistryProblems(mol, sanitizeOps=SanitizeFlags.SANITIZE_ALL)
-    RDLogger.EnableLog("rdApp.*")
+    RDLogger.EnableLog("rdApp.*")  # type: ignore[attr-defined]
 
     messages = [error.Message() for error in errors]
     atom_indices = [e.GetAtomIndices() if hasattr(e, "GetAtomIndices") else e.GetAtomIdx() for e in errors]
@@ -37,7 +37,7 @@ def check_chemistry_using_rdkit(mol_pred: Mol) -> dict[str, Any]:
     return {"results": results, "details": details}
 
 
-def check_chemistry_using_inchi(mol_pred: Mol) -> dict[str, Any]:
+def check_chemistry_using_inchi(mol_pred: Mol) -> dict[str, dict[str, str | bool | None]]:
     """Check sanity of a molecule using InChI rules."""
     assert isinstance(mol_pred, Mol)
     mol = deepcopy(mol_pred)
@@ -58,7 +58,7 @@ def check_chemistry_using_inchi(mol_pred: Mol) -> dict[str, Any]:
     return {"results": {"inchi_convertible": passes}, "details": dict(errors=errors, inchi=inchi)}
 
 
-def check_all_atoms_connected(mol_pred: Mol) -> dict[str, Any]:
+def check_all_atoms_connected(mol_pred: Mol) -> dict[str, dict[str, bool] | dict[str, int]]:
     """Check if all atoms in a molecule are connected."""
     assert isinstance(mol_pred, Mol)
     mol = deepcopy(mol_pred)

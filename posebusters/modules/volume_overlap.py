@@ -69,5 +69,5 @@ def _pairwise_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
 
 def _filter_by_mask(mol: Mol, mask: np.ndarray) -> Mol:
     if mask.sum() < len(mask):
-        mol = delete_atoms(mol, np.where(~mask)[0].tolist())
+        mol = delete_atoms(mol, np.where(~mask)[0].tolist())  # type: ignore[arg-type]
     return mol

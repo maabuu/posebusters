@@ -24,9 +24,9 @@ def copy_pos_to_template_mol(mol_ref: Mol, mol_pos: Mol) -> Mol:
     mol_new.RemoveAllConformers()
     RemoveStereochemistry(mol_new)
 
-    RDLogger.DisableLog("rdApp.")
+    RDLogger.DisableLog("rdApp.")  # type: ignore[attr-defined]
     mol_pos = AssignBondOrdersFromTemplate(refmol=mol_new, mol=mol_pos)
-    RDLogger.EnableLog("rdApp.")
+    RDLogger.EnableLog("rdApp.")  # type: ignore[attr-defined]
     assert mol_pos is not None
 
     # get atom mapping between molecules
@@ -106,12 +106,12 @@ def remove_isotopic_info(mol: Mol) -> Mol:
 
 def get_hbond_acceptors(mol: Mol) -> set[int]:
     """Return indices of atoms that can act as hydrogen bond acceptors."""
-    return {s[0] for s in mol.GetSubstructMatches(HAcceptorSmarts, uniquify=1)}
+    return {s[0] for s in mol.GetSubstructMatches(HAcceptorSmarts, uniquify=1)}  # type: ignore[call-overload]
 
 
 def get_hbond_donors(mol: Mol) -> set[int]:
     """Return indices of atoms that can act as hydrogen bond donors."""
-    return {s[0] for s in mol.GetSubstructMatches(HDonorSmarts, uniquify=1)}
+    return {s[0] for s in mol.GetSubstructMatches(HDonorSmarts, uniquify=1)}  # type: ignore[call-overload]
 
 
 def delete_atoms(mol: Mol, indices: list[int]) -> Mol:
