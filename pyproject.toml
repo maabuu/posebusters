@@ -27,8 +27,9 @@ requires-python = ">=3.9"
 dynamic = ["version", "description"]
 dependencies = ['rdkit >= 2024.9', 'pandas', 'numpy', 'pyyaml']
 
-[project.optional-dependencies]
-dev = ["ruff"]
+[dependency-groups]
+dev = ["ruff", "pre-commit"]
+test = ["pytest", "pytest-cov", "mypy"]
 docs = [
     "ipython",
     "nbsphinx",
@@ -37,7 +38,6 @@ docs = [
     "sphinx",
     "sphinxcontrib-programoutput",
 ]
-test = ["pre-commit", "pytest", "pytest-cov"]
 
 [project.urls]
 Documentation = "https://posebusters.readthedocs.io/en/latest/"
@@ -64,6 +64,9 @@ docstring-code-format = true
 [tool.ruff.lint.pylint]
 max-args = 6
 
+[tool.mypy]
+strict = false
+
 [tool.coverage.run]
 branch = true
 
@@ -87,3 +90,6 @@ number = 4
 recursive = true
 targets = "posebusters"
 skips = ['B101']
+
+[tool.uv]
+default-groups = ["dev", "test"]

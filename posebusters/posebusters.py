@@ -63,10 +63,10 @@ class PoseBusters:
     """Class to run all tests on a set of molecules."""
 
     file_paths: pd.DataFrame
-    module_name: list
-    module_func: list
-    module_args: list
-    fname: list
+    module_name: list[str]
+    module_func: list[Callable]
+    module_args: list[set[str]]
+    fname: list[str]
 
     def __init__(
         self,
@@ -85,8 +85,6 @@ class PoseBusters:
             chunk_size: Number of poses to process per process if parallelization is used. If None, parallelization over
                 files only.
         """
-        self.module_func: list  # dict[str, Callable]
-        self.module_args: list  # dict[str, set[str]]
 
         if isinstance(config, str) and config in {"dock", "redock", "mol", "gen"}:
             logger.info("Using default configuration for mode %s.", config)
@@ -283,13 +281,13 @@ class PoseBusters:
             self.module_args.append(module_args)
 
     @staticmethod
-    def _get_name(mol: Mol) -> str:
+    def _get_name(mol: Mol | None) -> str:
         """Get the name of a molecule from the RDKit molecule object. Returns empty string if no name found."""
         if mol is None or not mol.HasProp("_Name"):
             return ""
-        return mol.GetProp("_Name")
+        return str(mol.GetProp("_Name", autoConvert=False))
 
-    def _collect_in_table(self, results_gen, full_report) -> pd.DataFrame:
+    def _collect_in_table(self, results_gen: Generator, full_report: bool) -> pd.DataFrame:
         """Collect generator results in a pandas dataframe."""
 
         df = pd.concat([self._make_table({k: v}, self.config, full_report=full_report) for k, v in results_gen])
@@ -299,7 +297,7 @@ class PoseBusters:
         return df
 
     @staticmethod
-    def _make_table(results_dict: ResultDict, config, full_report: bool = False) -> pd.DataFrame:
+    def _make_table(results_dict: ResultDict, config: dict[str, Any], full_report: bool = False) -> pd.DataFrame:
         """Generate a table from the output of the tests."""
 
         d = {id: {(module, output): value for module, output, value in results} for id, results in results_dict.items()}
@@ -316,6 +314,6 @@ class PoseBusters:
 
         df[missing_columns] = pd.NA
         df = df[columns]
-        df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]
+        df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]  # type: ignore[call-overload]
 
         return df

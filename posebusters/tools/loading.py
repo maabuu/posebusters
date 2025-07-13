@@ -158,6 +158,7 @@ def _load_and_combine_mols(path: Path, sanitize=True, removeHs=True, strictParsi
             if mol_next is not None:
                 mol.AddConformer(mol_next.GetConformer(), assignId=True)
         return mol
+    return None
 
 
 def _process_mol(  # noqa: PLR0913

@@ -3,7 +3,7 @@
 import pandas as pd
 
 
-def _value_map(x):
+def _value_map(x: bool) -> str:
     if isinstance(x, bool):
         return ".   " if x else "Fail"
     return x
@@ -48,4 +48,4 @@ def create_short_output(df: pd.DataFrame) -> str:
     results["Pass"] = results[columns].all(axis=1)
     results.index.name = None
     results = results[["Passed tests"]]
-    return results.to_string(index=True, header=False) + "\n"
+    return str(results.to_string(index=True, header=False)) + "\n"

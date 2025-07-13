@@ -20,7 +20,7 @@ from .tools.formatting import create_long_output, create_short_output
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """Safe entry point for PoseBusters from the command line."""
     parser = _parse_args(sys.argv[1:])
     try:
@@ -42,7 +42,7 @@ def bust(  # noqa: PLR0913
     top_n: int | None = None,
     max_workers: bool = False,
     chunk_size: int | None = None,
-):
+) -> None:
     """PoseBusters: Plausibility checks for generated molecule poses."""
     if table is None and len(mol_pred) == 0:
         raise ValueError("Provide either MOLS_PRED or TABLE.")
@@ -71,7 +71,7 @@ def bust(  # noqa: PLR0913
         output.write(_format_results(results, outfmt, no_header, i))
 
 
-def _parse_args(args):
+def _parse_args(args: list[str]) -> argparse.Namespace:
     desc = "PoseBusters: Plausibility checks for generated molecule poses."
     parser = argparse.ArgumentParser(description=desc, add_help=False)
 
@@ -145,8 +145,8 @@ def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = F
     raise ValueError(f"Unknown output format {outfmt}")
 
 
-def _select_mode(config, columns: Iterable[str]) -> str | dict[str, Any]:
-    # decide on mode to run
+def _select_mode(config: Path | None, columns: Iterable[str]) -> str | dict[str, Any]:
+    """Decide which mode to run on based on the inputs."""
 
     # load config if provided
     if isinstance(config, Path):
@@ -169,7 +169,7 @@ def _select_mode(config, columns: Iterable[str]) -> str | dict[str, Any]:
     return mode
 
 
-def _path(path_str: str):
+def _path(path_str: str | Path) -> Path:
     path = Path(path_str)
     if not path.exists():
         raise argparse.ArgumentTypeError(f"File {path} not found!")

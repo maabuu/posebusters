@@ -21,7 +21,7 @@ def check_volume_overlap(  # noqa: PLR0913
     vdw_scale: float = 0.8,
     ignore_types: set[str] = {"hydrogens"},
     search_distance: float = 6.0,
-) -> dict[str, dict]:
+) -> dict[str, dict[str, float | bool]]:
     """Check volume overlap between ligand and protein.
 
     Args:
@@ -63,11 +63,11 @@ def check_volume_overlap(  # noqa: PLR0913
     return {"results": results}
 
 
-def _pairwise_distance(x, y):
+def _pairwise_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return np.linalg.norm(x[:, None, :] - y[None, :, :], axis=-1)
 
 
 def _filter_by_mask(mol: Mol, mask: np.ndarray) -> Mol:
     if mask.sum() < len(mask):
-        mol = delete_atoms(mol, np.where(~mask)[0].tolist())
+        mol = delete_atoms(mol, np.where(~mask)[0].tolist())  # type: ignore[arg-type]
     return mol

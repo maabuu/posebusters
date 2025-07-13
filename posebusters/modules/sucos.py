@@ -47,7 +47,7 @@ def get_feature_map_score(
 
     # create feature map based on small molecule
     feature_map = FeatMaps.FeatMap(feats=features_small, weights=[1] * len(features_small), params=PARAMETERS)
-    feature_map.scoreMode = FeatMaps.FeatMapScoreMode.Best
+    feature_map.scoreMode = FeatMaps.FeatMapScoreMode.Best  # type: ignore[misc]
 
     # score features of large molecule present in small molecule
     feature_score = feature_map.ScoreFeats(features_large)
@@ -55,7 +55,7 @@ def get_feature_map_score(
     # normalize score
     normalization_constant = min(feature_map.GetNumFeatures(), len(features_large))
     if normalization_constant > 0:
-        return feature_score / normalization_constant
+        return float(feature_score / normalization_constant)
 
     return np.nan
 
