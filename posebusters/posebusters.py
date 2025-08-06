@@ -86,7 +86,16 @@ class PoseBusters:
                 files only.
         """
 
-        if isinstance(config, str) and config in {"dock", "redock", "mol", "gen"}:
+        if isinstance(config, str) and config in {
+            "dock",
+            "redock",
+            "mol",
+            "gen",
+            "dock_fast",
+            "redock_fast",
+            "mol_fast",
+            "gen_fast",
+        }:
             logger.info("Using default configuration for mode %s.", config)
             with open(Path(__file__).parent / "config" / f"{config}.yml", encoding="utf-8") as config_file:
                 self.config = safe_load(config_file)
