@@ -57,8 +57,10 @@ repos:
       # Run the linter.
       - id: ruff
         args: [--fix]
+        types_or: [python, pyi] # exclude notebooks
       # Run the formatter.
       - id: ruff-format
+        types_or: [python, pyi] # exclude notebooks
 
   # find unused imports
   - repo: https://github.com/hadialqattan/pycln
