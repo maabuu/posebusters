@@ -91,10 +91,12 @@ class PoseBusters:
             "redock",
             "mol",
             "gen",
+            "regen",
             "dock_fast",
             "redock_fast",
             "mol_fast",
             "gen_fast",
+            "regen_fast",
         }:
             logger.info("Using default configuration for mode %s.", config)
             with open(Path(__file__).parent / "config" / f"{config}.yml", encoding="utf-8") as config_file:
