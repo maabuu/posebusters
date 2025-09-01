@@ -53,7 +53,7 @@ def safe_load_mol(path: Path | Mol, load_all: bool = False, **load_params) -> Mo
 
 def safe_supply_mols(
     path: Path, load_all=True, sanitize=True, indices: Iterable[int] | None = None, **load_params
-) -> Generator[Mol | None, None, None]:
+) -> Generator[Mol | None]:
     """Supply molecules from a file, optionally adding hydrogens and assigning bond orders.
 
     Args:

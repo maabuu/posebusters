@@ -154,7 +154,7 @@ class PoseBusters:
         results = self._collect_in_table(generator, full_report=full_report)
         return results
 
-    def _run(self) -> Generator[ResultTuple, None, None]:
+    def _run(self) -> Generator[ResultTuple]:
         """Run all tests on molecules provided in file paths.
 
         Yields:
@@ -170,13 +170,13 @@ class PoseBusters:
         else:
             yield from self._run_parallel_over_poses(max_workers=max_workers, chunk_size=chunk_size)
 
-    def _run_single_thread(self) -> Generator[ResultTuple, None, None]:
+    def _run_single_thread(self) -> Generator[ResultTuple]:
         for _, paths in self.file_paths.iterrows():
             yield from self._run_multiple_poses(paths)
 
     def _run_parallel_over_files(
         self, timeout: int | None = None, max_workers: int | None = None
-    ) -> Generator[ResultTuple, None, None]:
+    ) -> Generator[ResultTuple]:
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = [executor.submit(self._run_and_combine, paths) for _, paths in self.file_paths.iterrows()]
             for future in as_completed(futures, timeout=None):
@@ -193,7 +193,7 @@ class PoseBusters:
 
     def _run_parallel_over_poses(
         self, timeout: int | None = None, max_workers: int | None = None, chunk_size: int = 100
-    ) -> Generator[ResultTuple, None, None]:
+    ) -> Generator[ResultTuple]:
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for _, paths in self.file_paths.iterrows():
@@ -219,9 +219,7 @@ class PoseBusters:
         """Run and collect all tests for all poses in the prediction file."""
         return list(self._run_multiple_poses(paths, indices=indices))
 
-    def _run_multiple_poses(
-        self, paths: pd.Series, indices: Iterable[int] | None = None
-    ) -> Generator[ResultTuple, None, None]:
+    def _run_multiple_poses(self, paths: pd.Series, indices: Iterable[int] | None = None) -> Generator[ResultTuple]:
         """Run all tests on indexed poses in the prediction file.
 
         Args:
