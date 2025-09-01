@@ -159,6 +159,8 @@ def _select_mode(config: Path | None, columns: Iterable[str]) -> str | dict[str,
     # select mode based on inputs
     if "mol_pred" in columns and "mol_true" in columns and "mol_cond" in columns:
         mode = "redock"
+    elif "mol_pred" in columns and "mol_true" in columns:
+        mode = "regen"
     elif "mol_pred" in columns and ("protein" in columns) or ("mol_cond" in columns):
         mode = "dock"
     elif any(column in columns for column in ("mol_pred", "mols_pred", "molecule", "molecules", "molecule")):
