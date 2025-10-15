@@ -167,7 +167,11 @@ def check_geometry(  # noqa: PLR0913, PLR0915
         logger.warning("Molecule has no bonds.")
 
     # distance geometry bounds, lower triangle min distances, upper triangle max distances
-    bounds = GetMoleculeBoundsMatrix(mol, **bound_matrix_params)
+    try:
+        bounds = GetMoleculeBoundsMatrix(mol, **bound_matrix_params)
+    except RuntimeError as e:
+        logger.warning(f"RDKit distance geometry failed with error: {e}")
+        return {"results": results}
 
     # indices
     lower_triangle_idcs = np.tril_indices(mol.GetNumAtoms(), k=-1)
