@@ -35,7 +35,7 @@ docs = [
     "nbsphinx",
     "sphinx_rtd_theme",
     "sphinx-hoverxref",
-    "sphinx<9",                    # unpin when hoverxref updates to avoid deprecation warning "The '_Opt' object tuple..."
+    "sphinx",
     "sphinxcontrib-programoutput",
 ]
 
