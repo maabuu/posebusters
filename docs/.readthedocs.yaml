@@ -6,9 +6,8 @@ build:
     python: "3.12"
   jobs:
     pre_install:
-      - pip install flit
-    post_install:
-      - flit install --deps production --extras docs
+      - pip install dependency-groups
+      - dependency-groups --group docs > docs/requirements.txt
 
 sphinx:
   configuration: docs/source/conf.py
@@ -16,10 +15,9 @@ sphinx:
 
 python:
   install:
+    - requirements: docs/requirements.txt
     - method: pip
       path: .
-      extra_requirements:
-        - docs
 
 formats:
   - htmlzip
