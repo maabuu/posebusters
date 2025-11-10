@@ -7,7 +7,7 @@ build:
   jobs:
     pre_install:
       - pip install dependency-groups
-      - dependency-groups --group docs > docs/requirements.txt
+      - dependency-groups docs > docs/requirements.txt
 
 sphinx:
   configuration: docs/source/conf.py
