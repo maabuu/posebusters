@@ -16,7 +16,7 @@ sphinx:
 
 python:
   install:
-    - method: flit
+    - method: pip
       path: .
       extra_requirements:
         - docs
