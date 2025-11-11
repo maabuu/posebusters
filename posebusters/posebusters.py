@@ -28,6 +28,7 @@ from .modules.sanity import (
     check_chemistry,
     check_chemistry_using_inchi,
     check_chemistry_using_rdkit,
+    check_radicals,
 )
 from .modules.sucos import check_sucos
 from .modules.volume_overlap import check_volume_overlap
@@ -42,6 +43,7 @@ module_dict: dict[str, Callable] = {
     "rdkit_sanity": check_chemistry_using_rdkit,
     "inchi_convertible": check_chemistry_using_inchi,
     "atoms_connected": check_all_atoms_connected,
+    "check_radicals": check_radicals,
     "identity": check_identity,
     "distance_geometry": check_geometry,
     "flatness": check_flatness,
