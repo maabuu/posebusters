@@ -28,10 +28,13 @@ logger = logging.getLogger(__name__)
 _warning_prefix = "WARNING: Energy ratio module "
 _empty_results = {
     "results": {
+        "mol_pred_energy_with_h": float("nan"),
+        "mol_pred_energy_without_h": float("nan"),
         "ensemble_avg_energy": float("nan"),
-        "mol_pred_energy": float("nan"),
-        "energy_ratio": float("nan"),
-        "energy_ratio_passes": float("nan"),
+        "energy_ratio_with_h": float("nan"),
+        "energy_ratio_without_h": float("nan"),
+        "energy_ratio_with_h_passes": float("nan"),
+        "energy_ratio_without_h_passes": float("nan"),
     }
 }
 
@@ -107,12 +110,12 @@ def check_energy_ratio(
     ratio_wo_h_passes = ratio_wo_h <= threshold_energy_ratio if isfinite(ratio_wo_h) else float("nan")
 
     results = {
-        "mol_pred_energy": oberved_energy_w_h,
+        "mol_pred_energy_with_h": oberved_energy_w_h,
         "mol_pred_energy_without_h": observed_energy_wo_h,
         "ensemble_avg_energy": mean_energy,
-        "energy_ratio": ratio_w_h,
+        "energy_ratio_with_h": ratio_w_h,
         "energy_ratio_without_h": ratio_wo_h,
-        "energy_ratio_passes": ratio_w_h_passes,
+        "energy_ratio_with_h_passes": ratio_w_h_passes,
         "energy_ratio_without_h_passes": ratio_wo_h_passes,
     }
     return {"results": results}
