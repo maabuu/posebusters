@@ -11,11 +11,16 @@ from rdkit import ForceField  # noqa: F401
 from rdkit.Chem.inchi import InchiReadWriteError, MolFromInchi
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdDistGeom import EmbedMultipleConfs, ETKDGv3
-from rdkit.Chem.rdForceFieldHelpers import UFFGetMoleculeForceField, UFFOptimizeMoleculeConfs
+from rdkit.Chem.rdForceFieldHelpers import (
+    UFFGetMoleculeForceField,
+    UFFHasAllMoleculeParams,
+    UFFOptimizeMoleculeConfs,
+)
 from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D, SanitizeMol
 
 from ..tools.inchi import get_inchi
 from ..tools.logging import CaptureLogger
+from ..tools.molecules import add_hydrogens_with_uff_positions
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +63,8 @@ def check_energy_ratio(
     try:
         assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
         assert not SanitizeMol(mol_pred, catchErrors=True), "Molecule does not sanitize."
-        AddHs(mol_pred, addCoords=True)
+        mol_pred = add_hydrogens_with_uff_positions(mol_pred)
+        assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
         logger.warning(_warning_prefix + "failed because RDKit sanitization failed for molecule: %s", e)
         return _empty_results
