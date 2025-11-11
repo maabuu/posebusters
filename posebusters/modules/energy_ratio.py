@@ -72,7 +72,7 @@ def check_energy_ratio(
     try:
         with CaptureLogger():
             # make hydrogens explicit, eliminate radicals by adding hydrogens, optimize hydrogen positions
-            mol_pred, oberved_energy_w_h, observed_energy = add_hydrogens_with_uff_positions(mol_pred)
+            mol_pred, oberved_energy_w_h, observed_energy_wo_h = add_hydrogens_with_uff_positions(mol_pred)
         assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
         logger.warning(_warning_prefix + "failed because %s", e.args[1])
@@ -102,20 +102,19 @@ def check_energy_ratio(
         mean_energy = epsilon  # clipping
 
     # simple ratio
-    ratio = observed_energy / mean_energy
-    ratio_passes = ratio <= threshold_energy_ratio if isfinite(ratio) else float("nan")
-
     ratio_w_h = oberved_energy_w_h / mean_energy
     ratio_w_h_passes = ratio_w_h <= threshold_energy_ratio if isfinite(ratio_w_h) else float("nan")
+    ratio_wo_h = observed_energy_wo_h / mean_energy
+    ratio_wo_h_passes = ratio_wo_h <= threshold_energy_ratio if isfinite(ratio_wo_h) else float("nan")
 
     results = {
-        "mol_pred_energy_with_hydrogens": oberved_energy_w_h,
-        "mol_pred_energy": observed_energy,
+        "mol_pred_energy": oberved_energy_w_h,
+        "mol_pred_energy_without_h": observed_energy_wo_h,
         "ensemble_avg_energy": mean_energy,
-        "energy_ratio": ratio,
-        "energy_ratio_with_hydrogens": ratio_w_h,
-        "energy_ratio_passes": ratio_passes,
-        "energy_ratio_with_hydrogens_passes": ratio_w_h_passes,
+        "energy_ratio": ratio_w_h,
+        "energy_ratio_without_h": ratio_wo_h,
+        "energy_ratio_passes": ratio_w_h_passes,
+        "energy_ratio_without_h_passes": ratio_wo_h_passes,
     }
     return {"results": results}
 
