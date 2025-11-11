@@ -63,6 +63,8 @@ def check_energy_ratio(
     try:
         assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
         assert not SanitizeMol(mol_pred, catchErrors=True), "Molecule does not sanitize."
+        mol_pred = add_hydrogens_with_uff_positions(mol_pred)
+        assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
         logger.warning(_warning_prefix + "failed because %s", e)
         return _empty_results
