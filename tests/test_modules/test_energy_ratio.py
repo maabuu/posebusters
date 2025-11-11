@@ -18,7 +18,7 @@ def test_check_energy_ratio(mol_pm2):
 
 def test_check_energy_ratio_14gs_0(mol_pred_14gs_gen0):
     # molecule is chemically insane, but conformation looks alright
-    out = check_energy_ratio(mol_pred_14gs_gen0)
+    out = check_energy_ratio(mol_pred_14gs_gen0, threshold_energy_ratio=10.0)
     assert math.isfinite(out["results"]["mol_pred_energy"])
     assert math.isfinite(out["results"]["ensemble_avg_energy"])
     assert math.isfinite(out["results"]["energy_ratio"])
