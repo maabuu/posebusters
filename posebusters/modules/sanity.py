@@ -83,3 +83,11 @@ def check_chemistry(mol_pred: Mol) -> dict[str, Any]:
         "results": rdkit_sanity["results"] | connectedness["results"],
         "details": rdkit_sanity["details"],
     }
+
+
+def check_radicals(mol_pred: Mol) -> dict[str, Any]:
+    """Check that a molecule has no radicals."""
+
+    has_no_radicals = not any(a.GetNumRadicalElectrons() for a in mol_pred.GetAtoms())
+
+    return {"results": {"no_radicals": has_no_radicals}}

@@ -33,6 +33,13 @@ modules:
       all_atoms_connected: "All atoms connected"
 
   - name: "Chemistry"
+    function: check_radicals
+    chosen_binary_test_output:
+      - no_radicals
+    rename_outputs:
+      no_radicals: "No radicals"
+
+  - name: "Chemistry"
     function: identity
     parameters:
       inchi_options: "w" # options passed to InChI generation
