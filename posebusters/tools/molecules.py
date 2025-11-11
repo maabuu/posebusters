@@ -153,23 +153,24 @@ def hydrate_radicals(mol: Mol) -> Mol:
     return mol
 
 
-def optimize_hydrogens_positions(mol: Mol) -> Mol:
+def optimize_hydrogens_positions(mol: Mol) -> tuple[Mol, float, float]:
     """Optimize the hydrogens' positions."""
 
     forcefield = UFFGetMoleculeForceField(mol, confId=0)
+    e_start = forcefield.CalcEnergy()
     for _, atom in enumerate(mol.GetAtoms()):
         if atom.GetAtomicNum() != 1:
             forcefield.AddFixedPoint(atom.GetIdx())
     forcefield.Minimize()
-    return mol
+    e_min = forcefield.CalcEnergy()
+    return mol, e_start, e_min
 
 
-def add_hydrogens_with_uff_positions(mol: Mol) -> Mol:
+def add_hydrogens_with_uff_positions(mol: Mol) -> tuple[Mol, float, float]:
     SanitizeMol(mol)
     mol = hydrate_radicals(mol)
     mol = AddHs(mol, addCoords=True)
-    mol = optimize_hydrogens_positions(mol)
-    return mol
+    return optimize_hydrogens_positions(mol)
 
 
 def _align_and_renumber(mol_true: Mol, mol_pred: Mol) -> Mol:

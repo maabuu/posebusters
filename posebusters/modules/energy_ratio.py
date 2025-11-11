@@ -63,10 +63,17 @@ def check_energy_ratio(
     try:
         assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
         assert not SanitizeMol(mol_pred, catchErrors=True), "Molecule does not sanitize."
-        mol_pred = add_hydrogens_with_uff_positions(mol_pred)
+    except Exception as e:
+        logger.warning(_warning_prefix + "failed because %s", e)
+        return _empty_results
+
+    try:
+        with CaptureLogger():
+            # make hydrogens explicit, eliminate radicals by adding hydrogens, optimize hydrogen positions
+            mol_pred, unoptimized_energy, observed_energy = add_hydrogens_with_uff_positions(mol_pred)
         assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
-        logger.warning(_warning_prefix + "failed because RDKit sanitization failed for molecule: %s", e)
+        logger.warning(_warning_prefix + "failed because %s", e.args[1])
         return _empty_results
 
     try:
@@ -77,12 +84,6 @@ def check_energy_ratio(
     except Exception as e:
         logger.warning(_warning_prefix + "failed because InChI creation failed for molecule: %s", e)
         return _empty_results
-
-    try:
-        observed_energy = get_conf_energy(mol_pred)
-    except Exception as e:
-        logger.warning(_warning_prefix + "failed to calculate conformation energy for %s: %s", inchi, e)
-        observed_energy = float("nan")
 
     try:
         energies = get_energies(inchi, ensemble_number_conformations, num_threads)
