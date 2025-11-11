@@ -11,11 +11,16 @@ from rdkit import ForceField  # noqa: F401
 from rdkit.Chem.inchi import InchiReadWriteError, MolFromInchi
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdDistGeom import EmbedMultipleConfs, ETKDGv3
-from rdkit.Chem.rdForceFieldHelpers import UFFGetMoleculeForceField, UFFOptimizeMoleculeConfs
+from rdkit.Chem.rdForceFieldHelpers import (
+    UFFGetMoleculeForceField,
+    UFFHasAllMoleculeParams,
+    UFFOptimizeMoleculeConfs,
+)
 from rdkit.Chem.rdmolops import AddHs, AssignStereochemistryFrom3D, SanitizeMol
 
 from ..tools.inchi import get_inchi
 from ..tools.logging import CaptureLogger
+from ..tools.molecules import add_hydrogens_with_uff_positions
 
 logger = logging.getLogger(__name__)
 
@@ -58,9 +63,18 @@ def check_energy_ratio(
     try:
         assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
         assert not SanitizeMol(mol_pred, catchErrors=True), "Molecule does not sanitize."
-        AddHs(mol_pred, addCoords=True)
+        assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
-        logger.warning(_warning_prefix + "failed because RDKit sanitization failed for molecule: %s", e)
+        logger.warning(_warning_prefix + "failed because %s", e)
+        return _empty_results
+
+    try:
+        with CaptureLogger():
+            # make hydrogens explicit, eliminate radicals by adding hydrogens, optimize hydrogen positions
+            mol_pred, oberved_energy_w_h, observed_energy_wo_h = add_hydrogens_with_uff_positions(mol_pred)
+        assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
+    except Exception as e:
+        logger.warning(_warning_prefix + "failed because %s", e.args[1])
         return _empty_results
 
     try:
@@ -71,12 +85,6 @@ def check_energy_ratio(
     except Exception as e:
         logger.warning(_warning_prefix + "failed because InChI creation failed for molecule: %s", e)
         return _empty_results
-
-    try:
-        observed_energy = get_conf_energy(mol_pred)
-    except Exception as e:
-        logger.warning(_warning_prefix + "failed to calculate conformation energy for %s: %s", inchi, e)
-        observed_energy = float("nan")
 
     try:
         energies = get_energies(inchi, ensemble_number_conformations, num_threads)
@@ -93,29 +101,19 @@ def check_energy_ratio(
         mean_energy = epsilon  # clipping
 
     # simple ratio
-    ratio = observed_energy / mean_energy
-    ratio_passes = ratio <= threshold_energy_ratio if isfinite(ratio) else float("nan")
-
-    # ratio after subtracting mean
-    deviation = observed_energy - mean_energy
-    relative_deviation = deviation / mean_energy
-    relative_deviation_passes = (
-        relative_deviation <= threshold_energy_ratio if isfinite(relative_deviation) else float("nan")
-    )
-
-    # standard score (ratio after subtracting by population mean and dividing by population std)
-    z_value = (observed_energy - mean_energy) / std_energy
-    z_value_passes = z_value <= threshold_energy_ratio if isfinite(z_value) else float("nan")
+    ratio_w_h = oberved_energy_w_h / mean_energy
+    ratio_w_h_passes = ratio_w_h <= threshold_energy_ratio if isfinite(ratio_w_h) else float("nan")
+    ratio_wo_h = observed_energy_wo_h / mean_energy
+    ratio_wo_h_passes = ratio_wo_h <= threshold_energy_ratio if isfinite(ratio_wo_h) else float("nan")
 
     results = {
+        "mol_pred_energy": oberved_energy_w_h,
+        "mol_pred_energy_without_h": observed_energy_wo_h,
         "ensemble_avg_energy": mean_energy,
-        "mol_pred_energy": observed_energy,
-        "energy_ratio": ratio,
-        "relative_deviation": relative_deviation,
-        "z_value": z_value,
-        "energy_ratio_passes": ratio_passes,
-        "relative_deviation_passes": relative_deviation_passes,
-        "z_value_passes": z_value_passes,
+        "energy_ratio": ratio_w_h,
+        "energy_ratio_without_h": ratio_wo_h,
+        "energy_ratio_passes": ratio_w_h_passes,
+        "energy_ratio_without_h_passes": ratio_wo_h_passes,
     }
     return {"results": results}
 

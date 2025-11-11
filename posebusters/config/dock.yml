@@ -113,9 +113,11 @@ modules:
       threshold_energy_ratio: 100.0
       ensemble_number_conformations: 50
     chosen_binary_test_output:
+      - energy_ratio_with_hydrogens_passes
       - energy_ratio_passes
     rename_outputs:
-      energy_ratio_passes: "Internal energy"
+      energy_ratio_with_hydrogens_passes: "Internal energy"
+      energy_ratio_passes: "Internal energy without H"
 
   - name: "Distance to protein"
     function: "intermolecular_distance"

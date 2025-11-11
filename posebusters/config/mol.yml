@@ -110,11 +110,12 @@ modules:
     parameters:
       threshold_energy_ratio: 100.0
       ensemble_number_conformations: 50
-      inchi_strict: False
     chosen_binary_test_output:
+      - energy_ratio_with_hydrogens_passes
       - energy_ratio_passes
     rename_outputs:
-      energy_ratio_passes: "Internal energy"
+      energy_ratio_with_hydrogens_passes: "Internal energy"
+      energy_ratio_passes: "Internal energy without H"
 
 # Options for loading molecule files with RDKit
 loading:
