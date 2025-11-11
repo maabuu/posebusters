@@ -10,6 +10,7 @@ from rdkit import RDLogger
 from rdkit.Chem.AllChem import AssignBondOrdersFromTemplate
 from rdkit.Chem.Lipinski import HAcceptorSmarts, HDonorSmarts
 from rdkit.Chem.rdchem import AtomValenceException, Bond, Conformer, GetPeriodicTable, Mol, RWMol
+from rdkit.Chem.rdForceFieldHelpers import UFFGetMoleculeForceField
 from rdkit.Chem.rdMolAlign import GetBestAlignmentTransform
 from rdkit.Chem.rdmolfiles import MolFromSmarts
 from rdkit.Chem.rdmolops import AddHs, RemoveHs, RemoveStereochemistry, RenumberAtoms, SanitizeMol
@@ -74,7 +75,7 @@ def neutralize_atoms(mol: Mol) -> Mol:
 
 
 def remove_all_charges_and_hydrogens(mol: Mol) -> Mol:
-    """Remove all charges and hydrogens from molecule."""
+    """Remove all charges and explicit hydrogens from molecule."""
     try:
         # rdkit keeps hydrogens that define sterochemistry so remove stereo first
         RemoveStereochemistry(mol)
@@ -131,6 +132,44 @@ def delete_atoms(mol: Mol, indices: list[int]) -> Mol:
     for index in indices:
         mol.RemoveAtom(index)
     return Mol(mol)
+
+
+def count_radicals(mol: Mol) -> int:
+    """Count the number of radicals in a molecule."""
+
+    return sum(atom.GetNumRadicalElectrons() for atom in mol.GetAtoms())
+
+
+def hydrate_radicals(mol: Mol) -> Mol:
+    """Hydrate radicals in a molecule. Modifies molecule in place."""
+
+    SanitizeMol(mol)
+    for atom in mol.GetAtoms():
+        num_atom_radicals = atom.GetNumRadicalElectrons()
+        if num_atom_radicals:
+            atom.SetNumExplicitHs(atom.GetNumExplicitHs() + num_atom_radicals)
+            atom.SetNumRadicalElectrons(0)
+    SanitizeMol(mol)
+    return mol
+
+
+def optimize_hydrogens_positions(mol: Mol) -> Mol:
+    """Optimize the hydrogens' positions."""
+
+    forcefield = UFFGetMoleculeForceField(mol, confId=0)
+    for _, atom in enumerate(mol.GetAtoms()):
+        if atom.GetAtomicNum() != 1:
+            forcefield.AddFixedPoint(atom.GetIdx())
+    forcefield.Minimize()
+    return mol
+
+
+def add_hydrogens_with_uff_positions(mol: Mol) -> Mol:
+    SanitizeMol(mol)
+    mol = hydrate_radicals(mol)
+    mol = AddHs(mol, addCoords=True)
+    mol = optimize_hydrogens_positions(mol)
+    return mol
 
 
 def _align_and_renumber(mol_true: Mol, mol_pred: Mol) -> Mol:
