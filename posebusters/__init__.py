@@ -12,6 +12,7 @@ from posebusters.modules.sanity import (
     check_chemistry,
     check_chemistry_using_inchi,
     check_chemistry_using_rdkit,
+    check_radicals,
 )
 from posebusters.modules.volume_overlap import check_volume_overlap
 from posebusters.posebusters import PoseBusters
@@ -28,6 +29,7 @@ __all__ = [
     "check_identity",
     "check_intermolecular_distance",
     "check_loading",
+    "check_radicals",
     "check_rmsd",
     "check_volume_overlap",
 ]
