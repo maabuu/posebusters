@@ -9,7 +9,7 @@ import pandas as pd
 from rdkit import RDLogger
 from rdkit.Chem.inchi import InchiReadWriteError
 from rdkit.Chem.rdchem import Mol
-from rdkit.Chem.rdmolops import DetectChemistryProblems, GetMolFrags, SanitizeFlags
+from rdkit.Chem.rdmolops import DetectChemistryProblems, GetMolFrags, SanitizeFlags, SanitizeMol
 
 from ..tools.inchi import get_inchi
 
@@ -88,6 +88,13 @@ def check_chemistry(mol_pred: Mol) -> dict[str, Any]:
 def check_radicals(mol_pred: Mol) -> dict[str, Any]:
     """Check that a molecule has no radicals."""
 
-    has_no_radicals = not any(a.GetNumRadicalElectrons() for a in mol_pred.GetAtoms())
+    radicals_before_sanitization = any(a.GetNumRadicalElectrons() for a in mol_pred.GetAtoms())
+    SanitizeMol(mol_pred, catchErrors=True)
+    radicals_after_sanitization = any(a.GetNumRadicalElectrons() for a in mol_pred.GetAtoms())
 
-    return {"results": {"no_radicals": has_no_radicals}}
+    return {
+        "results": {
+            "no_radicals": not radicals_after_sanitization,
+            "no_radicals_before_sanitization": not radicals_before_sanitization,
+        }
+    }
