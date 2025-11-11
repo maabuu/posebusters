@@ -70,7 +70,7 @@ def check_energy_ratio(
     try:
         with CaptureLogger():
             # make hydrogens explicit, eliminate radicals by adding hydrogens, optimize hydrogen positions
-            mol_pred, unoptimized_energy, observed_energy = add_hydrogens_with_uff_positions(mol_pred)
+            mol_pred, oberved_energy_w_h, observed_energy = add_hydrogens_with_uff_positions(mol_pred)
         assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
         logger.warning(_warning_prefix + "failed because %s", e.args[1])
@@ -103,26 +103,17 @@ def check_energy_ratio(
     ratio = observed_energy / mean_energy
     ratio_passes = ratio <= threshold_energy_ratio if isfinite(ratio) else float("nan")
 
-    # ratio after subtracting mean
-    deviation = observed_energy - mean_energy
-    relative_deviation = deviation / mean_energy
-    relative_deviation_passes = (
-        relative_deviation <= threshold_energy_ratio if isfinite(relative_deviation) else float("nan")
-    )
-
-    # standard score (ratio after subtracting by population mean and dividing by population std)
-    z_value = (observed_energy - mean_energy) / std_energy
-    z_value_passes = z_value <= threshold_energy_ratio if isfinite(z_value) else float("nan")
+    ratio_w_h = oberved_energy_w_h / mean_energy
+    ratio_w_h_passes = ratio_w_h <= threshold_energy_ratio if isfinite(ratio_w_h) else float("nan")
 
     results = {
-        "ensemble_avg_energy": mean_energy,
+        "mol_pred_energy_with_hydrogens": oberved_energy_w_h,
         "mol_pred_energy": observed_energy,
+        "ensemble_avg_energy": mean_energy,
         "energy_ratio": ratio,
-        "relative_deviation": relative_deviation,
-        "z_value": z_value,
+        "energy_ratio_with_hydrogens": ratio_w_h,
         "energy_ratio_passes": ratio_passes,
-        "relative_deviation_passes": relative_deviation_passes,
-        "z_value_passes": z_value_passes,
+        "energy_ratio_with_hydrogens_passes": ratio_w_h_passes,
     }
     return {"results": results}
 
