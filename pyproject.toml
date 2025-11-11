@@ -28,7 +28,12 @@ dynamic = ["version", "description"]
 dependencies = ['rdkit >= 2024.9', 'pandas', 'numpy', 'pyyaml']
 
 [dependency-groups]
-dev = ["ruff", "pre-commit"]
+dev = [
+    "ruff",
+    "pre-commit",
+    "pandas-stubs>=2.2.2.240807",
+    "types-pyyaml>=6.0.12.20250915",
+]
 test = ["pytest", "pytest-cov", "mypy"]
 docs = [
     "ipykernel>=6.31.0",
