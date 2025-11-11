@@ -31,6 +31,7 @@ dependencies = ['rdkit >= 2024.9', 'pandas', 'numpy', 'pyyaml']
 dev = ["ruff", "pre-commit"]
 test = ["pytest", "pytest-cov", "mypy"]
 docs = [
+    "ipykernel>=6.31.0",
     "ipython",
     "nbsphinx",
     "sphinx_rtd_theme",
