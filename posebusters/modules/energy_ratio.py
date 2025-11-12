@@ -28,13 +28,11 @@ logger = logging.getLogger(__name__)
 _warning_prefix = "WARNING: Energy ratio module "
 _empty_results = {
     "results": {
-        "mol_pred_energy_with_h": float("nan"),
-        "mol_pred_energy_without_h": float("nan"),
+        "num_h_added": float("nan"),
+        "mol_pred_energy": float("nan"),
         "ensemble_avg_energy": float("nan"),
-        "energy_ratio_with_h": float("nan"),
-        "energy_ratio_without_h": float("nan"),
-        "energy_ratio_with_h_passes": float("nan"),
-        "energy_ratio_without_h_passes": float("nan"),
+        "energy_ratio": float("nan"),
+        "energy_ratio_passes": float("nan"),
     }
 }
 
@@ -81,8 +79,8 @@ def check_energy_ratio(
     try:
         with CaptureLogger():
             num_atoms_in = mol_pred.GetNumAtoms()
-            # make hydrogens explicit, replace radicals with hydrogens, optimize hydrogen positions
-            mol_pred, oberved_energy_w_h, observed_energy_wo_h = add_hydrogens_with_uff_positions(mol_pred)
+            # make hydrogens explicit, replace radicals with hydrogens, optimize added hydrogens' positions
+            mol_pred, _, observed_energy = add_hydrogens_with_uff_positions(mol_pred)
             num_atoms_filled = mol_pred.GetNumAtoms()
             num_h_added = num_atoms_filled - num_atoms_in
         assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
@@ -110,21 +108,15 @@ def check_energy_ratio(
         logger.warning(_warning_prefix + "calculated average energy of molecule 0 for %s", inchi)
         mean_energy = epsilon  # clipping
 
-    # simple ratio
-    ratio_w_h = oberved_energy_w_h / mean_energy
-    ratio_w_h_passes = ratio_w_h <= threshold_energy_ratio if isfinite(ratio_w_h) else float("nan")
-    ratio_wo_h = observed_energy_wo_h / mean_energy
-    ratio_wo_h_passes = ratio_wo_h <= threshold_energy_ratio if isfinite(ratio_wo_h) else float("nan")
+    energy_ratio = observed_energy / mean_energy
+    energy_ratio_passes = energy_ratio <= threshold_energy_ratio if isfinite(energy_ratio) else float("nan")
 
     results = {
         "num_h_added": num_h_added,
-        "mol_pred_energy_with_h": oberved_energy_w_h,
-        "mol_pred_energy_without_h": observed_energy_wo_h,
+        "mol_pred_energy": observed_energy,
         "ensemble_avg_energy": mean_energy,
-        "energy_ratio_with_h": ratio_w_h,
-        "energy_ratio_without_h": ratio_wo_h,
-        "energy_ratio_with_h_passes": ratio_w_h_passes,
-        "energy_ratio_without_h_passes": ratio_wo_h_passes,
+        "energy_ratio": energy_ratio,
+        "energy_ratio_passes": energy_ratio_passes,
     }
     return {"results": results}
 
