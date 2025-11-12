@@ -128,12 +128,15 @@ modules:
     parameters:
       threshold_energy_ratio: 100.0
       ensemble_number_conformations: 50
+  - name: "Energy ratio"
+    function: energy_ratio
+    parameters:
+      threshold_energy_ratio: 100.0
+      ensemble_number_conformations: 50
     chosen_binary_test_output:
-      - energy_ratio_without_h_passes
-      - energy_ratio_with_h_passes
+      - energy_ratio_passes
     rename_outputs:
-      energy_ratio_with_h_passes: "Internal energy"
-      energy_ratio_without_h_passes: "Internal energy without H"
+      energy_ratio_passes: "Internal energy"
 
   - name: "RMSD"
     function: rmsd
