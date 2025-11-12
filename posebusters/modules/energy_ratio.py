@@ -47,7 +47,15 @@ def check_energy_ratio(
     epsilon=1e-10,
     num_threads=0,
 ) -> dict[str, dict[str, float | bool]]:
-    """Check whether the energy of the docked ligand is within user defined range.
+    """Check whether the internal energy of a molecular conformation is too far from its ground state.
+
+    Notes:
+      - If there are missing explicit hydrogens, they are added and their positions are optimized.
+      - Hydrogens are missing when there are radicals or there are implicit hydrogens.
+      - The energy ratio 'with hydrogens' uses the energy of the molecule after filling in hydrogens
+        but before optimizing their positions.
+      - The energy ratio 'without hydrogens' uses the energy of the molecule after filling in hydrogens
+        AND after optimizing their positions. So their contribution (if any) to the energy ratio is reduced.
 
     Args:
         mol_pred: Predicted molecule (docked ligand) with exactly one conformer.
@@ -66,15 +74,17 @@ def check_energy_ratio(
     try:
         assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
         assert not SanitizeMol(mol_pred, catchErrors=True), "Molecule does not sanitize."
-        assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
         logger.warning(_warning_prefix + "failed because %s", e)
         return _empty_results
 
     try:
         with CaptureLogger():
-            # make hydrogens explicit, eliminate radicals by adding hydrogens, optimize hydrogen positions
+            num_atoms_in = mol_pred.GetNumAtoms()
+            # make hydrogens explicit, replace radicals with hydrogens, optimize hydrogen positions
             mol_pred, oberved_energy_w_h, observed_energy_wo_h = add_hydrogens_with_uff_positions(mol_pred)
+            num_atoms_filled = mol_pred.GetNumAtoms()
+            num_h_added = num_atoms_filled - num_atoms_in
         assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
         logger.warning(_warning_prefix + "failed because %s", e.args[1])
@@ -92,12 +102,9 @@ def check_energy_ratio(
     try:
         energies = get_energies(inchi, ensemble_number_conformations, num_threads)
         mean_energy = sum(energies) / len(energies)
-        std_energy = sum((energy - mean_energy) ** 2 for energy in energies) / (len(energies) - 1)
-        std_energy = max(epsilon, std_energy)  # clipping
     except Exception as e:
         logger.warning(_warning_prefix + "failed to calculate ensemble conformation energy for %s: %s", inchi, e)
         mean_energy = float("nan")
-        std_energy = float("nan")
 
     if mean_energy == 0:
         logger.warning(_warning_prefix + "calculated average energy of molecule 0 for %s", inchi)
@@ -110,6 +117,7 @@ def check_energy_ratio(
     ratio_wo_h_passes = ratio_wo_h <= threshold_energy_ratio if isfinite(ratio_wo_h) else float("nan")
 
     results = {
+        "num_h_added": num_h_added,
         "mol_pred_energy_with_h": oberved_energy_w_h,
         "mol_pred_energy_without_h": observed_energy_wo_h,
         "ensemble_avg_energy": mean_energy,
