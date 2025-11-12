@@ -80,8 +80,11 @@ def check_energy_ratio(
 
     try:
         with CaptureLogger():
+            num_atoms_in = mol_pred.GetNumAtoms()
             # make hydrogens explicit, replace radicals with hydrogens, optimize hydrogen positions
             mol_pred, oberved_energy_w_h, observed_energy_wo_h = add_hydrogens_with_uff_positions(mol_pred)
+            num_atoms_filled = mol_pred.GetNumAtoms()
+            num_h_added = num_atoms_filled - num_atoms_in
         assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
         logger.warning(_warning_prefix + "failed because %s", e.args[1])
@@ -114,6 +117,7 @@ def check_energy_ratio(
     ratio_wo_h_passes = ratio_wo_h <= threshold_energy_ratio if isfinite(ratio_wo_h) else float("nan")
 
     results = {
+        "num_h_added": num_h_added,
         "mol_pred_energy_with_h": oberved_energy_w_h,
         "mol_pred_energy_without_h": observed_energy_wo_h,
         "ensemble_avg_energy": mean_energy,
