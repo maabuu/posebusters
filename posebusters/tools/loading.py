@@ -72,13 +72,13 @@ def safe_supply_mols(
         return None
     if path.suffix == ".sdf":
         pass
-    elif path.suffix in {".mol", ".mol2"}:
-        yield safe_load_mol(path, sanitize=True, **load_params)
+    elif path.suffix in {".mol", ".mol2", ".pdb"}:
+        yield safe_load_mol(path, sanitize=sanitize, **load_params)
         return None
     else:
-        raise ValueError(f"Molecule file {path} has unknown format. Only .sdf, .mol and .mol2 are supported.")
+        raise ValueError(f"Molecule file {path} has unknown format. Only .sdf, .mol, .mol2, and .pdb are supported.")
 
-    with SDMolSupplier(str(path), sanitize=False, strictParsing=True) as supplier:
+    with SDMolSupplier(str(path), sanitize=sanitize, strictParsing=True) as supplier:
         for index in range(len(supplier)) if indices is None else indices:
             mol_clean = _process_mol(supplier[index], sanitize=sanitize, **load_params)
             if mol_clean is not None:
