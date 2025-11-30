@@ -70,6 +70,7 @@ def safe_supply_mols(
     if not path.exists():
         logger.warning("File %s not found.", path)
         return None
+
     if path.suffix == ".sdf":
         pass
     elif path.suffix in {".mol", ".mol2", ".pdb"}:
@@ -78,7 +79,8 @@ def safe_supply_mols(
     else:
         raise ValueError(f"Molecule file {path} has unknown format. Only .sdf, .mol, .mol2, and .pdb are supported.")
 
-    with SDMolSupplier(str(path), sanitize=sanitize, strictParsing=True) as supplier:
+    with SDMolSupplier(str(path), sanitize=False, strictParsing=True) as supplier:
+        # do not sanitize in supplier, this is done in process_mol and yields None for failed mols
         for index in range(len(supplier)) if indices is None else indices:
             mol_clean = _process_mol(supplier[index], sanitize=sanitize, **load_params)
             if mol_clean is not None:
@@ -123,19 +125,23 @@ def _load_mol(  # noqa: PLR0913
                 mol = supplier[index]
         else:
             mol = MolFromMolFile(str(path), sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
+
     elif path.suffix == ".mol2":
         # MolFromMol2File only loads only first molecule from mol2 file
         with open(path) as file:
             if load_all and sum(ln.strip().startswith("@<TRIPOS>MOLECULE") for ln in file.readlines()) > 1:
                 logger.error("Cannot load multiple molecules from mol2 file, only loading first.")
         mol = MolFromMol2File(str(path), sanitize=False, removeHs=removeHs, cleanupSubstructures=cleanupSubstructures)
+
     elif path.suffix == ".pdb":
         mol = MolFromPDBFile(str(path), sanitize=False, removeHs=removeHs, proximityBonding=proximityBonding)
+
     elif path.suffix == ".mol":
         # .mol files only contain one molecule
         with open(path) as file:
             block = "".join(file.readlines()).strip() + "\nM  END"
             mol = MolFromMolBlock(block, sanitize=False, removeHs=removeHs, strictParsing=strictParsing)
+
     else:
         raise ValueError(f"Unknown file type {path.suffix}")
 
