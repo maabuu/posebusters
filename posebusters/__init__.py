@@ -34,4 +34,4 @@ __all__ = [
     "check_volume_overlap",
 ]
 
-__version__ = "0.6.1"
+__version__ = "0.6.2"
