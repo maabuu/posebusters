@@ -108,7 +108,19 @@ class PoseBusters:
             self.config = config
         else:
             logger.error("Configuration %s not valid. Provide 'dock', 'redock', 'mol', 'gen' or a dictionary.", config)
-        assert len(set(self.config.get("tests", {}).keys()) - set(module_dict.keys())) == 0
+
+        # Validate that all function names in modules exist in module_dict
+        if "modules" in self.config:
+            invalid_functions = []
+            for module in self.config["modules"]:
+                func_name = module.get("function")
+                if func_name and func_name not in module_dict:
+                    invalid_functions.append(func_name)
+            if invalid_functions:
+                raise ValueError(
+                    f"Invalid function names in config: {invalid_functions}. "
+                    f"Available functions: {sorted(module_dict.keys())}"
+                )
 
         self.config["top_n"] = self.config.get("top_n", top_n)
         self.config["max_workers"] = self.config.get("max_workers", max_workers)
