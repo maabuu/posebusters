@@ -312,11 +312,9 @@ class PoseBusters:
 
     def _collect_in_table(self, results_gen: Generator, full_report: bool) -> pd.DataFrame:
         """Collect generator results in a pandas dataframe."""
-
         df = pd.concat([self._make_table({k: v}, self.config, full_report=full_report) for k, v in results_gen])
         df.index.names = ["file", "molecule", "position"]
-        df.columns = [c.lower().replace(" ", "_") for c in df.columns]
-
+        df.columns = pd.Index(c.lower().replace(" ", "_") for c in df.columns)
         return df
 
     @staticmethod
@@ -337,6 +335,6 @@ class PoseBusters:
 
         df[missing_columns] = pd.NA
         df = df[columns]
-        df.columns = [names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns]  # type: ignore[call-overload]
+        df.columns = pd.Index(names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns)  # type: ignore[call-overload]
 
         return df
