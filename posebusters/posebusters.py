@@ -4,16 +4,21 @@ from __future__ import annotations
 
 import inspect
 import logging
+import warnings
 from collections.abc import Callable, Generator, Iterable
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
+from io import StringIO
 from math import ceil
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from rdkit import logger as rdkit_logger
 from rdkit.Chem.rdchem import Mol
+from rdkit.rdBase import DisableLog, LogToPythonLogger
+from rich.progress import track
 from yaml import safe_load
 
 from .modules.distance_geometry import check_geometry
@@ -36,6 +41,7 @@ from .tools.loading import get_num_mols, safe_load_mol, safe_supply_mols
 
 logger = logging.getLogger(__name__)
 
+DisableLog("rdApp.*")
 
 module_dict: dict[str, Callable] = {
     "loading": check_loading,
@@ -167,6 +173,7 @@ class PoseBusters:
         """
         self.file_paths = mol_table
         generator = self._run()
+        generator = (result for result in track(generator, description="Busting...", total=len(mol_table)))
         results = self._collect_in_table(generator, full_report=full_report)
         return results
 
@@ -193,7 +200,7 @@ class PoseBusters:
     def _run_parallel_over_files(
         self, timeout: int | None = None, max_workers: int | None = None
     ) -> Generator[ResultTuple]:
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        with ProcessPoolExecutor(max_workers=max_workers, initializer=_initializer) as executor:
             futures = [executor.submit(self._run_and_combine, paths) for _, paths in self.file_paths.iterrows()]
             for future in as_completed(futures, timeout=None):
                 try:
@@ -210,7 +217,7 @@ class PoseBusters:
     def _run_parallel_over_poses(
         self, timeout: int | None = None, max_workers: int | None = None, chunk_size: int = 100
     ) -> Generator[ResultTuple]:
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        with ProcessPoolExecutor(max_workers=max_workers, initializer=_initializer) as executor:
             futures = []
             for _, paths in self.file_paths.iterrows():
                 num_mols_pred = get_num_mols(paths["mol_pred"])
@@ -338,3 +345,24 @@ class PoseBusters:
         df.columns = pd.Index(names_lookup.get(c, c[-1] + suffix_lookup.get(c[0], "")) for c in df.columns)  # type: ignore[call-overload]
 
         return df
+
+
+def _initializer():
+    """Initializer workers."""
+    LogToPythonLogger()
+    sio = StringIO()
+    handler = logging.StreamHandler(sio)
+    handler.setFormatter(logging.Formatter("%(name)s - %(levelname)s - %(message)s"))
+
+    rdkit_logger.handlers.clear()
+    rdkit_logger.addHandler(handler)
+    rdkit_logger.setLevel(logging.ERROR)
+
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.ERROR)
+
+    DisableLog("rdApp.*")
+
+    logging.getLogger().setLevel(logging.ERROR)
+    logging.captureWarnings(True)
+    warnings.filterwarnings("ignore")
