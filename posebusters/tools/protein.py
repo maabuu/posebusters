@@ -71,7 +71,8 @@ def _keep_atom(  # noqa: PLR0913, PLR0911
     if ignore_h and symbol == "H":
         return False
 
-    if ignore_inorg_cof and symbol in _inorganic_cofactor_elements:
+    is_inorganic_elem = symbol in _inorganic_cofactor_elements
+    if ignore_inorg_cof and is_inorganic_elem:
         return False
 
     # if loaded from PDB file, we can use the residue names and the hetero flag
@@ -86,10 +87,15 @@ def _keep_atom(  # noqa: PLR0913, PLR0911
         return False
 
     residue_name = info.GetResidueName()
-    if ignore_water and residue_name in _water_ccd_codes:
+    is_water = residue_name in _water_ccd_codes
+    if ignore_water and is_water:
         return False
 
-    if ignore_inorg_cof and residue_name in _inorganic_cofactor_ccd_codes:
+    is_inorganic_ccd = residue_name in _inorganic_cofactor_ccd_codes
+    if ignore_inorg_cof and is_inorganic_ccd:
+        return False
+
+    if ignore_org_cof and is_hetero and (not is_water) and (not is_inorganic_ccd) and (not is_inorganic_elem):
         return False
 
     return True

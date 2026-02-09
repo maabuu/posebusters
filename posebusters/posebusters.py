@@ -247,10 +247,10 @@ class PoseBusters:
         """
 
         mol_args = {}
-        if "mol_cond" in paths and paths["mol_cond"] is not None:
+        if "mol_cond" in paths and paths["mol_cond"] is not None and pd.notna(paths["mol_cond"]):
             mol_cond_load_params = self.config.get("loading", {}).get("mol_cond", {})
             mol_args["mol_cond"] = safe_load_mol(path=paths["mol_cond"], **mol_cond_load_params)
-        if "mol_true" in paths and paths["mol_true"] is not None:
+        if "mol_true" in paths and paths["mol_true"] is not None and pd.notna(paths["mol_true"]):
             mol_true_load_params = self.config.get("loading", {}).get("mol_true", {})
             mol_args["mol_true"] = safe_load_mol(path=paths["mol_true"], **mol_true_load_params)
 
