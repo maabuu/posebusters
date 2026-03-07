@@ -25,7 +25,6 @@ from ..tools.molecules import add_hydrogens_with_uff_positions
 logger = logging.getLogger(__name__)
 
 
-_warning_prefix = "WARNING: Energy ratio module "
 _empty_results = {
     "results": {
         "num_h_added": float("nan"),
@@ -73,7 +72,7 @@ def check_energy_ratio(
         assert mol_pred.GetNumConformers() > 0, "Molecule does not have a conformer."
         assert not SanitizeMol(mol_pred, catchErrors=True), "Molecule does not sanitize."
     except Exception as e:
-        logger.warning(_warning_prefix + "failed because %s", e)
+        logger.warning("Energy ratio module failed because %s", e)
         return _empty_results
 
     try:
@@ -85,27 +84,27 @@ def check_energy_ratio(
             num_h_added = num_atoms_filled - num_atoms_in
         assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
-        logger.warning(_warning_prefix + "failed because %s", e.args[1])
+        logger.warning("Energy ratio module failed because %s", e)
         return _empty_results
 
     try:
         inchi = get_inchi(mol_pred, inchi_strict=inchi_strict)
     except InchiReadWriteError as e:
-        logger.warning(_warning_prefix + "failed because InChI creation failed for molecule: %s", e.args[1])
+        logger.warning("Energy ratio module failed because InChI creation failed for molecule: %s", e)
         return _empty_results
     except Exception as e:
-        logger.warning(_warning_prefix + "failed because InChI creation failed for molecule: %s", e)
+        logger.warning("Energy ratio module failed because InChI creation failed for molecule: %s", e)
         return _empty_results
 
     try:
         energies = get_energies(inchi, ensemble_number_conformations, num_threads)
         mean_energy = sum(energies) / len(energies)
     except Exception as e:
-        logger.warning(_warning_prefix + "failed to calculate ensemble conformation energy for %s: %s", inchi, e)
+        logger.warning("Energy ratio module failed to calculate ensemble conformation energy for %s: %s", inchi, e)
         mean_energy = float("nan")
 
     if mean_energy == 0:
-        logger.warning(_warning_prefix + "calculated average energy of molecule 0 for %s", inchi)
+        logger.warning("Energy ratio module calculated an average energy of 0 for %s", inchi)
         mean_energy = epsilon  # clipping
 
     energy_ratio = observed_energy / mean_energy
