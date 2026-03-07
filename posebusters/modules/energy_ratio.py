@@ -85,7 +85,7 @@ def check_energy_ratio(
             num_h_added = num_atoms_filled - num_atoms_in
         assert UFFHasAllMoleculeParams(mol_pred), "UFF parameters missing for molecule."
     except Exception as e:
-        logger.warning(_warning_prefix + "failed because %s", e.args[1])
+        logger.warning(_warning_prefix + "failed because %s", e)
         return _empty_results
 
     try:
