@@ -76,3 +76,9 @@ def test_check_energy_ratio_disconnected_atoms(mol_disconnnected_atoms):
     assert math.isfinite(out["results"]["ensemble_avg_energy"])
     assert math.isfinite(out["results"]["energy_ratio"])
     assert out["results"]["energy_ratio_passes"] is True
+
+
+def test_check_energy_ratio_iron_ion(mol_fe2plus):
+    # test fails because UFF does not have parameters for Fe 2+ ion
+    out = check_energy_ratio(mol_fe2plus)
+    assert math.isnan(out["results"]["energy_ratio_passes"])

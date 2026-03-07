@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import pytest
-from rdkit import Chem
+from rdkit.Chem.rdchem import Conformer, Mol
 from rdkit.Chem.rdDistGeom import EmbedMolecule, srETKDGv3
-from rdkit.Chem.rdmolfiles import MolFromMol2File, MolFromMolFile, MolFromPDBFile, SDMolSupplier
+from rdkit.Chem.rdmolfiles import MolFromMol2File, MolFromMolFile, MolFromPDBFile, MolFromSmiles, SDMolSupplier
+from rdkit.Chem.rdmolops import AddHs
 
 
 @pytest.fixture
@@ -259,8 +260,8 @@ def mol_3wrb_gde_pred():
     return MolFromMolFile("tests/conftest/mol_3WRB_1_GDE_0_ligand_pred.sdf")
 
 
-def embed_mol(smi: str) -> Chem.Mol:
-    hmol = Chem.AddHs(Chem.MolFromSmiles(smi))
+def embed_mol(smi: str) -> Mol:
+    hmol = AddHs(MolFromSmiles(smi))
     ps = srETKDGv3()
     ps.randomSeed = 42
     _ = EmbedMolecule(hmol, params=ps)
@@ -306,3 +307,12 @@ def mol_pip_wrong():
 @pytest.fixture()
 def mol_issue_67():
     return MolFromMolFile("tests/conftest/mol_issue_67.sdf")
+
+
+@pytest.fixture
+def mol_fe2plus():
+    mol = MolFromSmiles("[Fe+2]")
+    conformer = Conformer(1)
+    conformer.SetAtomPosition(0, [0.0, 0.0, 0.0])
+    mol.AddConformer(conformer)
+    return mol
