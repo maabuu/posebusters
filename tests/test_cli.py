@@ -34,6 +34,9 @@ def test_parse_args() -> None:
     assert not args.full_report
     assert args.outfmt == "long"
 
+    args = _parse_args([mol_pred_1ia1, "--outfmt", "diagnostic"])
+    assert args.outfmt == "diagnostic"
+
 
 def test_bust_mols() -> None:
     bust([Path(mol_pred_1ia1)], Path(mol_true_1ia1), Path(mol_cond_1ia1))
