@@ -36,6 +36,15 @@ class Diagnostic:
     metrics: dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class DiagnosticContext:
+    """Diagnostics plus the molecular context needed for visual reports."""
+
+    diagnostics: tuple[Diagnostic, ...]
+    mol_pred: Mol | None
+    mol_cond: Mol | None
+
+
 def diagnose_module(
     module: dict[str, Any],
     module_output: dict[str, Any],

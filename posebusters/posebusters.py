@@ -16,7 +16,7 @@ import pandas as pd
 from rdkit.Chem.rdchem import Mol
 from yaml import safe_load
 
-from .diagnostics import Diagnostic, diagnose_module
+from .diagnostics import Diagnostic, DiagnosticContext, diagnose_module
 from .modules.distance_geometry import check_geometry
 from .modules.energy_ratio import check_energy_ratio
 from .modules.flatness import check_flatness
@@ -59,7 +59,7 @@ molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 ResultKey = tuple[str, str, int]
 ResultList = list[tuple[str, str, Any]]
 ResultTuple = tuple[ResultKey, ResultList]
-DiagnosticResultTuple = tuple[ResultKey, ResultList, list[Diagnostic]]
+DiagnosticResultTuple = tuple[ResultKey, ResultList, DiagnosticContext]
 ResultDict = dict[ResultKey, ResultList]
 
 
@@ -272,7 +272,12 @@ class PoseBusters:
             key: ResultKey = (str(paths["mol_pred"]), self._get_name(mol_pred), i)
             if diagnose:
                 results, diagnostics = self._run_one_pose_with_diagnostics(mol_args)
-                yield key, results, diagnostics
+                context = DiagnosticContext(
+                    diagnostics=tuple(diagnostics),
+                    mol_pred=mol_pred,
+                    mol_cond=mol_args.get("mol_cond"),
+                )
+                yield key, results, context
             else:
                 results = self._run_one_pose(mol_args)
                 yield key, results
