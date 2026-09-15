@@ -280,7 +280,7 @@ def mols_flat_etkdgv3():
 @pytest.fixture()
 def mols_nonflat_etkdgv3():
     # just nonflat
-    smis_flat = ["C1CC(C)NC1", "N1C=CCC=C1", "C1C=CCCO1"]
+    smis_flat = ["C1CC(C)NC1", "C1CCCCC1", "C1C=CCCO1"]
     return [embed_mol(smi) for smi in smis_flat]
 
 
