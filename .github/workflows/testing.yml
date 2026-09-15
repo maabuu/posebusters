@@ -17,13 +17,13 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v10.1.0
 
       - name: Setup Python ${{ matrix.python }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -37,7 +37,7 @@ jobs:
           uv run pytest --doctest-modules --junitxml=junit/test-results-${{ matrix.python }}.xml --cov --cov-report=xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         if: matrix.os == 'ubuntu-latest' && matrix.python == '3.11'
 
       - name: Upload pytest test results
@@ -49,4 +49,4 @@ jobs:
 
       - name: Summary
         if: always()
-        run: echo "Testing completed for Python ${{ matrix.python-version }} on Platform ${{ matrix.os }}"
+        run: echo "Testing completed for Python ${{ matrix.python }} on Platform ${{ matrix.os }}"
