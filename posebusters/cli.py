@@ -15,6 +15,7 @@ from yaml import safe_load
 
 from . import __version__
 from .diagnostics import create_diagnostic_output
+from .html_report import HtmlPoseResult, create_html_report
 from .posebusters import DiagnosticResultTuple, PoseBusters, ResultTuple
 from .tools.formatting import create_long_output, create_short_output
 
@@ -54,7 +55,7 @@ def bust(  # noqa: PLR0913
         mode = _select_mode(config, file_paths.columns.tolist())
         posebusters = PoseBusters(mode, top_n=top_n, max_workers=max_workers, chunk_size=chunk_size)
         posebusters.file_paths = file_paths
-        posebusters_results = posebusters._run(diagnose=outfmt == "diagnostic")
+        posebusters_results = posebusters._run(diagnose=outfmt in {"diagnostic", "html"})
     else:
         # run on single input
         d = {k for k, v in dict(mol_pred=mol_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
@@ -62,23 +63,44 @@ def bust(  # noqa: PLR0913
         posebusters = PoseBusters(mode, top_n=top_n, max_workers=max_workers, chunk_size=chunk_size)
         cols = ["mol_pred", "mol_true", "mol_cond"]
         posebusters.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred], columns=cols)
-        posebusters_results = posebusters._run(diagnose=outfmt == "diagnostic")
+        posebusters_results = posebusters._run(diagnose=outfmt in {"diagnostic", "html"})
+
+    if outfmt == "html" and output is sys.stdout:
+        raise ValueError("HTML output requires --output FILE.")
 
     if isinstance(output, Path):
         output = open(Path(output), "w", encoding="utf-8")
 
-    diagnostic_output = outfmt == "diagnostic"
+    diagnostic_output = outfmt in {"diagnostic", "html"}
+    html_results: list[HtmlPoseResult] = []
     for i, result in enumerate(posebusters_results):
         if diagnostic_output:
-            k, v, diagnostics = cast(DiagnosticResultTuple, result)
+            k, v, context = cast(DiagnosticResultTuple, result)
         else:
             k, v = cast(ResultTuple, result)
-            diagnostics = []
+            context = None
 
         results = posebusters._make_table({k: v}, posebusters.config, full_report=full_report)
+        if outfmt == "html":
+            assert context is not None
+            html_results.append(
+                HtmlPoseResult(
+                    key=k,
+                    results=results,
+                    diagnostics=context.diagnostics,
+                    mol_pred=context.mol_pred,
+                    mol_cond=context.mol_cond,
+                )
+            )
+            continue
+
         output.write(_format_results(results, outfmt, no_header, i))
-        if diagnostic_output:
-            output.write(create_diagnostic_output(k, diagnostics))
+        if outfmt == "diagnostic":
+            assert context is not None
+            output.write(create_diagnostic_output(k, list(context.diagnostics)))
+
+    if outfmt == "html":
+        output.write(create_html_report(html_results))
 
 
 def _parse_args(args: list[str]) -> argparse.Namespace:
@@ -101,7 +123,7 @@ def _parse_args(args: list[str]) -> argparse.Namespace:
 
     # output options
     out_group.add_argument(
-        "--outfmt", choices=["short", "long", "csv", "diagnostic"], default="short", help="output format"
+        "--outfmt", choices=["short", "long", "csv", "diagnostic", "html"], default="short", help="output format"
     )
     out_group.add_argument("--output", type=Path, default=sys.stdout, help="output file (default: stdout)")
     # out_group.add_argument("--snake_case", action="store_false", help="use snake case for output columns")
@@ -134,8 +156,11 @@ def _parse_args(args: list[str]) -> argparse.Namespace:
         parser.print_help()
         parser.exit(status=1, message="\nProvide either MOL_PRED or TABLE as input.\n")
 
+    if namespace.outfmt == "html" and namespace.output is sys.stdout:
+        parser.exit(status=2, message="\n--outfmt html requires --output FILE.\n")
+
     # full report only works with long and csv output
-    if namespace.full_report and namespace.outfmt in {"short", "diagnostic"}:
+    if namespace.full_report and namespace.outfmt in {"short", "diagnostic", "html"}:
         logger.warning("Option --full-report ignored. Please use --outfmt long or csv for --full-report.")
         namespace.full_report = False
     return namespace

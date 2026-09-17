@@ -232,10 +232,10 @@ def test_diagnose_mode_preserves_standard_results(mol_pip_wrong):
 
     assert len(normal) == len(diagnosed) == 1
     normal_key, normal_results = cast(ResultTuple, normal[0])
-    diagnosed_key, diagnosed_results, diagnostics = cast(DiagnosticResultTuple, diagnosed[0])
+    diagnosed_key, diagnosed_results, context = cast(DiagnosticResultTuple, diagnosed[0])
     assert diagnosed_key == normal_key
     assert diagnosed_results == normal_results
-    assert diagnostics
+    assert context.diagnostics
 
 
 def test_diagnose_reports_failed_check_without_details():
