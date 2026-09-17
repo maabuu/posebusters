@@ -7,14 +7,15 @@ import logging
 import sys
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, TextIO
+from typing import Any, TextIO, cast
 
 import pandas as pd
 from rdkit.Chem.rdchem import Mol
 from yaml import safe_load
 
 from . import __version__
-from .posebusters import PoseBusters
+from .diagnostics import create_diagnostic_output
+from .posebusters import DiagnosticResultTuple, PoseBusters, ResultTuple
 from .tools.formatting import create_long_output, create_short_output
 
 logger = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ def bust(  # noqa: PLR0913
         mode = _select_mode(config, file_paths.columns.tolist())
         posebusters = PoseBusters(mode, top_n=top_n, max_workers=max_workers, chunk_size=chunk_size)
         posebusters.file_paths = file_paths
-        posebusters_results = posebusters._run()
+        posebusters_results = posebusters._run(diagnose=outfmt == "diagnostic")
     else:
         # run on single input
         d = {k for k, v in dict(mol_pred=mol_pred, mol_true=mol_true, mol_cond=mol_cond).items() if v}
@@ -61,14 +62,23 @@ def bust(  # noqa: PLR0913
         posebusters = PoseBusters(mode, top_n=top_n, max_workers=max_workers, chunk_size=chunk_size)
         cols = ["mol_pred", "mol_true", "mol_cond"]
         posebusters.file_paths = pd.DataFrame([[mol_pred, mol_true, mol_cond] for mol_pred in mol_pred], columns=cols)
-        posebusters_results = posebusters._run()
+        posebusters_results = posebusters._run(diagnose=outfmt == "diagnostic")
 
     if isinstance(output, Path):
         output = open(Path(output), "w", encoding="utf-8")
 
-    for i, (k, v) in enumerate(posebusters_results):
+    diagnostic_output = outfmt == "diagnostic"
+    for i, result in enumerate(posebusters_results):
+        if diagnostic_output:
+            k, v, diagnostics = cast(DiagnosticResultTuple, result)
+        else:
+            k, v = cast(ResultTuple, result)
+            diagnostics = []
+
         results = posebusters._make_table({k: v}, posebusters.config, full_report=full_report)
         output.write(_format_results(results, outfmt, no_header, i))
+        if diagnostic_output:
+            output.write(create_diagnostic_output(k, diagnostics))
 
 
 def _parse_args(args: list[str]) -> argparse.Namespace:
@@ -90,7 +100,9 @@ def _parse_args(args: list[str]) -> argparse.Namespace:
     in_group.add_argument("-t", dest="table", type=_path, help=help)
 
     # output options
-    out_group.add_argument("--outfmt", choices=["short", "long", "csv"], default="short", help="output format")
+    out_group.add_argument(
+        "--outfmt", choices=["short", "long", "csv", "diagnostic"], default="short", help="output format"
+    )
     out_group.add_argument("--output", type=Path, default=sys.stdout, help="output file (default: stdout)")
     # out_group.add_argument("--snake_case", action="store_false", help="use snake case for output columns")
     out_group.add_argument("--full-report", action="store_true", help="print details for each test")
@@ -123,7 +135,7 @@ def _parse_args(args: list[str]) -> argparse.Namespace:
         parser.exit(status=1, message="\nProvide either MOL_PRED or TABLE as input.\n")
 
     # full report only works with long and csv output
-    if namespace.full_report and namespace.outfmt == "short":
+    if namespace.full_report and namespace.outfmt in {"short", "diagnostic"}:
         logger.warning("Option --full-report ignored. Please use --outfmt long or csv for --full-report.")
         namespace.full_report = False
     return namespace
@@ -139,7 +151,7 @@ def _format_results(df: pd.DataFrame, outfmt: str = "short", no_header: bool = F
         df.columns = [c.lower().replace(" ", "_") for c in df.columns]
         return df.to_csv(index=True, header=header)
 
-    if outfmt == "short":
+    if outfmt in {"short", "diagnostic"}:
         return create_short_output(df)
 
     raise ValueError(f"Unknown output format {outfmt}")

@@ -10,12 +10,13 @@ from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 from math import ceil
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pandas as pd
 from rdkit.Chem.rdchem import Mol
 from yaml import safe_load
 
+from .diagnostics import Diagnostic, diagnose_module
 from .modules.distance_geometry import check_geometry
 from .modules.energy_ratio import check_energy_ratio
 from .modules.flatness import check_flatness
@@ -58,6 +59,7 @@ molecule_args = {"mol_cond", "mol_true", "mol_pred"}
 ResultKey = tuple[str, str, int]
 ResultList = list[tuple[str, str, Any]]
 ResultTuple = tuple[ResultKey, ResultList]
+DiagnosticResultTuple = tuple[ResultKey, ResultList, list[Diagnostic]]
 ResultDict = dict[ResultKey, ResultList]
 
 
@@ -170,13 +172,18 @@ class PoseBusters:
         results = self._collect_in_table(generator, full_report=full_report)
         return results
 
-    def _run(self) -> Generator[ResultTuple]:
+    def _run(self, diagnose: bool = False) -> Generator[ResultTuple | DiagnosticResultTuple]:
         """Run all tests on molecules provided in file paths.
 
         Yields:
             Generator of result dictionaries.
         """
         self._initialize_modules()
+        # Run diagnostics sequentially to preserve stable pose indices for multi-pose SDF files.
+        if diagnose:
+            yield from self._run_single_thread(diagnose=True)
+            return
+
         max_workers = self.config.get("max_workers", None)
         chunk_size = self.config.get("chunk_size", 100)
         if max_workers is not None and max_workers <= 0:
@@ -186,9 +193,9 @@ class PoseBusters:
         else:
             yield from self._run_parallel_over_poses(max_workers=max_workers, chunk_size=chunk_size)
 
-    def _run_single_thread(self) -> Generator[ResultTuple]:
+    def _run_single_thread(self, diagnose: bool = False) -> Generator[ResultTuple | DiagnosticResultTuple]:
         for _, paths in self.file_paths.iterrows():
-            yield from self._run_multiple_poses(paths)
+            yield from self._run_multiple_poses(paths, diagnose=diagnose)
 
     def _run_parallel_over_files(
         self, timeout: int | None = None, max_workers: int | None = None
@@ -233,9 +240,11 @@ class PoseBusters:
 
     def _run_and_combine(self, paths: pd.Series, indices: Iterable[int] | None = None) -> list[ResultTuple]:
         """Run and collect all tests for all poses in the prediction file."""
-        return list(self._run_multiple_poses(paths, indices=indices))
+        return cast(list[ResultTuple], list(self._run_multiple_poses(paths, indices=indices)))
 
-    def _run_multiple_poses(self, paths: pd.Series, indices: Iterable[int] | None = None) -> Generator[ResultTuple]:
+    def _run_multiple_poses(
+        self, paths: pd.Series, indices: Iterable[int] | None = None, diagnose: bool = False
+    ) -> Generator[ResultTuple | DiagnosticResultTuple]:
         """Run all tests on indexed poses in the prediction file.
 
         Args:
@@ -261,14 +270,29 @@ class PoseBusters:
             mol_args["mol_pred"] = mol_pred
 
             key: ResultKey = (str(paths["mol_pred"]), self._get_name(mol_pred), i)
-            results: ResultList = self._run_one_pose(mol_args)
-
-            yield key, results
+            if diagnose:
+                results, diagnostics = self._run_one_pose_with_diagnostics(mol_args)
+                yield key, results, diagnostics
+            else:
+                results = self._run_one_pose(mol_args)
+                yield key, results
 
     def _run_one_pose(self, molecules: dict[str, Any]) -> ResultList:
         """Run all tests on a single pose."""
+        results, _ = self._execute_one_pose(molecules, diagnose=False)
+        return results
+
+    def _run_one_pose_with_diagnostics(self, molecules: dict[str, Any]) -> tuple[ResultList, list[Diagnostic]]:
+        """Run all tests on a single pose and retain supported failure diagnostics."""
+        return self._execute_one_pose(molecules, diagnose=True)
+
+    def _execute_one_pose(self, molecules: dict[str, Any], diagnose: bool) -> tuple[ResultList, list[Diagnostic]]:
+        """Run all tests on a single pose and optionally collect diagnostics."""
         results = []
-        for name, fname, func, args in zip(self.module_name, self.fname, self.module_func, self.module_args):
+        diagnostics: list[Diagnostic] = []
+        for module, name, fname, func, args in zip(
+            self.config["modules"], self.module_name, self.fname, self.module_func, self.module_args
+        ):
             # pick needed arguments for module
             args_needed = {k: v for k, v in molecules.items() if k in args}
 
@@ -284,9 +308,10 @@ class PoseBusters:
 
             # save to object
             results.extend([(name, k, v) for k, v in module_output["results"].items()])
-            # self.results[results_key]["details"].append(module_output["details"])
+            if diagnose:
+                diagnostics.extend(diagnose_module(module, module_output, molecules))
 
-        return results
+        return results, diagnostics
 
     def _initialize_modules(self) -> None:
         self.module_name = []
